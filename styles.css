@@ -1,0 +1,973 @@
+/**
+ * ZenWeb Production CSS Engine
+ * Neurodivergent Cognitive Design, Sensory Protection & Specificity Overrides
+ */
+
+/* ==========================================================================
+   1. ROOT THEMES & SPECIFICITY OVERRIDES
+   ========================================================================== */
+
+/* Atkinson Hyperlegible & OpenDyslexic web font imports */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+/* Default Theme: Calm Pastel / Lavender */
+:root[data-zenweb-theme="pastel"] {
+  --ff-bg: #f8f5fc !important;
+  --ff-surface: #efe8f8 !important;
+  --ff-surface-elevated: #ffffff !important;
+  --ff-text: #281e35 !important;
+  --ff-text-muted: #5e526c !important;
+  --ff-accent: #7c4dff !important;
+  --ff-accent-subtle: #ebdffc !important;
+  --ff-border: #dcd0ea !important;
+  --ff-highlight: #fffae0 !important;
+  --ff-shadow: rgba(45, 30, 65, 0.08) !important;
+  --ff-font-stack: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Theme 2: Deep Focus Contrast */
+:root[data-zenweb-theme="deep-contrast"] {
+  --ff-bg: #0f141c !important;
+  --ff-surface: #18202d !important;
+  --ff-surface-elevated: #1e2738 !important;
+  --ff-text: #eee8dc !important;
+  --ff-text-muted: #a6b0c2 !important;
+  --ff-accent: #64b5f6 !important;
+  --ff-accent-subtle: #1c3247 !important;
+  --ff-border: #2c394f !important;
+  --ff-highlight: #28374d !important;
+  --ff-shadow: rgba(0, 0, 0, 0.4) !important;
+  --ff-font-stack: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Theme 3: Monochrome Sepia */
+:root[data-zenweb-theme="sepia"] {
+  --ff-bg: #f4ecdc !important;
+  --ff-surface: #e9dec9 !important;
+  --ff-surface-elevated: #fbf7ee !important;
+  --ff-text: #3c3022 !important;
+  --ff-text-muted: #72624d !important;
+  --ff-accent: #b26a00 !important;
+  --ff-accent-subtle: #ecd9ba !important;
+  --ff-border: #d7c9ad !important;
+  --ff-highlight: #f8e8c8 !important;
+  --ff-shadow: rgba(60, 48, 34, 0.08) !important;
+  --ff-font-stack: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Specific Font Stack Variations */
+:root[data-zenweb-font="opendyslexic"] {
+  --ff-font-stack: 'OpenDyslexic', 'Atkinson Hyperlegible', sans-serif !important;
+}
+:root[data-zenweb-font="system"] {
+  --ff-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+:root[data-zenweb-font="serif"] {
+  --ff-font-stack: Georgia, "Times New Roman", Cambria, serif !important;
+}
+
+/* High-Specificity DOM Injection when theme is active */
+html[data-zenweb-theme],
+html[data-zenweb-theme] body {
+  background-color: var(--ff-bg) !important;
+  color: var(--ff-text) !important;
+  font-family: var(--ff-font-stack) !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+/* Universal text container normalization */
+html[data-zenweb-theme] p,
+html[data-zenweb-theme] li,
+html[data-zenweb-theme] dd,
+html[data-zenweb-theme] dt,
+html[data-zenweb-theme] article,
+html[data-zenweb-theme] blockquote {
+  font-family: var(--ff-font-stack) !important;
+  line-height: var(--ff-line-height, 1.75) !important;
+  letter-spacing: var(--ff-letter-spacing, 0.02em) !important;
+  color: var(--ff-text) !important;
+}
+
+/* Optimal line length cap (ADHD tracking support) */
+html[data-zenweb-max-width="true"] article,
+html[data-zenweb-max-width="true"] main p,
+html[data-zenweb-max-width="true"] .article-content p,
+html[data-zenweb-max-width="true"] .entry-content p,
+html[data-zenweb-max-width="true"] [role="main"] p {
+  max-width: 75ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Surface backgrounds for cards and side panels */
+html[data-zenweb-theme] nav,
+html[data-zenweb-theme] header,
+html[data-zenweb-theme] section,
+html[data-zenweb-theme] main,
+html[data-zenweb-theme] table {
+  background-color: transparent !important;
+  color: var(--ff-text) !important;
+}
+
+html[data-zenweb-theme] a {
+  color: var(--ff-accent) !important;
+  text-decoration-thickness: 1.5px !important;
+  text-underline-offset: 3px !important;
+}
+
+html[data-zenweb-theme] h1,
+html[data-zenweb-theme] h2,
+html[data-zenweb-theme] h3,
+html[data-zenweb-theme] h4,
+html[data-zenweb-theme] h5,
+html[data-zenweb-theme] h6 {
+  color: var(--ff-text) !important;
+  font-family: var(--ff-font-stack) !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.35 !important;
+}
+
+/* Strip aggressive borders & harsh stark lines */
+html[data-zenweb-theme] hr {
+  border: 0 !important;
+  border-top: 1px solid var(--ff-border) !important;
+  margin: 2rem 0 !important;
+}
+
+/* ==========================================================================
+   2. DISTRACTION SHIELD ENGINE
+   ========================================================================== */
+
+html[data-zenweb-shield="true"] .ad,
+html[data-zenweb-shield="true"] .ads,
+html[data-zenweb-shield="true"] .advertisement,
+html[data-zenweb-shield="true"] .advert,
+html[data-zenweb-shield="true"] [id*="google_ads"],
+html[data-zenweb-shield="true"] [class*="sponsored"],
+html[data-zenweb-shield="true"] [class*="promoted"],
+html[data-zenweb-shield="true"] [class*="taboola"],
+html[data-zenweb-shield="true"] [class*="outbrain"],
+html[data-zenweb-shield="true"] [class*="newsletter-modal"],
+html[data-zenweb-shield="true"] [class*="subscribe-popup"],
+html[data-zenweb-shield="true"] [class*="cookie-banner"],
+html[data-zenweb-shield="true"] [class*="consent-banner"],
+html[data-zenweb-shield="true"] [class*="sticky-banner"],
+html[data-zenweb-shield="true"] aside:not([data-zenweb-keep]) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   3. FLASHBANG & ANIMATION SUPPRESSOR
+   ========================================================================== */
+
+/* Instant smooth anti-flashbang veil during initial page paint */
+#zenweb-flashbang-veil {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483640 !important;
+  pointer-events: none !important;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background-color: var(--ff-bg, #f8f5fc) !important;
+  opacity: 1;
+}
+
+#zenweb-flashbang-veil.ff-fade-out {
+  opacity: 0 !important;
+}
+
+/* Freeze jarring animations when suppressor is on */
+html[data-zenweb-suppress-anim="true"] *,
+html[data-zenweb-suppress-anim="true"] *::before,
+html[data-zenweb-suppress-anim="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Protect ZenWeb's own UI overlays from suppressor */
+html[data-zenweb-suppress-anim="true"] #zenweb-root,
+html[data-zenweb-suppress-anim="true"] #zenweb-root * {
+  animation-duration: initial !important;
+  transition-duration: initial !important;
+}
+
+/* Pause jarring auto-playing videos */
+html[data-zenweb-suppress-anim="true"] video[autoplay]:not([data-zenweb-allowed]) {
+  filter: grayscale(80%) opacity(0.3) !important;
+}
+
+/* ==========================================================================
+   4. READING RULER / LINE FOCUS OVERLAY (WAAPI / GPU ACCELERATED)
+   ========================================================================== */
+
+#zenweb-ruler-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483630 !important;
+  pointer-events: none !important;
+  display: block !important;
+  contain: strict;
+  will-change: transform, opacity;
+}
+
+.ff-ruler-curtain-top,
+.ff-ruler-curtain-bottom {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: rgba(15, 20, 28, var(--ff-ruler-dim, 0.65)) !important;
+  transition: background-color 0.2s ease;
+  pointer-events: none !important;
+}
+
+.ff-ruler-curtain-top {
+  top: 0 !important;
+  height: 0 !important;
+}
+
+.ff-ruler-curtain-bottom {
+  bottom: 0 !important;
+  height: 0 !important;
+}
+
+.ff-ruler-aperture {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  box-shadow: 0 0 0 1.5px var(--ff-accent, #7c4dff), 0 0 24px rgba(124, 77, 255, 0.25) !important;
+  background: transparent !important;
+  border-radius: 4px;
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
+   5. BIONIC READING ENGINE
+   ========================================================================== */
+
+b.ff-bionic-lead {
+  font-weight: 750 !important;
+  color: var(--ff-text, inherit) !important;
+  opacity: 1 !important;
+}
+
+span.ff-bionic-tail {
+  opacity: 0.88 !important;
+}
+
+/* ==========================================================================
+   6. SMART CHUNKING (DIGESTIBLE 2-3 SENTENCE SUB-BLOCKS)
+   ========================================================================== */
+
+.ff-chunk-block {
+  display: block !important;
+  margin-bottom: 0.95rem !important;
+}
+
+.ff-chunk-divider {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0.75rem auto !important;
+  width: 48px !important;
+  height: 2px !important;
+  border-radius: 2px !important;
+  background-color: var(--ff-border, #dcd0ea) !important;
+  opacity: 0.6 !important;
+}
+
+/* ==========================================================================
+   7. LAST-READ ANCHOR INDICATOR
+   ========================================================================== */
+
+.ff-last-read-anchor {
+  position: relative !important;
+}
+
+.ff-last-read-anchor::before {
+  content: "📌 Resumed Reading Here" !important;
+  position: absolute !important;
+  left: -12px !important;
+  top: -24px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 3px 8px !important;
+  border-radius: 12px !important;
+  background: var(--ff-accent, #7c4dff) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(124, 77, 255, 0.35) !important;
+  animation: ff-pulse 2s infinite ease-in-out !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+@keyframes ff-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+/* ==========================================================================
+   8. AI EXECUTIVE SUMMARY CARD
+   ========================================================================== */
+
+.ff-ai-summary-card {
+  all: initial;
+  display: block !important;
+  box-sizing: border-box !important;
+  font-family: var(--ff-font-stack, 'Atkinson Hyperlegible', sans-serif) !important;
+  background: var(--ff-surface-elevated, #ffffff) !important;
+  border: 1.5px solid var(--ff-border, #dcd0ea) !important;
+  border-left: 6px solid var(--ff-accent, #7c4dff) !important;
+  border-radius: 12px !important;
+  padding: 20px 24px !important;
+  margin: 24px auto 32px auto !important;
+  max-width: 78ch !important;
+  box-shadow: 0 8px 24px var(--ff-shadow, rgba(45, 30, 65, 0.08)) !important;
+  color: var(--ff-text, #281e35) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+
+.ff-ai-summary-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 28px var(--ff-shadow, rgba(45, 30, 65, 0.12)) !important;
+}
+
+.ff-ai-summary-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 14px !important;
+  border-bottom: 1px solid var(--ff-border, #dcd0ea) !important;
+  padding-bottom: 10px !important;
+}
+
+.ff-ai-summary-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--ff-accent, #7c4dff) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.ff-ai-summary-badge {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 2px 8px !important;
+  border-radius: 12px !important;
+  background: var(--ff-accent-subtle, #ebdffc) !important;
+  color: var(--ff-accent, #7c4dff) !important;
+}
+
+.ff-ai-summary-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.ff-ai-summary-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  font-size: 14.5px !important;
+  line-height: 1.6 !important;
+  color: var(--ff-text, #281e35) !important;
+}
+
+.ff-ai-summary-bullet {
+  flex-shrink: 0 !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: var(--ff-accent-subtle, #ebdffc) !important;
+  color: var(--ff-accent, #7c4dff) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  margin-top: 1px !important;
+}
+
+.ff-ai-summary-close {
+  background: transparent !important;
+  border: none !important;
+  color: var(--ff-text-muted, #777) !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  line-height: 1 !important;
+}
+
+.ff-ai-summary-close:hover {
+  background: var(--ff-surface, #f0f0f0) !important;
+  color: var(--ff-text, #222) !important;
+}
+
+/* ==========================================================================
+   9. PLAIN-ENGLISH SIMPLIFIER & TONE NEUTRALIZER FLOATING TOOLTIP
+   ========================================================================== */
+
+#zenweb-selection-tooltip {
+  all: initial;
+  position: absolute !important;
+  z-index: 2147483645 !important;
+  background: var(--ff-surface-elevated, #ffffff) !important;
+  border: 1px solid var(--ff-border, #dcd0ea) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  padding: 6px !important;
+  display: flex !important;
+  gap: 6px !important;
+  align-items: center !important;
+  font-family: var(--ff-font-stack, sans-serif) !important;
+  transform: translate(-50%, -100%) translateY(-10px) !important;
+  transition: opacity 0.15s ease, transform 0.15s ease !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#zenweb-selection-tooltip.ff-visible {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.ff-tooltip-btn {
+  all: initial;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  background: var(--ff-surface, #f4effa) !important;
+  color: var(--ff-text, #281e35) !important;
+  font-family: inherit !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.ff-tooltip-btn:hover {
+  background: var(--ff-accent, #7c4dff) !important;
+  color: #ffffff !important;
+}
+
+/* Inline Modal for Simplified Text or Neutralized Tone */
+.ff-ai-inline-result {
+  all: initial;
+  display: block !important;
+  position: absolute !important;
+  z-index: 2147483646 !important;
+  background: var(--ff-surface-elevated, #ffffff) !important;
+  color: var(--ff-text, #281e35) !important;
+  border: 1.5px solid var(--ff-accent, #7c4dff) !important;
+  border-radius: 12px !important;
+  padding: 16px 20px !important;
+  max-width: 380px !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2) !important;
+  font-family: var(--ff-font-stack, sans-serif) !important;
+  animation: ff-scale-up 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes ff-scale-up {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.ff-ai-inline-result-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--ff-accent, #7c4dff) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  margin-bottom: 8px !important;
+}
+
+.ff-ai-inline-result-content {
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  color: var(--ff-text, #281e35) !important;
+  margin: 0 0 12px 0 !important;
+}
+
+/* ==========================================================================
+   10. FATIGUE & IDLE MONITOR GENTLE NOTIFICATION PILL
+   ========================================================================== */
+
+#zenweb-fatigue-prompt {
+  all: initial;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 2147483640 !important;
+  background: var(--ff-surface-elevated, #ffffff) !important;
+  color: var(--ff-text, #281e35) !important;
+  border: 1.5px solid var(--ff-accent, #7c4dff) !important;
+  border-radius: 16px !important;
+  padding: 18px 22px !important;
+  max-width: 360px !important;
+  box-shadow: 0 12px 32px rgba(45, 30, 65, 0.18) !important;
+  font-family: var(--ff-font-stack, sans-serif) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  animation: ff-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
+}
+
+@keyframes ff-slide-up {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.ff-fatigue-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--ff-accent, #7c4dff) !important;
+}
+
+.ff-fatigue-body {
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  color: var(--ff-text-muted, #5e526c) !important;
+}
+
+.ff-fatigue-actions {
+  display: flex !important;
+  gap: 8px !important;
+  margin-top: 4px !important;
+}
+
+.ff-fatigue-btn-primary {
+  all: initial;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 14px !important;
+  border-radius: 8px !important;
+  background: var(--ff-accent, #7c4dff) !important;
+  color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease !important;
+}
+
+.ff-fatigue-btn-secondary {
+  all: initial;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  background: var(--ff-surface, #eee) !important;
+  color: var(--ff-text, #333) !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+}
+
+/* ==========================================================================
+   11. CONTROLLED CANVAS MICRO-GAMING SUITE & BREATHING OVERLAY
+   ========================================================================== */
+
+#zenweb-game-modal {
+  all: initial;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: rgba(15, 20, 28, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: var(--ff-font-stack, 'Atkinson Hyperlegible', sans-serif) !important;
+  contain: strict;
+  will-change: opacity;
+  animation: ff-fade-in 0.3s ease !important;
+}
+
+@keyframes ff-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ff-game-container {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 720px !important;
+  width: 90vw !important;
+}
+
+.ff-game-hud {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 12px !important;
+  padding: 10px 18px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+}
+
+.ff-game-title-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.ff-game-title {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.ff-game-timer-pill {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  background: rgba(124, 77, 255, 0.35) !important;
+  border: 1px solid #7c4dff !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  color: #ffffff !important;
+}
+
+.ff-game-timer-circle {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: #00e676 !important;
+  animation: ff-timer-blink 1s infinite !important;
+}
+
+@keyframes ff-timer-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.ff-game-canvas-wrapper {
+  position: relative !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+  background: #10141d !important;
+}
+
+#zenweb-game-canvas {
+  display: block !important;
+  width: 680px !important;
+  height: 420px !important;
+  max-width: 88vw !important;
+  max-height: 55vh !important;
+  cursor: crosshair !important;
+}
+
+.ff-game-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-top: 12px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-size: 12.5px !important;
+}
+
+.ff-game-close-btn {
+  all: initial;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
+  font-family: inherit !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.ff-game-close-btn:hover {
+  background: rgba(255, 82, 82, 0.3) !important;
+  border-color: #ff5252 !important;
+}
+
+/* ==========================================================================
+   12. 30-SECOND GUIDED BREATHING TRANSITION (POST-GAME RESET)
+   ========================================================================== */
+
+#zenweb-breathing-modal {
+  all: initial;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: rgba(12, 16, 24, 0.96) !important;
+  backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: var(--ff-font-stack, 'Atkinson Hyperlegible', sans-serif) !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  animation: ff-fade-in 0.4s ease !important;
+}
+
+.ff-breathing-circle-container {
+  position: relative !important;
+  width: 260px !important;
+  height: 260px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 32px 0 !important;
+}
+
+.ff-breathing-outer-ring {
+  position: absolute !important;
+  width: 250px !important;
+  height: 250px !important;
+  border: 2px dashed rgba(124, 77, 255, 0.3) !important;
+  border-radius: 50% !important;
+}
+
+.ff-breathing-orb {
+  width: 140px !important;
+  height: 140px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, #7c4dff 0%, #3f51b5 100%) !important;
+  box-shadow: 0 0 45px rgba(124, 77, 255, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  color: #ffffff !important;
+  will-change: transform;
+}
+
+/* Box Breathing Animation sequence: Inhale (4s), Hold (4s), Exhale (4s), Hold (4s) */
+.ff-breathing-anim-box {
+  animation: ff-box-breath 16s infinite ease-in-out !important;
+}
+
+@keyframes ff-box-breath {
+  0% { transform: scale(0.75); }
+  25% { transform: scale(1.35); }   /* Inhale complete */
+  50% { transform: scale(1.35); }   /* Hold */
+  75% { transform: scale(0.75); }   /* Exhale complete */
+  100% { transform: scale(0.75); }  /* Hold */
+}
+
+.ff-breathing-phase-text {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #e0d0f5 !important;
+  margin-bottom: 8px !important;
+  letter-spacing: 0.03em !important;
+}
+
+.ff-breathing-subtext {
+  font-size: 15px !important;
+  color: rgba(255, 255, 255, 0.7) !important;
+  max-width: 380px !important;
+  line-height: 1.5 !important;
+}
+
+.ff-breathing-countdown {
+  font-size: 14px !important;
+  color: #00e676 !important;
+  font-weight: 600 !important;
+  margin-top: 20px !important;
+  background: rgba(0, 230, 118, 0.12) !important;
+  padding: 4px 16px !important;
+  border-radius: 14px !important;
+}
+
+/* ==========================================================================
+   13. HYPERFIXATION LOCKOUT OVERLAY
+   ========================================================================== */
+
+#zenweb-lockout-modal {
+  all: initial;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483647 !important;
+  background: rgba(15, 20, 28, 0.95) !important;
+  backdrop-filter: blur(12px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: var(--ff-font-stack, 'Atkinson Hyperlegible', sans-serif) !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  padding: 24px !important;
+  box-sizing: border-box !important;
+}
+
+.ff-lockout-card {
+  background: #18202d !important;
+  border: 1.5px solid #2c394f !important;
+  border-radius: 20px !important;
+  padding: 36px 32px !important;
+  max-width: 460px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+.ff-lockout-icon {
+  font-size: 42px !important;
+}
+
+.ff-lockout-title {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #64b5f6 !important;
+}
+
+.ff-lockout-desc {
+  font-size: 14.5px !important;
+  line-height: 1.6 !important;
+  color: #a6b0c2 !important;
+}
+
+.ff-lockout-time-left {
+  font-size: 26px !important;
+  font-weight: 700 !important;
+  color: #ffca28 !important;
+  font-variant-numeric: tabular-nums !important;
+  background: rgba(255, 202, 40, 0.12) !important;
+  padding: 8px 24px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 202, 40, 0.3) !important;
+}
+
+/* ==========================================================================
+   14. FLOATING QUICK-ACCESS FOCUS PILL (DOCKABLE / NON-INTRUSIVE)
+   ========================================================================== */
+
+#zenweb-floating-pill {
+  all: initial;
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  z-index: 2147483635 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: var(--ff-surface-elevated, #ffffff) !important;
+  border: 1.5px solid var(--ff-border, #dcd0ea) !important;
+  border-radius: 30px !important;
+  padding: 6px 12px !important;
+  box-shadow: 0 8px 24px var(--ff-shadow, rgba(45, 30, 65, 0.14)) !important;
+  font-family: var(--ff-font-stack, sans-serif) !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: transform, opacity;
+}
+
+#zenweb-floating-pill:hover {
+  box-shadow: 0 12px 30px var(--ff-shadow, rgba(45, 30, 65, 0.22)) !important;
+  transform: translateY(-2px) !important;
+}
+
+.ff-pill-btn {
+  all: initial;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: var(--ff-surface, #f4effa) !important;
+  color: var(--ff-text, #281e35) !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  position: relative !important;
+}
+
+.ff-pill-btn:hover {
+  background: var(--ff-accent, #7c4dff) !important;
+  color: #ffffff !important;
+  transform: scale(1.08) !important;
+}
+
+.ff-pill-btn.ff-active {
+  background: var(--ff-accent, #7c4dff) !important;
+  color: #ffffff !important;
+}
+
+.ff-pill-tooltip {
+  position: absolute !important;
+  bottom: 42px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  background: #18202d !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 3px 8px !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.15s ease !important;
+}
+
+.ff-pill-btn:hover .ff-pill-tooltip {
+  opacity: 1 !important;
+}

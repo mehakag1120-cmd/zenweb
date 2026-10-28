@@ -1,0 +1,29 @@
+{
+  "name": "zenweb",
+  "version": "1.0.0",
+  "description": "Production-grade Chrome Extension (Manifest V3) for ADHD & Autism Spectrum neurodivergent cognitive design and sensory regulation.",
+  "main": "background.js",
+  "scripts": {
+    "validate": "node -e \"const fs=require('fs'); ['manifest.json','background.js','content.js','ai-engine.js','game-engine.js','audio-engine.js','popup.js','sidepanel.js'].forEach(f => { if(f.endsWith('.json')) JSON.parse(fs.readFileSync(f,'utf8')); else new Function(fs.readFileSync(f,'utf8')); console.log('✓ ' + f); }); console.log('All files valid!');\"",
+    "package": "node -e \"const fs=require('fs'), zlib=require('zlib'), {execSync}=require('child_process'); console.log('Packaging ZenWeb extension for Chrome Web Store...'); execSync('powershell Compress-Archive -Path manifest.json,background.js,content.js,ai-engine.js,game-engine.js,audio-engine.js,popup.html,popup.css,popup.js,sidepanel.html,sidepanel.css,sidepanel.js,styles.css,icons,demo.html,README.md -DestinationPath zenweb-extension.zip -Force'); console.log('Successfully created zenweb-extension.zip');\""
+  },
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "accessibility",
+    "a11y",
+    "adhd",
+    "autism",
+    "neurodivergent",
+    "sensory-protection",
+    "web-audio-api",
+    "gemini-nano",
+    "bionic-reading"
+  ],
+  "author": "Principal Browser Extension Architect",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/placeholder/zenweb.git"
+  }
+}

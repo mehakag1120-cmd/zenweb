@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZenWeb Control Center</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="ff-popup-app">
+    <!-- Header -->
+    <header class="ff-popup-header">
+      <div class="ff-brand">
+        <div class="ff-brand-icon">✨</div>
+        <div class="ff-brand-info">
+          <h1>ZenWeb</h1>
+          <span class="ff-brand-tag">Neurodivergent Sensory Copilot</span>
+        </div>
+      </div>
+      <label class="ff-switch" title="Toggle ZenWeb Global">
+        <input type="checkbox" id="master-toggle" checked>
+        <span class="ff-slider"></span>
+      </label>
+    </header>
+
+    <!-- Navigation Tabs for Executive Clarity -->
+    <nav class="ff-tabs" role="tablist">
+      <button class="ff-tab active" data-tab="theme" role="tab">🎨 Sensory</button>
+      <button class="ff-tab" data-tab="reading" role="tab">📖 Reading</button>
+      <button class="ff-tab" data-tab="audio" role="tab">🎧 Audio</button>
+      <button class="ff-tab" data-tab="break" role="tab">🎮 Reset</button>
+      <button class="ff-tab" data-tab="ai" role="tab">🤖 AI</button>
+    </nav>
+
+    <!-- TAB 1: SENSORY & THEMES -->
+    <div class="ff-tab-content active" id="tab-theme">
+      <div class="ff-section-title">Color Temperature & Contrast</div>
+      <div class="ff-theme-grid">
+        <button class="ff-theme-btn" data-theme="pastel">
+          <div class="ff-theme-preview ff-preview-pastel"></div>
+          <span>Calm Pastel</span>
+        </button>
+        <button class="ff-theme-btn" data-theme="deep-contrast">
+          <div class="ff-theme-preview ff-preview-contrast"></div>
+          <span>Deep Focus</span>
+        </button>
+        <button class="ff-theme-btn" data-theme="sepia">
+          <div class="ff-theme-preview ff-preview-sepia"></div>
+          <span>Warm Sepia</span>
+        </button>
+        <button class="ff-theme-btn" data-theme="none">
+          <div class="ff-theme-preview ff-preview-default"></div>
+          <span>Default</span>
+        </button>
+      </div>
+
+      <div class="ff-section-title" style="margin-top: 16px;">Dyslexia & Legibility Typography</div>
+      <div class="ff-select-group">
+        <label for="font-select">Font Family</label>
+        <select id="font-select" class="ff-select">
+          <option value="atkinson">Atkinson Hyperlegible (Optimal Scannability)</option>
+          <option value="opendyslexic">OpenDyslexic (Weighted Bottoms)</option>
+          <option value="system">System Clean Sans</option>
+          <option value="serif">Classic Editorial Serif</option>
+        </select>
+      </div>
+
+      <div class="ff-toggle-list">
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Distraction Shield</span>
+            <span class="ff-label-desc">Hides banners, ads, recommendations, and noisy sidebars</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="shield-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Flashbang & Animation Suppressor</span>
+            <span class="ff-label-desc">Freezes jarring motion, white flashes, and video autoplay</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="anim-suppress-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Line Length Cap (75ch)</span>
+            <span class="ff-label-desc">Prevents horizontal eye tracking fatigue across wide monitors</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="max-width-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: READING ACCOMMODATIONS -->
+    <div class="ff-tab-content" id="tab-reading">
+      <div class="ff-toggle-list">
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Reading Ruler / Focus Lane</span>
+            <span class="ff-label-desc">Dims surrounding lines to eliminate line-skipping</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="ruler-toggle">
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-slider-group" id="ruler-options">
+          <div class="ff-slider-header">
+            <span>Ruler Focus Height</span>
+            <span id="ruler-height-val">120px</span>
+          </div>
+          <input type="range" id="ruler-height-slider" min="60" max="240" step="10" value="120" class="ff-range">
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Bionic Reading Converter</span>
+            <span class="ff-label-desc">Bolds first letters of words to anchor visual fixation</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="bionic-toggle">
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Smart Paragraph Chunking</span>
+            <span class="ff-label-desc">Breaks walls of text into 3-sentence scannable units</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="chunking-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Last-Read Anchor</span>
+            <span class="ff-label-desc">Saves reading spot and scrolls back with bookmark pin</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="anchor-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUDIO FOCUS ENGINE -->
+    <div class="ff-tab-content" id="tab-audio">
+      <div class="ff-audio-status-card">
+        <div class="ff-audio-play-icon" id="audio-play-indicator">🎧</div>
+        <div class="ff-audio-status-text">
+          <div id="audio-status-title" style="font-weight: 700;">Synthesized Ambient Engine</div>
+          <div style="font-size: 12px; color: var(--ff-muted);">100% on-device Web Audio API (Zero downloads)</div>
+        </div>
+        <button class="ff-btn-audio-toggle" id="btn-audio-toggle">Play</button>
+      </div>
+
+      <div class="ff-section-title" style="margin-top: 14px;">Sensory Soundscape</div>
+      <div class="ff-sound-grid">
+        <button class="ff-sound-chip active" data-sound="brown">
+          <span>🤎</span>
+          <span>Brown Noise</span>
+        </button>
+        <button class="ff-sound-chip" data-sound="rain">
+          <span>🌧️</span>
+          <span>Calm Rain</span>
+        </button>
+        <button class="ff-sound-chip" data-sound="binaural">
+          <span>🧘</span>
+          <span>Binaural Beats</span>
+        </button>
+      </div>
+
+      <div class="ff-slider-group" style="margin-top: 18px;">
+        <div class="ff-slider-header">
+          <span>Volume</span>
+          <span id="audio-vol-val">25%</span>
+        </div>
+        <input type="range" id="audio-volume-slider" min="0" max="100" value="25" class="ff-range">
+      </div>
+    </div>
+
+    <!-- TAB 4: CONTROLLED MICRO-BREAKS -->
+    <div class="ff-tab-content" id="tab-break">
+      <div class="ff-dopamine-guard-card">
+        <div class="ff-guard-header">
+          <span>🛡️ Hyperfixation Guard</span>
+          <span class="ff-guard-status" id="guard-status-badge">Ready</span>
+        </div>
+        <p style="font-size: 12.5px; color: var(--ff-muted); margin: 6px 0 0 0; line-height: 1.4;">
+          Enforces hard 90s/180s limits followed by a 30s breathing reset and a 15-minute cooling period to keep dopamine balanced.
+        </p>
+      </div>
+
+      <div class="ff-section-title" style="margin-top: 14px;">Select Calming Micro-Game</div>
+      <div class="ff-game-selector">
+        <button class="ff-game-btn active" data-game="fluid">
+          <span>🌊</span>
+          <div class="ff-game-btn-text">
+            <strong>Zen Fluid Flow</strong>
+            <small>Sensory gravity particles</small>
+          </div>
+        </button>
+        <button class="ff-game-btn" data-game="pulse">
+          <span>💫</span>
+          <div class="ff-game-btn-text">
+            <strong>Rhythm Pulse</strong>
+            <small>Vagal nerve resonant sync</small>
+          </div>
+        </button>
+        <button class="ff-game-btn" data-game="stack">
+          <span>🧱</span>
+          <div class="ff-game-btn-text">
+            <strong>Zen Stacker</strong>
+            <small>Minimal kinetic balance</small>
+          </div>
+        </button>
+        <button class="ff-game-btn" data-game="pattern">
+          <span>🔮</span>
+          <div class="ff-game-btn-text">
+            <strong>Pattern Flow</strong>
+            <small>Harmonic pad memory</small>
+          </div>
+        </button>
+        <button class="ff-game-btn" data-game="runner">
+          <span>🕊️</span>
+          <div class="ff-game-btn-text">
+            <strong>Micro Flow Glide</strong>
+            <small>Gentle rolling sine waves</small>
+          </div>
+        </button>
+      </div>
+
+      <div class="ff-break-actions">
+        <button class="ff-btn-launch" id="btn-launch-break">Launch 90s Reset</button>
+        <button class="ff-btn-breathe" id="btn-launch-breathe" title="Start Box Breathing directly">🧘 30s Breath</button>
+      </div>
+
+      <div style="margin-top: 10px; text-align: center;">
+        <button id="btn-reset-lockout" style="all:initial; cursor:pointer; font-size:11px; color:var(--ff-muted); text-decoration:underline;">
+          Reset 15-min lockout (Dev override)
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 5: ON-DEVICE AI CO-PILOT -->
+    <div class="ff-tab-content" id="tab-ai">
+      <div class="ff-ai-status-banner">
+        <span>🧠</span>
+        <div style="font-size: 12px; line-height: 1.4;">
+          <strong>Chrome Built-in AI / Gemini Nano</strong><br>
+          <span style="color: var(--ff-muted);">100% private, on-device offline intelligence</span>
+        </div>
+      </div>
+
+      <div class="ff-toggle-list" style="margin-top: 14px;">
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">3-Bullet Overview Card</span>
+            <span class="ff-label-desc">Automatically mounts key insights on long articles</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="ai-summary-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Selection Simplifier</span>
+            <span class="ff-label-desc">Rewrites highlighted jargon into plain conversational English</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="ai-simplify-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Tone Neutralizer</span>
+            <span class="ff-label-desc">Softens sensationalist, clickbait, and panic-inducing text</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="ai-tone-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+
+        <div class="ff-toggle-row">
+          <div class="ff-toggle-label">
+            <span class="ff-label-title">Fatigue Freeze Detection</span>
+            <span class="ff-label-desc">Gentle prompt when stuck in the same position > 4 mins</span>
+          </div>
+          <label class="ff-mini-switch">
+            <input type="checkbox" id="fatigue-toggle" checked>
+            <span class="ff-mini-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button class="ff-btn-sidepanel" id="btn-open-sidepanel">
+        <span>✨</span>
+        <span>Open AI Chat Side Panel</span>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="ff-popup-footer">
+      <span>ZenWeb v1.0.0</span>
+      <span>Neurodivergent Cognitive Design</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

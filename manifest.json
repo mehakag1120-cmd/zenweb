@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "ZenWeb - ADHD & Sensory Cognitive Copilot",
+  "version": "1.0.0",
+  "description": "Production-grade neurodivergent cognitive design extension transforming websites into calm, accessible, dopamine-balanced environments.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "sidePanel",
+    "idle"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "ZenWeb Control Center"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "audio-engine.js",
+        "ai-engine.js",
+        "game-engine.js",
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*",
+        "sidepanel.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

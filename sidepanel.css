@@ -1,29 +1,36 @@
 /**
- * ZenWeb Sidepanel Stylesheet
+ * ZenWeb Sidepanel Stylesheet (v2.0)
+ * Modern Bubbly Aesthetics inspired by 21stdev.com
  * GPU accelerated, clean flexbox layout, soothing visual hierarchy.
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   --sp-primary: #7c4dff;
   --sp-primary-hover: #651fff;
+  --sp-primary-glow: rgba(124, 77, 255, 0.28);
   --sp-bg: #f8f6fc;
   --sp-card: #ffffff;
-  --sp-text: #21182c;
+  --sp-text: #1b1724;
   --sp-muted: #645873;
   --sp-border: #e3d9f0;
   --sp-accent-subtle: #f0eafc;
-  --sp-font: 'Atkinson Hyperlegible', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --sp-font-heading: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --sp-font-body: 'Lexend', -apple-system, sans-serif;
+  --sp-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --sp-primary: #9d71fd;
     --sp-primary-hover: #b388ff;
-    --sp-bg: #12151e;
-    --sp-card: #1a202c;
-    --sp-text: #f0ecf5;
-    --sp-muted: #9ba4b5;
-    --sp-border: #2d3748;
+    --sp-primary-glow: rgba(157, 113, 253, 0.35);
+    --sp-bg: #0d1117;
+    --sp-card: #161b22;
+    --sp-text: #f0f6fc;
+    --sp-muted: #8b949e;
+    --sp-border: #2c3440;
     --sp-accent-subtle: #241d35;
   }
 }
@@ -35,7 +42,7 @@
 }
 
 body {
-  font-family: var(--sp-font);
+  font-family: var(--sp-font-body);
   background-color: var(--sp-bg);
   color: var(--sp-text);
   height: 100vh;
@@ -50,6 +57,7 @@ body {
   flex-direction: column;
   height: 100vh;
   padding: 16px;
+  gap: 10px;
 }
 
 /* Header */
@@ -72,8 +80,9 @@ body {
 }
 
 .ff-sp-header h2 {
-  font-size: 16px;
-  font-weight: 700;
+  font-family: var(--sp-font-heading);
+  font-size: 16.5px;
+  font-weight: 800;
   line-height: 1.1;
   color: var(--sp-text);
 }
@@ -88,28 +97,28 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   background: var(--sp-card);
   border: 1px solid var(--sp-border);
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.15s ease;
+  transition: all 0.2s var(--sp-ease);
 }
 
 .ff-sp-icon-btn:hover {
   background: var(--sp-accent-subtle);
-  transform: rotate(30deg);
+  transform: rotate(45deg) scale(1.08);
 }
 
 /* Context Card */
 .ff-sp-context-card {
-  margin: 12px 0 10px 0;
-  padding: 10px 12px;
+  padding: 10px 14px;
   background: var(--sp-card);
-  border: 1px solid var(--sp-border);
-  border-radius: 10px;
+  border: 1.5px solid var(--sp-border);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .ff-sp-context-header {
@@ -124,13 +133,21 @@ body {
   height: 7px;
   border-radius: 50%;
   background: #00e676;
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+  animation: sp-dot-pulse 2s infinite ease-in-out;
+}
+
+@keyframes sp-dot-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
 }
 
 .ff-sp-context-label {
-  font-size: 10.5px;
-  font-weight: 700;
+  font-family: var(--sp-font-heading);
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--sp-muted);
 }
 
@@ -148,7 +165,7 @@ body {
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   scrollbar-width: none;
 }
 
@@ -161,30 +178,32 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 6px 10px;
-  border-radius: 16px;
+  padding: 7px 12px;
+  border-radius: 20px;
   background: var(--sp-card);
-  border: 1px solid var(--sp-border);
+  border: 1.5px solid var(--sp-border);
   color: var(--sp-text);
-  font-family: inherit;
+  font-family: var(--sp-font-heading);
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: all 0.2s var(--sp-ease);
 }
 
 .ff-sp-chip:hover {
   border-color: var(--sp-primary);
   background: var(--sp-accent-subtle);
   color: var(--sp-primary);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px var(--sp-primary-glow);
 }
 
 /* Messages Stream */
 .ff-sp-messages {
   flex: 1;
   overflow-y: auto;
-  margin: 10px 0;
+  margin: 6px 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -195,23 +214,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px 14px;
-  border-radius: 12px;
+  padding: 13px 16px;
+  border-radius: 16px;
   font-size: 13.5px;
   line-height: 1.6;
-  animation: ff-msg-in 0.2s ease;
+  animation: sp-msg-in 0.22s var(--sp-ease);
 }
 
-@keyframes ff-msg-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes sp-msg-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .ff-sp-assistant {
   background: var(--sp-card);
-  border: 1px solid var(--sp-border);
+  border: 1.5px solid var(--sp-border);
   align-self: flex-start;
   max-width: 95%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
 
 .ff-sp-user {
@@ -219,19 +239,21 @@ body {
   color: #ffffff;
   align-self: flex-end;
   max-width: 85%;
+  box-shadow: 0 4px 16px var(--sp-primary-glow);
 }
 
 .ff-sp-msg-header {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-family: var(--sp-font-heading);
   font-size: 11px;
   font-weight: 700;
   color: var(--sp-muted);
 }
 
 .ff-sp-user .ff-sp-msg-header {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
   justify-content: flex-end;
 }
 
@@ -261,16 +283,17 @@ body {
 .ff-sp-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: var(--sp-card);
   border: 1.5px solid var(--sp-border);
-  border-radius: 12px;
-  padding: 6px 10px;
-  transition: border-color 0.15s ease;
+  border-radius: 16px;
+  padding: 8px 12px;
+  transition: all 0.2s var(--sp-ease);
 }
 
 .ff-sp-input-wrapper:focus-within {
   border-color: var(--sp-primary);
+  box-shadow: 0 0 14px var(--sp-primary-glow);
 }
 
 .ff-sp-textarea {
@@ -278,7 +301,7 @@ body {
   border: none;
   background: transparent;
   color: var(--sp-text);
-  font-family: inherit;
+  font-family: var(--sp-font-body);
   font-size: 13.5px;
   resize: none;
   outline: none;
@@ -292,17 +315,17 @@ body {
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--sp-primary);
   color: #ffffff;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s var(--sp-ease);
 }
 
 .ff-sp-send-btn:hover {
   background: var(--sp-primary-hover);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .ff-sp-hint {

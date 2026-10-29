@@ -3,32 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenWeb Interactive Demonstration & Verification Suite</title>
+  <title>ZenWeb Sensory & Contrast Verification Suite</title>
   <style>
-    /* Baseline unstyled un-calmed website simulation */
+    /* Baseline unstyled simulated webpage */
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-color: #ffffff;
       color: #111111;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .demo-nav {
-      background: #1a1a2e;
+      background: #121620;
       color: #fff;
-      padding: 12px 24px;
+      padding: 14px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .demo-container {
       display: flex;
       max-width: 1200px;
-      margin: 20px auto;
-      gap: 24px;
-      padding: 0 16px;
+      margin: 24px auto;
+      gap: 28px;
+      padding: 0 20px;
     }
 
     .demo-main {
@@ -39,78 +40,102 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     /* Annoying ads to test distraction shield */
     .ad, .advertisement, .sticky-banner {
-      background: #ffeb3b;
-      border: 2px dashed #f57f17;
-      padding: 16px;
+      background: #fff9c4;
+      border: 2px dashed #fbc02d;
+      padding: 18px;
       text-align: center;
       font-weight: bold;
-      color: #d84315;
+      color: #e65100;
+      border-radius: 8px;
     }
 
     .flashing-box {
       background: #ff1744;
       color: white;
-      padding: 12px;
+      padding: 14px;
       text-align: center;
       font-weight: bold;
+      border-radius: 8px;
       animation: flash-anim 0.8s infinite alternate;
     }
 
     @keyframes flash-anim {
       from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.04); opacity: 0.6; }
+      to { transform: scale(1.03); opacity: 0.6; }
     }
 
     article p {
-      font-size: 16px;
-      margin-bottom: 20px;
-      line-height: 1.5;
+      font-size: 16.5px;
+      margin-bottom: 22px;
+      line-height: 1.6;
     }
 
     .demo-test-card {
-      background: #e8eaf6;
-      border: 1.5px solid #3f51b5;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 24px;
+      background: #ede7f6;
+      border: 1.5px solid #7c4dff;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 16px rgba(124, 77, 255, 0.12);
     }
 
     .demo-test-card h3 {
-      margin-top: 0;
-      color: #1a237e;
+      margin: 0 0 8px 0;
+      color: #4a148c;
+      font-size: 18px;
     }
 
     .demo-btn-group {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 14px;
     }
 
     .demo-btn {
-      background: #3f51b5;
+      background: #7c4dff;
       color: white;
       border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
+      padding: 9px 16px;
+      border-radius: 10px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.2s ease;
     }
 
     .demo-btn:hover {
-      background: #303f9f;
+      background: #651fff;
+      transform: translateY(-1px);
+    }
+
+    .demo-btn-secondary {
+      background: #ffffff;
+      color: #333333;
+      border: 1px solid #cccccc;
+    }
+
+    .demo-btn-secondary:hover {
+      background: #f5f5f5;
+    }
+
+    .demo-contrast-box {
+      padding: 16px;
+      margin: 18px 0;
+      border-radius: 10px;
+      border: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
   <header class="demo-nav">
-    <div style="font-weight: bold; font-size: 18px;">TechScience Global Today</div>
-    <div>Simulated Busy Web Environment</div>
+    <div style="font-weight: 800; font-size: 19px;">TechScience Global Journal</div>
+    <div style="font-size: 13px; opacity: 0.8;">Simulated Live Web Environment</div>
   </header>
 
   <!-- Sticky noisy banner to test Distraction Shield -->
@@ -120,46 +145,65 @@
 
   <div class="demo-container">
     <main class="demo-main">
-      <!-- Interactive verification suite controls -->
+
+      <!-- Interactive Verification Suite -->
       <section class="demo-test-card">
-        <h3>🧪 ZenWeb Verification & Interactive Controls</h3>
-        <p style="margin: 4px 0 10px 0; font-size: 13.5px; color: #333;">
-          When the ZenWeb Chrome Extension is loaded, verify features using these quick triggers or the extension popup icon:
+        <h3>🧪 ZenWeb Interactive Verification Suite</h3>
+        <p style="margin: 0; font-size: 13.5px; color: #444;">
+          Test real-time controls, contrast overrides, frosted glass reading ruler, and lossless on/off restoration:
         </p>
+
         <div class="demo-btn-group">
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('brown')">🎧 Play Brown Noise</button>
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('rain')">🌧️ Play Rain</button>
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('binaural')">🧘 Play Binaural Beats</button>
+          <!-- Theme triggers -->
+          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'deep-contrast')">🌌 Deep Focus Contrast</button>
+          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'pastel')">🌸 Calm Pastel</button>
+          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'sepia')">📜 Warm Sepia</button>
+          <button class="demo-btn demo-btn-secondary" onclick="document.documentElement.removeAttribute('data-zenweb-theme')">Default Colors</button>
+
+          <!-- Ruler trigger -->
+          <button class="demo-btn" onclick="toggleRuler()" style="background: #29b6f6;">📏 Toggle Frosted Ruler</button>
+
+          <!-- Audio triggers -->
+          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('brown')">🎧 Brown Noise</button>
+          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('rain')">🌧️ Rain</button>
           <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.stop()" style="background:#d32f2f;">⏹️ Stop Audio</button>
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('fluid', 90)" style="background:#7c4dff;">🎮 Launch Zen Fluid (90s)</button>
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('pulse', 90)" style="background:#7c4dff;">💫 Launch Rhythm Pulse (90s)</button>
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('stack', 90)" style="background:#7c4dff;">🧱 Launch Stacker (90s)</button>
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.startBreathingTransition()" style="background:#00897b;">🧘 30s Box Breathing</button>
+
+          <!-- Micro-breaks -->
+          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('fluid', 90)" style="background:#00c853;">🎮 90s Zen Fluid</button>
+          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.startBreathingTransition()" style="background:#00897b;">🧘 30s Box Breath</button>
         </div>
       </section>
 
       <article>
-        <!-- Sensationalist Clickbait Headline to test Tone Neutralizer -->
-        <h1 id="article-headline" style="font-size: 32px; color: #b71c1c;">
+        <!-- Clickbait headline to test Tone Neutralizer -->
+        <h1 id="article-headline" style="font-size: 32px; color: #b71c1c; font-weight: 800;">
           CATASTROPHIC DISASTER SHOCKS ENTIRE TECH INDUSTRY: DOOMSDAY SCENARIO IMMINENT AS CHAOS ERUPTS!
         </h1>
 
         <p style="font-size: 14px; color: #666;">
-          Published by Dr. Bartholomew Abernathy | 8-minute read | Academic Cognitive Research Division
+          Published by Dr. Elena Vance | 7-minute read | Cognitive Neuroscience Division
         </p>
 
-        <!-- Simulated flashing banner inside article -->
+        <!-- Simulated flashing banner -->
         <div class="flashing-box">
           ⚠️ URGENT: MIND-BLOWING REVELATION INSIDE! (Flashbang Suppressor will freeze this)
         </div>
 
-        <!-- Long dense academic text to test Smart Chunking & Bionic Reading -->
+        <!-- Hardcoded black inline style text to verify Deep Contrast text color override! -->
+        <div class="demo-contrast-box" style="color: #000000; background-color: #ffffff;">
+          <strong style="color: #050505;">Hardcoded Black Text Verification Container:</strong>
+          <p style="color: rgb(10, 10, 10); margin-top: 6px;">
+            This paragraph has explicit inline style <code>color: rgb(10,10,10)</code>. In previous versions, switching to dark theme left this text black against a dark background! In ZenWeb v2.0, high-specificity rules and inline cleaners ensure this text turns into brilliant, legible warm cream text (<code>#f0f6fc</code>)!
+          </p>
+        </div>
+
+        <!-- Long academic wall of text for Smart Chunking & Bionic Reading -->
         <p>
-          The fundamental paradigm shift in modern web design has necessitated an expeditious re-evaluation of cognitive architecture in neurodivergent populations. In light of the fact that visual stimuli predominantly inundate digital interfaces with discordant sensory input, neurodivergent individuals suffering from Attention-Deficit/Hyperactivity Disorder and Autism Spectrum conditions experience heightened susceptibility to executive dysfunction, working memory depletion, and sensory overload. Substantive empirical documentation indicates that an overabundance of asynchronous visual transitions, non-linear informational hierarchies, and unconstrained typographical line lengths systematically degrade reading comprehension.
+          The fundamental paradigm shift in contemporary web interfaces has precipitated an urgent re-evaluation of cognitive architecture in neurodivergent populations. In light of the fact that commercial websites aggressively inundate digital users with sensory dissonance, individuals with Attention-Deficit/Hyperactivity Disorder (ADHD) and Autism Spectrum Conditions (ASC) experience heightened vulnerability to executive dysfunction freeze, working memory exhaustion, and sensory overstimulation. Empirical findings consistently demonstrate that uncontrolled typographical line lengths, asynchronous visual animations, and aggressive contrast boundaries systematically diminish cognitive comprehension.
         </p>
 
         <p>
-          In order to ameliorate these debilitating attentional impediments, technological interventions must facilitate ambient sensory grounding rather than relying solely upon blunt computational subtraction. Prior to the utilization of hardware-accelerated rendering pipelines, contemporary single-page web applications routinely failed to accommodate the neurodivergent scanning patterns characterized by intermittent saccadic fixations. Nevertheless, by employing algorithmic lead-weight typographical modifications—commonly termed bionic typography—the neural pathways responsible for linguistic decipherment are afforded visual anchors that substantially truncate ocular dwell times while simultaneously preserving deep semantic retention.
+          In order to ameliorate these attentional impediments, technological interventions must prioritize ambient sensory grounding rather than relying solely on blunt ad blocking. Prior to the utilization of hardware-accelerated rendering pipelines, web applications routinely failed to accommodate the neurodivergent scanning patterns characterized by rapid, intermittent saccadic fixations. Nevertheless, by employing algorithmic lead-weight typography—commonly known as bionic reading—the neural pathways responsible for linguistic decipherment receive distinct visual anchors that truncate ocular dwell latency while preserving deep semantic retention.
         </p>
 
         <p>
@@ -176,21 +220,21 @@
         </div>
 
         <p>
-          In conclusion, the convergence of privacy-first on-device artificial intelligence, hardware-accelerated compositor thread manipulation, and neurodivergent-centered sensory ergonomics establishes an entirely unprecedented benchmark for digital accessibility. Websites ceases to be chaotic battlegrounds for finite dopamine reserves; instead, they are transformed into tranquil, predictable, and cognitively regenerative environments.
+          In conclusion, the convergence of privacy-first on-device artificial intelligence, hardware-accelerated compositor thread manipulation, and neurodivergent-centered sensory ergonomics establishes an entirely unprecedented benchmark for digital accessibility. Websites cease to be chaotic battlegrounds for finite dopamine reserves; instead, they are transformed into tranquil, predictable, and cognitively regenerative environments.
         </p>
       </article>
     </main>
 
-    <!-- Annoying sidebar with ads and recommendations -->
+    <!-- Sidebar with ads and autoplay recommendations -->
     <aside class="demo-sidebar">
       <div class="ad">
         PROMOTED: You Won't Believe What Happened Next! (Ad Block Test)
       </div>
 
-      <div style="background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 8px;">
-        <h4 style="margin: 0 0 8px 0; color: #e65100;">Autoplay Recommendation</h4>
-        <p style="font-size: 13px; margin: 0 0 10px 0;">This noisy sidebar is suppressed when ZenWeb's Distraction Shield is enabled.</p>
-        <video autoplay muted loop style="width: 100%; border-radius: 4px; background: #000;">
+      <div style="background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 10px;">
+        <h4 style="margin: 0 0 8px 0; color: #e65100;">Autoplay Video Container</h4>
+        <p style="font-size: 13px; margin: 0 0 10px 0;">This noisy container is suppressed when ZenWeb's Distraction Shield is enabled.</p>
+        <video autoplay muted loop style="width: 100%; border-radius: 6px; background: #000;">
           <source src="data:video/mp4;base64," type="video/mp4">
         </video>
       </div>
@@ -200,5 +244,14 @@
       </div>
     </aside>
   </div>
+
+  <script>
+    function toggleRuler() {
+      const ruler = document.getElementById('zenweb-ruler-overlay');
+      if (ruler) {
+        ruler.classList.toggle('zw-active');
+      }
+    }
+  </script>
 </body>
 </html>

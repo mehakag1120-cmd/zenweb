@@ -1,19 +1,38 @@
 /**
- * ZenWeb Popup Controller
- * Manages UI synchronization, real-time messaging with content script,
- * and persistent settings via chrome.storage.sync.
+ * ZenWeb Popup Controller (v2.0)
+ * Bubbly Micro-Interactions, Live Explicit State Badges, and Real-Time Tab Synchronization.
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elements
-  const tabs = document.querySelectorAll('.ff-tab');
-  const tabContents = document.querySelectorAll('.ff-tab-content');
+  // Master Switch & Hero
   const masterToggle = document.getElementById('master-toggle');
-  const themeBtns = document.querySelectorAll('.ff-theme-btn');
+  const masterCard = document.getElementById('zw-master-card');
+  const masterStatusDot = document.getElementById('master-status-dot');
+  const masterStatusText = document.getElementById('master-status-text');
+  const masterStatusSub = document.getElementById('master-status-sub');
+  const mainControls = document.getElementById('zw-main-controls');
+
+  // Tabs
+  const tabs = document.querySelectorAll('.zw-tab');
+  const tabContents = document.querySelectorAll('.zw-tab-content');
+
+  // Sensory Elements
+  const themeCards = document.querySelectorAll('.zw-theme-card');
   const fontSelect = document.getElementById('font-select');
   const shieldToggle = document.getElementById('shield-toggle');
   const animToggle = document.getElementById('anim-suppress-toggle');
   const maxWidthToggle = document.getElementById('max-width-toggle');
+
+  // Badges
+  const badgeShield = document.getElementById('badge-shield');
+  const badgeAnim = document.getElementById('badge-anim');
+  const badgeMaxWidth = document.getElementById('badge-max-width');
+  const badgeRuler = document.getElementById('badge-ruler');
+  const badgeBionic = document.getElementById('badge-bionic');
+  const badgeChunking = document.getElementById('badge-chunking');
+  const badgeAnchor = document.getElementById('badge-anchor');
+
+  // Reading & Focus
   const rulerToggle = document.getElementById('ruler-toggle');
   const rulerSlider = document.getElementById('ruler-height-slider');
   const rulerHeightVal = document.getElementById('ruler-height-val');
@@ -21,31 +40,63 @@ document.addEventListener('DOMContentLoaded', async () => {
   const chunkingToggle = document.getElementById('chunking-toggle');
   const anchorToggle = document.getElementById('anchor-toggle');
 
-  // Audio elements
+  // Audio Engine
   const btnAudioToggle = document.getElementById('btn-audio-toggle');
-  const soundChips = document.querySelectorAll('.ff-sound-chip');
+  const audioIconWrap = document.getElementById('audio-icon-wrap');
+  const soundCards = document.querySelectorAll('.zw-sound-card');
   const audioVolumeSlider = document.getElementById('audio-volume-slider');
   const audioVolVal = document.getElementById('audio-vol-val');
 
-  // Micro-game elements
-  const gameBtns = document.querySelectorAll('.ff-game-btn');
+  // Micro-Breaks
+  const gameCards = document.querySelectorAll('.zw-game-card');
   const btnLaunchBreak = document.getElementById('btn-launch-break');
   const btnLaunchBreathe = document.getElementById('btn-launch-breathe');
   const guardStatusBadge = document.getElementById('guard-status-badge');
   const btnResetLockout = document.getElementById('btn-reset-lockout');
 
-  // AI elements
+  // AI Elements
   const aiSummaryToggle = document.getElementById('ai-summary-toggle');
   const aiSimplifyToggle = document.getElementById('ai-simplify-toggle');
   const aiToneToggle = document.getElementById('ai-tone-toggle');
   const fatigueToggle = document.getElementById('fatigue-toggle');
+  const badgeAiSummary = document.getElementById('badge-ai-summary');
+  const badgeAiSimplify = document.getElementById('badge-ai-simplify');
+  const badgeAiTone = document.getElementById('badge-ai-tone');
+  const badgeFatigue = document.getElementById('badge-fatigue');
   const btnOpenSidepanel = document.getElementById('btn-open-sidepanel');
+  const btnHeaderSidepanel = document.getElementById('btn-header-sidepanel');
 
   let currentSettings = {};
   let selectedGame = 'fluid';
   let isAudioPlaying = false;
 
-  // 1. Tab Switching
+  // Helper: Explicit Badge State Updater
+  function updateBadge(badgeEl, isChecked) {
+    if (!badgeEl) return;
+    badgeEl.textContent = isChecked ? 'ON' : 'OFF';
+    badgeEl.classList.toggle('on', isChecked);
+    badgeEl.classList.toggle('off', !isChecked);
+  }
+
+  // Helper: Master UI State Updater
+  function updateMasterUI(isEnabled) {
+    masterToggle.checked = isEnabled;
+    masterCard.classList.toggle('active', isEnabled);
+    masterStatusDot.classList.toggle('active', isEnabled);
+
+    if (isEnabled) {
+      masterStatusText.textContent = 'ZenWeb is Active';
+      masterStatusSub.textContent = 'Transforming site into a calm, accessible space';
+      mainControls.style.opacity = '1';
+      mainControls.style.pointerEvents = 'auto';
+    } else {
+      masterStatusText.textContent = 'ZenWeb is Paused';
+      masterStatusSub.textContent = 'Original website restored';
+      mainControls.style.opacity = '0.55';
+    }
+  }
+
+  // 1. Tab Switching with Spring Feedback
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       tabs.forEach(t => t.classList.remove('active'));
@@ -61,46 +112,71 @@ document.addEventListener('DOMContentLoaded', async () => {
   chrome.storage.sync.get(null, (settings) => {
     currentSettings = settings || {};
 
-    masterToggle.checked = settings.enabled !== false;
-    fontSelect.value = settings.fontFamily || 'atkinson';
-    shieldToggle.checked = settings.distractionShield !== false;
-    animToggle.checked = settings.animationSuppressor !== false;
-    maxWidthToggle.checked = settings.maxLineLength !== false;
+    const isEnabled = settings.enabled !== false;
+    updateMasterUI(isEnabled);
 
+    // Font selection
+    fontSelect.value = settings.fontFamily || 'lexend';
+
+    // Sensory toggles
+    shieldToggle.checked = settings.distractionShield !== false;
+    updateBadge(badgeShield, shieldToggle.checked);
+
+    animToggle.checked = settings.animationSuppressor !== false;
+    updateBadge(badgeAnim, animToggle.checked);
+
+    maxWidthToggle.checked = settings.maxLineLength !== false;
+    updateBadge(badgeMaxWidth, maxWidthToggle.checked);
+
+    // Reading accommodations
     rulerToggle.checked = !!settings.readingRuler;
+    updateBadge(badgeRuler, rulerToggle.checked);
+
     rulerSlider.value = settings.rulerHeight || 120;
     rulerHeightVal.textContent = `${rulerSlider.value}px`;
 
     bionicToggle.checked = !!settings.bionicReading;
-    chunkingToggle.checked = settings.smartChunking !== false;
-    anchorToggle.checked = settings.lastReadAnchor !== false;
+    updateBadge(badgeBionic, bionicToggle.checked);
 
-    // Theme active state
-    themeBtns.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.theme === (settings.theme || 'pastel'));
+    chunkingToggle.checked = settings.smartChunking !== false;
+    updateBadge(badgeChunking, chunkingToggle.checked);
+
+    anchorToggle.checked = settings.lastReadAnchor !== false;
+    updateBadge(badgeAnchor, anchorToggle.checked);
+
+    // Theme cards
+    themeCards.forEach(card => {
+      card.classList.toggle('active', card.dataset.theme === (settings.theme || 'pastel'));
     });
 
-    // Audio active state
+    // Audio setup
     const soundType = settings.soundEngine?.type || 'brown';
-    soundChips.forEach(chip => {
-      chip.classList.toggle('active', chip.dataset.sound === soundType);
+    soundCards.forEach(card => {
+      card.classList.toggle('active', card.dataset.sound === soundType);
     });
 
     const vol = settings.soundEngine?.volume !== undefined ? Math.round(settings.soundEngine.volume * 100) : 25;
     audioVolumeSlider.value = vol;
     audioVolVal.textContent = `${vol}%`;
 
-    // AI switches
+    // AI toggles
     aiSummaryToggle.checked = settings.aiSummaryCard !== false;
-    aiSimplifyToggle.checked = settings.aiTooltipSimplifier !== false;
-    aiToneToggle.checked = settings.toneNeutralizer !== false;
-    fatigueToggle.checked = settings.fatigueDetection !== false;
+    updateBadge(badgeAiSummary, aiSummaryToggle.checked);
 
-    // Check Lockout Status
+    aiSimplifyToggle.checked = settings.aiTooltipSimplifier !== false;
+    updateBadge(badgeAiSimplify, aiSimplifyToggle.checked);
+
+    aiToneToggle.checked = settings.toneNeutralizer !== false;
+    updateBadge(badgeAiTone, aiToneToggle.checked);
+
+    fatigueToggle.checked = settings.fatigueDetection !== false;
+    updateBadge(badgeFatigue, fatigueToggle.checked);
+
+    // Lockout status
     checkLockoutStatus(settings.gameLockUntil || 0);
   });
 
-  // Helper: Persist and Dispatch to Active Tab
+  // Helper: Persist and Dispatch Message to Active Tab
   function updateAndDispatch(updatedKeyValues) {
     currentSettings = { ...currentSettings, ...updatedKeyValues };
     chrome.storage.sync.set(updatedKeyValues);
@@ -109,22 +185,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(tabs[0].id, {
           type: 'UPDATE_SETTINGS',
-          settings: updatedKeyValues
+          settings: currentSettings // Dispatch full settings snapshot for clean state resolution
         });
       }
     });
   }
 
-  // 3. Event Listeners
+  // 3. Master Toggle Listener
   masterToggle.addEventListener('change', () => {
-    updateAndDispatch({ enabled: masterToggle.checked });
+    const isEnabled = masterToggle.checked;
+    updateMasterUI(isEnabled);
+    updateAndDispatch({ enabled: isEnabled });
   });
 
-  themeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      themeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      updateAndDispatch({ theme: btn.dataset.theme });
+  // 4. Theme & Font Listeners
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      themeCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      updateAndDispatch({ theme: card.dataset.theme });
     });
   });
 
@@ -133,50 +212,59 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   shieldToggle.addEventListener('change', () => {
+    updateBadge(badgeShield, shieldToggle.checked);
     updateAndDispatch({ distractionShield: shieldToggle.checked });
   });
 
   animToggle.addEventListener('change', () => {
+    updateBadge(badgeAnim, animToggle.checked);
     updateAndDispatch({ animationSuppressor: animToggle.checked });
   });
 
   maxWidthToggle.addEventListener('change', () => {
+    updateBadge(badgeMaxWidth, maxWidthToggle.checked);
     updateAndDispatch({ maxLineLength: maxWidthToggle.checked });
   });
 
+  // 5. Reading Focus Listeners (Frosted Ruler & Bionic)
   rulerToggle.addEventListener('change', () => {
+    updateBadge(badgeRuler, rulerToggle.checked);
     updateAndDispatch({ readingRuler: rulerToggle.checked });
   });
 
   rulerSlider.addEventListener('input', () => {
-    rulerHeightVal.textContent = `${rulerSlider.value}px`;
-    updateAndDispatch({ rulerHeight: parseInt(rulerSlider.value, 10) });
+    const val = parseInt(rulerSlider.value, 10);
+    rulerHeightVal.textContent = `${val}px`;
+    updateAndDispatch({ rulerHeight: val });
   });
 
   bionicToggle.addEventListener('change', () => {
+    updateBadge(badgeBionic, bionicToggle.checked);
     updateAndDispatch({ bionicReading: bionicToggle.checked });
   });
 
   chunkingToggle.addEventListener('change', () => {
+    updateBadge(badgeChunking, chunkingToggle.checked);
     updateAndDispatch({ smartChunking: chunkingToggle.checked });
   });
 
   anchorToggle.addEventListener('change', () => {
+    updateBadge(badgeAnchor, anchorToggle.checked);
     updateAndDispatch({ lastReadAnchor: anchorToggle.checked });
   });
 
-  // Audio Controls
-  soundChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      soundChips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const type = chip.dataset.sound;
+  // 6. Audio Engine Listeners
+  soundCards.forEach(card => {
+    card.addEventListener('click', () => {
+      soundCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const soundType = card.dataset.sound;
       updateAndDispatch({
-        soundEngine: { ...currentSettings.soundEngine, type }
+        soundEngine: { ...currentSettings.soundEngine, type: soundType }
       });
 
       if (isAudioPlaying) {
-        dispatchAudioPlay(type, audioVolumeSlider.value / 100);
+        dispatchAudioPlay(soundType, audioVolumeSlider.value / 100);
       }
     });
   });
@@ -198,17 +286,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     isAudioPlaying = !isAudioPlaying;
     if (isAudioPlaying) {
       btnAudioToggle.textContent = 'Stop';
-      btnAudioToggle.classList.add('active');
+      btnAudioToggle.classList.add('playing');
+      audioIconWrap.classList.add('playing');
       dispatchAudioPlay(getSelectedSoundType(), audioVolumeSlider.value / 100);
     } else {
       btnAudioToggle.textContent = 'Play';
-      btnAudioToggle.classList.remove('active');
+      btnAudioToggle.classList.remove('playing');
+      audioIconWrap.classList.remove('playing');
       dispatchAudioStop();
     }
   });
 
   function getSelectedSoundType() {
-    const active = document.querySelector('.ff-sound-chip.active');
+    const active = document.querySelector('.zw-sound-card.active');
     return active ? active.dataset.sound : 'brown';
   }
 
@@ -232,12 +322,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Micro-Breaks
-  gameBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      gameBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedGame = btn.dataset.game;
+  // 7. Micro-Break & Hyperfixation Guard
+  gameCards.forEach(card => {
+    card.addEventListener('click', () => {
+      gameCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedGame = card.dataset.game;
     });
   });
 
@@ -271,7 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     chrome.storage.sync.set({ gameLockUntil: 0 }, () => {
       checkLockoutStatus(0);
       btnResetLockout.textContent = 'Lockout cleared!';
-      setTimeout(() => { btnResetLockout.textContent = 'Reset 15-min lockout (Dev override)'; }, 2000);
+      setTimeout(() => { btnResetLockout.textContent = 'Reset 15-min lockout (Dev Test)'; }, 2000);
     });
   });
 
@@ -281,32 +371,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       const remainingMs = lockUntil - now;
       const m = Math.floor(remainingMs / 60000);
       guardStatusBadge.textContent = `Locked (${m}m)`;
-      guardStatusBadge.className = 'ff-guard-status locked';
+      guardStatusBadge.className = 'zw-guard-pill locked';
     } else {
       guardStatusBadge.textContent = 'Ready (90s)';
-      guardStatusBadge.className = 'ff-guard-status';
+      guardStatusBadge.className = 'zw-guard-pill';
     }
   }
 
-  // AI Switches
+  // 8. AI Toggles
   aiSummaryToggle.addEventListener('change', () => {
+    updateBadge(badgeAiSummary, aiSummaryToggle.checked);
     updateAndDispatch({ aiSummaryCard: aiSummaryToggle.checked });
   });
 
   aiSimplifyToggle.addEventListener('change', () => {
+    updateBadge(badgeAiSimplify, aiSimplifyToggle.checked);
     updateAndDispatch({ aiTooltipSimplifier: aiSimplifyToggle.checked });
   });
 
   aiToneToggle.addEventListener('change', () => {
+    updateBadge(badgeAiTone, aiToneToggle.checked);
     updateAndDispatch({ toneNeutralizer: aiToneToggle.checked });
   });
 
   fatigueToggle.addEventListener('change', () => {
+    updateBadge(badgeFatigue, fatigueToggle.checked);
     updateAndDispatch({ fatigueDetection: fatigueToggle.checked });
   });
 
-  btnOpenSidepanel.addEventListener('click', () => {
+  // Open Side Panel
+  const openSidepanel = () => {
     chrome.runtime.sendMessage({ type: 'OPEN_SIDE_PANEL' });
     window.close();
-  });
+  };
+  btnOpenSidepanel.addEventListener('click', openSidepanel);
+  btnHeaderSidepanel.addEventListener('click', openSidepanel);
 });

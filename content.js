@@ -1,13 +1,13 @@
 /**
- * ZenWeb Content Orchestrator
+ * ZenWeb Content Orchestrator (v2.0)
  * Comprehensive DOM transformer, Shadow DOM traverser, MutationObserver engine,
- * Bionic Reading converter, Reading Ruler, Smart Chunking, and Fatigue Monitor.
+ * Frosted Glass Reading Ruler, Lossless Bionic Reading, Smart Chunking, and Activity Monitor.
  */
 
 (function () {
   'use strict';
 
-  // Prevent multiple injections
+  // Prevent duplicate instances
   if (window.__ZENWEB_INITIALIZED__) return;
   window.__ZENWEB_INITIALIZED__ = true;
 
@@ -23,9 +23,10 @@
       this.lastActivityTime = Date.now();
       this.scrollStuckStartTime = null;
       this.fatigueTimerInterval = null;
-      this.bionicNodesCache = new Map(); // For clean toggling
+      this.bionicNodesCache = new Map(); // For lossless toggling
       this.chunkedNodesCache = new Map();
-      this.mousePos = { x: 0, y: 0 };
+      this.modifiedStyleNodes = new Set();
+      this.mousePos = { x: 0, y: window.innerHeight / 2 };
 
       this.init();
     }
@@ -37,35 +38,29 @@
       // 2. Load Settings from chrome.storage.sync
       this.settings = await this.loadSettings();
 
-      // 3. Apply Visual Themes and Specificity Engine
-      this.applyThemeAndStyles();
-
-      // 4. Mount DOM Overlays (Reading Ruler, Selection Tooltip, Floating Pill)
+      // 3. Mount UI Overlays (Ruler, Tooltip, Floating Pill)
       this.mountReadingRuler();
       this.mountSelectionTooltip();
       this.mountFloatingPill();
 
-      // 5. Initialize Bionic Reading, Smart Chunking, and Last-Read Anchor
-      if (this.settings.bionicReading) this.enableBionicReading();
-      if (this.settings.smartChunking) this.applySmartChunking();
-      if (this.settings.lastReadAnchor) this.initLastReadAnchor();
-
-      // 6. Mount AI Summary Card if article is detected
-      if (this.settings.aiSummaryCard) {
-        setTimeout(() => this.injectAISummaryCard(), 800);
+      // 4. Apply State based on settings.enabled
+      if (this.settings.enabled !== false) {
+        this.applyActiveState();
+      } else {
+        this.applyDisabledState();
       }
 
-      // 7. Setup Dynamic SPA MutationObserver & Shadow DOM traversal
+      // 5. Dynamic SPA MutationObserver
       this.setupMutationEngine();
 
-      // 8. Setup Activity & Fatigue Dwell Monitor
+      // 6. Activity & Fatigue Monitor
       this.setupActivityMonitor();
 
-      // 9. Listen for Runtime Extension Messages
+      // 7. Listen for Extension Runtime Messages
       this.setupMessageListeners();
 
-      // 10. Fade out anti-flashbang veil smoothly
-      setTimeout(() => this.dismissFlashbangVeil(), 250);
+      // 8. Dismiss Anti-Flashbang Veil
+      setTimeout(() => this.dismissFlashbangVeil(), 200);
     }
 
     /* ==========================================================================
@@ -85,7 +80,112 @@
     }
 
     /* ==========================================================================
-       ANTI-FLASHBANG VEIL (Eliminates blinding white flashes during navigation)
+       FULL STATE TOGGLE (100% Lossless On / Off Behavior)
+       ========================================================================== */
+
+    applyActiveState() {
+      const root = document.documentElement;
+
+      // Theme
+      if (this.settings.theme && this.settings.theme !== 'none') {
+        root.setAttribute('data-zenweb-theme', this.settings.theme);
+      } else {
+        root.removeAttribute('data-zenweb-theme');
+      }
+
+      // Typography & Shields
+      root.setAttribute('data-zenweb-font', this.settings.fontFamily || 'lexend');
+      root.setAttribute('data-zenweb-shield', this.settings.distractionShield ? 'true' : 'false');
+      root.setAttribute('data-zenweb-suppress-anim', this.settings.animationSuppressor ? 'true' : 'false');
+      root.setAttribute('data-zenweb-max-width', this.settings.maxLineLength ? 'true' : 'false');
+      root.style.setProperty('--zw-line-height', this.settings.lineSpacing || '1.75');
+
+      // Inline styles normalization
+      this.normalizeInlineStyles(document.body);
+
+      // Shadow DOM piercer
+      this.pierceShadowRoots(document.documentElement);
+
+      // Ruler visibility
+      this.updateRulerVisibility();
+
+      // Bionic Reading
+      if (this.settings.bionicReading) {
+        this.enableBionicReading();
+      } else {
+        this.disableBionicReading();
+      }
+
+      // Smart Chunking
+      if (this.settings.smartChunking) {
+        this.applySmartChunking();
+      } else {
+        this.removeSmartChunking();
+      }
+
+      // Last-Read Anchor
+      if (this.settings.lastReadAnchor) {
+        this.initLastReadAnchor();
+      }
+
+      // AI Summary Card
+      if (this.settings.aiSummaryCard) {
+        setTimeout(() => this.injectAISummaryCard(), 600);
+      } else {
+        document.getElementById('zenweb-ai-summary-card')?.remove();
+      }
+
+      // Floating pill active state
+      if (this.floatingPillEl) {
+        this.floatingPillEl.classList.remove('zw-disabled');
+      }
+    }
+
+    applyDisabledState() {
+      const root = document.documentElement;
+
+      // 1. Remove all root theme attributes
+      root.removeAttribute('data-zenweb-theme');
+      root.removeAttribute('data-zenweb-font');
+      root.removeAttribute('data-zenweb-shield');
+      root.removeAttribute('data-zenweb-suppress-anim');
+      root.removeAttribute('data-zenweb-max-width');
+      root.style.removeProperty('--zw-line-height');
+
+      // 2. Hide and deactivate Reading Ruler completely
+      this.hideRuler();
+
+      // 3. Losslessly restore Bionic Reading text
+      this.disableBionicReading();
+
+      // 4. Losslessly restore Chunked Paragraphs
+      this.removeSmartChunking();
+
+      // 5. Restore original inline styles
+      this.restoreNormalizedStyles();
+
+      // 6. Remove injected UI cards & prompts
+      document.getElementById('zenweb-ai-summary-card')?.remove();
+      document.getElementById('zenweb-fatigue-prompt')?.remove();
+      document.querySelector('.zw-ai-inline-result')?.remove();
+
+      if (this.tooltipEl) {
+        this.tooltipEl.classList.remove('zw-visible');
+      }
+
+      // 7. Dim floating pill
+      if (this.floatingPillEl) {
+        this.floatingPillEl.classList.add('zw-disabled');
+      }
+
+      // 8. Stop ambient sound if playing
+      if (window.ZenWebAudio && window.ZenWebAudio.isPlaying) {
+        window.ZenWebAudio.stop();
+      }
+    }
+
+    /* ==========================================================================
+       ANTI-FLASHBANG VEIL
        ========================================================================== */
 
     mountFlashbangVeil() {
@@ -98,80 +198,64 @@
     dismissFlashbangVeil() {
       const veil = document.getElementById('zenweb-flashbang-veil');
       if (veil) {
-        veil.classList.add('ff-fade-out');
-        setTimeout(() => veil.remove(), 450);
+        veil.classList.add('zw-fade-out');
+        setTimeout(() => veil.remove(), 400);
       }
     }
 
     /* ==========================================================================
-       SPECIFICITY OVERRIDE & THEME INJECTION
+       INLINE STYLE NORMALIZATION & LOSSLESS RESTORATION
        ========================================================================== */
 
-    applyThemeAndStyles() {
-      const root = document.documentElement;
-
-      if (!this.settings.enabled) {
-        root.removeAttribute('data-zenweb-theme');
-        root.removeAttribute('data-zenweb-font');
-        root.removeAttribute('data-zenweb-shield');
-        root.removeAttribute('data-zenweb-suppress-anim');
-        root.removeAttribute('data-zenweb-max-width');
-        return;
-      }
-
-      // Theme attribute
-      if (this.settings.theme && this.settings.theme !== 'none') {
-        root.setAttribute('data-zenweb-theme', this.settings.theme);
-      } else {
-        root.removeAttribute('data-zenweb-theme');
-      }
-
-      // Typography
-      root.setAttribute('data-zenweb-font', this.settings.fontFamily || 'atkinson');
-      root.setAttribute('data-zenweb-shield', this.settings.distractionShield ? 'true' : 'false');
-      root.setAttribute('data-zenweb-suppress-anim', this.settings.animationSuppressor ? 'true' : 'false');
-      root.setAttribute('data-zenweb-max-width', this.settings.maxLineLength ? 'true' : 'false');
-
-      // CSS custom property overrides
-      root.style.setProperty('--ff-line-height', this.settings.lineSpacing || '1.75');
-
-      // Strip aggressive inline colors without disrupting layout grids
-      this.normalizeInlineStyles(document.body);
-
-      // Pierce open Shadow DOM trees
-      this.pierceShadowRoots(document.documentElement);
-    }
-
-    /**
-     * Safely clears jarring inline styles (background-color, color, font-size)
-     * while preserving grid, flex, display, width, and position layout properties.
-     */
     normalizeInlineStyles(container) {
       if (!container || !this.settings.enabled) return;
 
       const elements = container.querySelectorAll('article, p, span, div, h1, h2, h3, h4, h5, h6, li, a');
       elements.forEach(el => {
-        // Skip ZenWeb's own UI elements
-        if (el.closest('#zenweb-root, [id^="zenweb-"]')) return;
+        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
 
         const inlineBg = el.style.backgroundColor || el.style.background;
         const inlineColor = el.style.color;
 
-        // If author forced black background or glaring neon colors
+        if (inlineColor) {
+          if (!el.dataset.zwOrigColor) {
+            el.dataset.zwOrigColor = inlineColor;
+            this.modifiedStyleNodes.add(el);
+          }
+          el.style.color = '';
+        }
+
         if (inlineBg && !inlineBg.includes('url')) {
+          if (!el.dataset.zwOrigBg) {
+            el.dataset.zwOrigBg = inlineBg;
+            this.modifiedStyleNodes.add(el);
+          }
           el.style.backgroundColor = '';
           el.style.background = '';
-        }
-        if (inlineColor) {
-          el.style.color = '';
         }
       });
     }
 
-    /**
-     * Recursive Shadow DOM Traverser
-     * Injects scoped styles into isolated shadowRoot components
-     */
+    restoreNormalizedStyles() {
+      this.modifiedStyleNodes.forEach(el => {
+        if (el && el.parentNode) {
+          if (el.dataset.zwOrigColor) {
+            el.style.color = el.dataset.zwOrigColor;
+            delete el.dataset.zwOrigColor;
+          }
+          if (el.dataset.zwOrigBg) {
+            el.style.backgroundColor = el.dataset.zwOrigBg;
+            delete el.dataset.zwOrigBg;
+          }
+        }
+      });
+      this.modifiedStyleNodes.clear();
+    }
+
+    /* ==========================================================================
+       SHADOW DOM PIERCER
+       ========================================================================== */
+
     pierceShadowRoots(node) {
       if (!node) return;
 
@@ -182,11 +266,12 @@
           styleEl.id = 'zenweb-shadow-styles';
           styleEl.textContent = `
             :host {
-              font-family: var(--ff-font-stack, 'Atkinson Hyperlegible', sans-serif) !important;
-              color: var(--ff-text, inherit) !important;
+              font-family: var(--zw-font-stack, 'Lexend', sans-serif) !important;
+              color: var(--zw-text, inherit) !important;
             }
-            p, span, div, h1, h2, h3 {
-              line-height: var(--ff-line-height, 1.7) !important;
+            p, span, div, h1, h2, h3, li, a {
+              color: var(--zw-text, inherit) !important;
+              line-height: var(--zw-line-height, 1.75) !important;
               letter-spacing: 0.02em !important;
             }
           `;
@@ -195,21 +280,21 @@
         this.pierceShadowRoots(shadow);
       }
 
-      // Traverse children
       const children = node.children || [];
       for (let i = 0; i < children.length; i++) {
         this.pierceShadowRoots(children[i]);
       }
     }
 
-    /**
-     * Dynamic SPA Support: Throttled MutationObserver with requestAnimationFrame
-     */
+    /* ==========================================================================
+       DYNAMIC SPA MUTATION OBSERVER
+       ========================================================================== */
+
     setupMutationEngine() {
       let isThrottled = false;
 
       this.observer = new MutationObserver((mutations) => {
-        if (!this.settings.enabled) return;
+        if (!this.settings || !this.settings.enabled) return;
 
         if (!isThrottled) {
           isThrottled = true;
@@ -217,11 +302,10 @@
             for (const mutation of mutations) {
               for (const addedNode of mutation.addedNodes) {
                 if (addedNode.nodeType === Node.ELEMENT_NODE) {
-                  if (!addedNode.closest('#zenweb-root, [id^="zenweb-"]')) {
+                  if (!addedNode.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) {
                     this.normalizeInlineStyles(addedNode);
                     this.pierceShadowRoots(addedNode);
 
-                    // Pause autoplay videos dynamically inserted
                     if (this.settings.animationSuppressor) {
                       const videos = addedNode.querySelectorAll('video[autoplay]');
                       videos.forEach(v => {
@@ -244,7 +328,7 @@
     }
 
     /* ==========================================================================
-       READING RULER / LINE FOCUS (GPU-Accelerated WAAPI Follow-Cursor Lane)
+       FROSTED GLASS READING RULER (FIXED TOGGLE & BLURRED BOUNDARIES)
        ========================================================================== */
 
     mountReadingRuler() {
@@ -253,22 +337,22 @@
         ruler = document.createElement('div');
         ruler.id = 'zenweb-ruler-overlay';
         ruler.innerHTML = `
-          <div class="ff-ruler-curtain-top" id="ff-ruler-curtain-top"></div>
-          <div class="ff-ruler-aperture" id="ff-ruler-aperture"></div>
-          <div class="ff-ruler-curtain-bottom" id="ff-ruler-curtain-bottom"></div>
+          <div class="zw-ruler-curtain-top" id="zw-ruler-curtain-top"></div>
+          <div class="zw-ruler-aperture" id="zw-ruler-aperture"></div>
+          <div class="zw-ruler-curtain-bottom" id="zw-ruler-curtain-bottom"></div>
         `;
         document.body.appendChild(ruler);
       }
       this.rulerEl = ruler;
       this.updateRulerVisibility();
 
-      // Smooth 60-120fps tracking using requestAnimationFrame and translate3d
+      // Fluid 60-120fps tracking using requestAnimationFrame
       let ticking = false;
       window.addEventListener('pointermove', (e) => {
         this.mousePos.x = e.clientX;
         this.mousePos.y = e.clientY;
 
-        if (!ticking && this.settings.readingRuler) {
+        if (!ticking && this.settings.enabled && this.settings.readingRuler) {
           requestAnimationFrame(() => {
             this.renderRulerPosition(this.mousePos.y);
             ticking = false;
@@ -279,16 +363,17 @@
     }
 
     renderRulerPosition(cursorY) {
-      if (!this.rulerEl) return;
+      if (!this.rulerEl || !this.settings.enabled || !this.settings.readingRuler) return;
+
       const height = this.settings.rulerHeight || 120;
       const half = height / 2;
       const topCurtainHeight = Math.max(0, cursorY - half);
       const apertureTop = topCurtainHeight;
       const bottomCurtainTop = cursorY + half;
 
-      const curtainTop = this.rulerEl.querySelector('#ff-ruler-curtain-top');
-      const aperture = this.rulerEl.querySelector('#ff-ruler-aperture');
-      const curtainBottom = this.rulerEl.querySelector('#ff-ruler-curtain-bottom');
+      const curtainTop = this.rulerEl.querySelector('#zw-ruler-curtain-top');
+      const aperture = this.rulerEl.querySelector('#zw-ruler-aperture');
+      const curtainBottom = this.rulerEl.querySelector('#zw-ruler-curtain-bottom');
 
       if (curtainTop && aperture && curtainBottom) {
         curtainTop.style.height = `${topCurtainHeight}px`;
@@ -302,22 +387,27 @@
     updateRulerVisibility() {
       if (!this.rulerEl) return;
       if (this.settings.enabled && this.settings.readingRuler) {
-        this.rulerEl.style.display = 'block';
-        document.documentElement.style.setProperty('--ff-ruler-dim', this.settings.rulerDimOpacity || 0.65);
+        this.rulerEl.classList.add('zw-active');
+        this.renderRulerPosition(this.mousePos.y);
       } else {
-        this.rulerEl.style.display = 'none';
+        this.hideRuler();
+      }
+    }
+
+    hideRuler() {
+      if (this.rulerEl) {
+        this.rulerEl.classList.remove('zw-active');
       }
     }
 
     /* ==========================================================================
-       BIONIC READING CONVERTER (Visual Anchor Leads)
+       LOSSLESS BIONIC READING CONVERTER
        ========================================================================== */
 
     enableBionicReading() {
       const paragraphs = document.querySelectorAll('article p, main p, .entry-content p, p');
       paragraphs.forEach(p => {
-        // Skip ZenWeb elements, headers, code, inputs
-        if (p.closest('#zenweb-root, [id^="zenweb-"], pre, code, table, form')) return;
+        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code, table, form')) return;
         if (this.bionicNodesCache.has(p)) return;
 
         this.bionicNodesCache.set(p, p.innerHTML);
@@ -335,34 +425,30 @@
     }
 
     convertTextToBionicHTML(html) {
-      // Split by HTML tags to safely bold text nodes without mangling tag attributes
       const parts = html.split(/(<[^>]+>)/g);
       return parts.map(part => {
-        if (part.startsWith('<') && part.endsWith('>')) {
-          return part; // Return HTML tag intact
-        }
+        if (part.startsWith('<') && part.endsWith('>')) return part;
         return part.replace(/(\b[a-zA-Z0-9']+\b)/g, (word) => {
           if (word.length <= 1) return word;
-          const leadLen = Math.ceil(word.length * 0.45); // Bold initial 45%
+          const leadLen = Math.ceil(word.length * 0.45);
           const lead = word.slice(0, leadLen);
           const tail = word.slice(leadLen);
-          return `<b class="ff-bionic-lead">${lead}</b><span class="ff-bionic-tail">${tail}</span>`;
+          return `<b class="zw-bionic-lead">${lead}</b><span class="zw-bionic-tail">${tail}</span>`;
         });
       }).join('');
     }
 
     /* ==========================================================================
-       SMART CHUNKING (Digestible 2-3 sentence sub-blocks)
+       LOSSLESS SMART CHUNKING
        ========================================================================== */
 
     applySmartChunking() {
       const paragraphs = document.querySelectorAll('article p, main p, .entry-content p');
       paragraphs.forEach(p => {
-        if (p.closest('#zenweb-root, [id^="zenweb-"], pre, code')) return;
+        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code')) return;
         if (this.chunkedNodesCache.has(p)) return;
 
         const text = p.innerText || '';
-        // Count sentences
         const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)/g);
         if (sentences && sentences.length > 5) {
           this.chunkedNodesCache.set(p, p.innerHTML);
@@ -370,9 +456,9 @@
           let newHTML = '';
           for (let i = 0; i < sentences.length; i += 3) {
             const chunk = sentences.slice(i, i + 3).join('');
-            newHTML += `<span class="ff-chunk-block">${chunk}</span>`;
+            newHTML += `<span class="zw-chunk-block">${chunk}</span>`;
             if (i + 3 < sentences.length) {
-              newHTML += `<div class="ff-chunk-divider"></div>`;
+              newHTML += `<div class="zw-chunk-divider"></div>`;
             }
           }
           p.innerHTML = newHTML;
@@ -388,7 +474,7 @@
     }
 
     /* ==========================================================================
-       LAST-READ ANCHOR (Page Scroll Memory & Paragraph Bookmark)
+       LAST-READ ANCHOR
        ========================================================================== */
 
     initLastReadAnchor() {
@@ -402,7 +488,6 @@
         }, 350);
       }
 
-      // Record scroll position
       let scrollTimer = null;
       window.addEventListener('scroll', () => {
         if (scrollTimer) clearTimeout(scrollTimer);
@@ -417,11 +502,11 @@
       const elements = document.elementsFromPoint(window.innerWidth / 2, centerY);
       const para = elements.find(el => el.tagName === 'P' || el.tagName === 'ARTICLE');
 
-      if (para && !para.closest('#zenweb-root, [id^="zenweb-"]')) {
-        para.classList.add('ff-last-read-anchor');
+      if (para && !para.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) {
+        para.classList.add('zw-last-read-anchor');
         setTimeout(() => {
-          para.classList.remove('ff-last-read-anchor');
-        }, 5000);
+          para.classList.remove('zw-last-read-anchor');
+        }, 4500);
       }
     }
 
@@ -435,50 +520,47 @@
       const mainEl = document.querySelector('article, [role="main"], main') || document.body;
       const pageText = this.extractCleanText(mainEl);
 
-      // Only show card for articles with substance (>300 words)
-      if (pageText.split(/\s+/).length < 250) return;
+      if (pageText.split(/\s+/).length < 220) return;
 
       const card = document.createElement('div');
       card.id = 'zenweb-ai-summary-card';
-      card.className = 'ff-ai-summary-card';
+      card.className = 'zw-ai-summary-card';
       card.innerHTML = `
-        <div class="ff-ai-summary-header">
-          <div class="ff-ai-summary-title">
+        <div class="zw-ai-summary-header">
+          <div class="zw-ai-summary-title">
             <span>⚡</span>
             <span>ZenWeb 3-Bullet Executive Overview</span>
-            <span class="ff-ai-summary-badge">ADHD Clarity</span>
+            <span class="zw-ai-summary-badge">ADHD Scannable</span>
           </div>
-          <button class="ff-ai-summary-close" id="ff-summary-close-btn" title="Dismiss Summary">✕</button>
+          <button class="zw-ai-summary-close" id="zw-summary-close-btn" title="Dismiss">✕</button>
         </div>
-        <div id="ff-summary-loading" style="font-size: 14px; color: var(--ff-text-muted); display: flex; align-items: center; gap: 8px;">
-          <span>🧠 Synthesizing key insights...</span>
+        <div id="zw-summary-loading" style="font-size: 14px; color: var(--zw-text-muted); display: flex; align-items: center; gap: 8px;">
+          <span>🧠 Synthesizing key takeaways...</span>
         </div>
-        <ul class="ff-ai-summary-list" id="ff-summary-list" style="display: none;"></ul>
+        <ul class="zw-ai-summary-list" id="zw-summary-list" style="display: none;"></ul>
       `;
 
-      // Insert at the top of the main reading container
       if (mainEl.firstChild) {
         mainEl.insertBefore(card, mainEl.firstChild);
       } else {
         mainEl.appendChild(card);
       }
 
-      card.querySelector('#ff-summary-close-btn').addEventListener('click', () => {
+      card.querySelector('#zw-summary-close-btn').addEventListener('click', () => {
         card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => card.remove();
       });
 
-      // Generate 3 bullets via AI engine
       if (window.ZenWebAI) {
         const bullets = await window.ZenWebAI.generate3BulletSummary(pageText);
-        const list = card.querySelector('#ff-summary-list');
-        const loading = card.querySelector('#ff-summary-loading');
+        const list = card.querySelector('#zw-summary-list');
+        const loading = card.querySelector('#zw-summary-loading');
 
         if (list && loading) {
           loading.style.display = 'none';
           list.style.display = 'flex';
           list.innerHTML = bullets.map((b, i) => `
-            <li class="ff-ai-summary-item">
-              <span class="ff-ai-summary-bullet">${i + 1}</span>
+            <li class="zw-ai-summary-item">
+              <span class="zw-ai-summary-bullet">${i + 1}</span>
               <span>${b}</span>
             </li>
           `).join('');
@@ -496,26 +578,30 @@
       const tooltip = document.createElement('div');
       tooltip.id = 'zenweb-selection-tooltip';
       tooltip.innerHTML = `
-        <button class="ff-tooltip-btn" id="ff-btn-simplify">
+        <button class="zw-tooltip-btn" id="zw-btn-simplify">
           <span>💡</span><span>Simplify</span>
         </button>
-        <button class="ff-tooltip-btn" id="ff-btn-neutralize">
+        <button class="zw-tooltip-btn" id="zw-btn-neutralize">
           <span>🕊️</span><span>Calm Tone</span>
         </button>
-        <button class="ff-tooltip-btn" id="ff-btn-speak">
+        <button class="zw-tooltip-btn" id="zw-btn-speak">
           <span>🔊</span><span>Listen</span>
         </button>
       `;
       document.body.appendChild(tooltip);
       this.tooltipEl = tooltip;
 
-      // Handle selection change
       document.addEventListener('selectionchange', () => {
+        if (!this.settings || !this.settings.enabled) {
+          this.tooltipEl.classList.remove('zw-visible');
+          return;
+        }
+
         const sel = window.getSelection();
         const text = sel ? sel.toString().trim() : '';
 
         if (!text || text.length < 5 || sel.isCollapsed) {
-          this.tooltipEl.classList.remove('ff-visible');
+          this.tooltipEl.classList.remove('zw-visible');
           return;
         }
 
@@ -524,30 +610,29 @@
         if (rect.width > 0 && rect.height > 0) {
           this.tooltipEl.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
           this.tooltipEl.style.top = `${rect.top + window.scrollY}px`;
-          this.tooltipEl.classList.add('ff-visible');
+          this.tooltipEl.classList.add('zw-visible');
         }
       });
 
-      // Tooltip actions
-      tooltip.querySelector('#ff-btn-simplify').addEventListener('click', async (e) => {
+      tooltip.querySelector('#zw-btn-simplify').addEventListener('click', async (e) => {
         e.stopPropagation();
         const text = window.getSelection()?.toString().trim();
         if (!text) return;
         const result = await window.ZenWebAI.simplifyText(text);
         this.renderInlineResult("Plain-English Rewrite", result);
-        this.tooltipEl.classList.remove('ff-visible');
+        this.tooltipEl.classList.remove('zw-visible');
       });
 
-      tooltip.querySelector('#ff-btn-neutralize').addEventListener('click', async (e) => {
+      tooltip.querySelector('#zw-btn-neutralize').addEventListener('click', async (e) => {
         e.stopPropagation();
         const text = window.getSelection()?.toString().trim();
         if (!text) return;
         const result = await window.ZenWebAI.neutralizeTone(text);
         this.renderInlineResult("Emotionally Neutralized Tone", result);
-        this.tooltipEl.classList.remove('ff-visible');
+        this.tooltipEl.classList.remove('zw-visible');
       });
 
-      tooltip.querySelector('#ff-btn-speak').addEventListener('click', (e) => {
+      tooltip.querySelector('#zw-btn-speak').addEventListener('click', (e) => {
         e.stopPropagation();
         const text = window.getSelection()?.toString().trim();
         if (!text) return;
@@ -555,15 +640,14 @@
           window.speechSynthesis.cancel();
           const utter = new SpeechSynthesisUtterance(text);
           utter.rate = 1.0;
-          utter.pitch = 1.0;
           window.speechSynthesis.speak(utter);
         }
-        this.tooltipEl.classList.remove('ff-visible');
+        this.tooltipEl.classList.remove('zw-visible');
       });
     }
 
     renderInlineResult(title, text) {
-      const existing = document.querySelector('.ff-ai-inline-result');
+      const existing = document.querySelector('.zw-ai-inline-result');
       if (existing) existing.remove();
 
       const sel = window.getSelection();
@@ -571,23 +655,22 @@
       const rect = sel.getRangeAt(0).getBoundingClientRect();
 
       const resultBox = document.createElement('div');
-      resultBox.className = 'ff-ai-inline-result';
+      resultBox.className = 'zw-ai-inline-result';
       resultBox.style.left = `${rect.left + window.scrollX}px`;
       resultBox.style.top = `${rect.bottom + window.scrollY + 8}px`;
 
       resultBox.innerHTML = `
-        <div class="ff-ai-inline-result-header">
+        <div class="zw-ai-inline-result-header">
           <span>${title}</span>
-          <button style="all:initial; cursor:pointer; font-size:16px; color:inherit;" id="ff-close-inline-res">✕</button>
+          <button style="all:initial; cursor:pointer; font-size:16px; color:inherit;" id="zw-close-inline-res">✕</button>
         </div>
-        <div class="ff-ai-inline-result-content">${text}</div>
-        <div style="font-size: 11px; color: var(--ff-text-muted);">ZenWeb Privacy-First AI</div>
+        <div class="zw-ai-inline-result-content">${text}</div>
+        <div style="font-size: 11px; color: var(--zw-text-muted);">ZenWeb Privacy-First AI</div>
       `;
 
       document.body.appendChild(resultBox);
-      resultBox.querySelector('#ff-close-inline-res').addEventListener('click', () => resultBox.remove());
+      resultBox.querySelector('#zw-close-inline-res').addEventListener('click', () => resultBox.remove());
 
-      // Auto dismiss on outside click
       const onOutClick = (e) => {
         if (!resultBox.contains(e.target)) {
           resultBox.remove();
@@ -598,7 +681,7 @@
     }
 
     /* ==========================================================================
-       ACTIVITY & FATIGUE DWELL MONITOR (ADHD/AUTISTIC FREEZE DETECTION)
+       ACTIVITY & FATIGUE DWELL MONITOR
        ========================================================================== */
 
     setupActivityMonitor() {
@@ -610,9 +693,8 @@
         window.addEventListener(evt, resetActivity, { passive: true });
       });
 
-      // Scroll Dwell Monitor: If user remains within +/- 40px of same scroll position for > 4 mins
       this.fatigueTimerInterval = setInterval(() => {
-        if (!this.settings.fatigueDetection) return;
+        if (!this.settings || !this.settings.enabled || !this.settings.fatigueDetection) return;
 
         const currentY = window.scrollY;
         const delta = Math.abs(currentY - this.lastScrollY);
@@ -626,11 +708,10 @@
 
             if (stuckDurationMs >= thresholdMs) {
               this.showFatiguePrompt();
-              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10 mins after prompt
+              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10m
             }
           }
         } else {
-          // User progressed reading
           this.lastScrollY = currentY;
           this.scrollStuckStartTime = Date.now();
         }
@@ -643,43 +724,39 @@
       const prompt = document.createElement('div');
       prompt.id = 'zenweb-fatigue-prompt';
       prompt.innerHTML = `
-        <div class="ff-fatigue-title">
+        <div class="zw-fatigue-title">
           <span>🧠</span>
-          <span>Gentle Cognitive Check-In</span>
+          <span>Gentle Focus Check-In</span>
         </div>
-        <div class="ff-fatigue-body">
-          You've been lingering on this section for a few minutes. Cognitive fatigue or executive freeze is normal! Would you like a 90-second sensory reset?
+        <div class="zw-fatigue-body">
+          You've been hovering on this paragraph for a few minutes. Cognitive fatigue or executive freeze happens! Would you like a 90-second sensory reset?
         </div>
-        <div class="ff-fatigue-actions">
-          <button class="ff-fatigue-btn-primary" id="ff-fatigue-play-btn">90s Focus Reset</button>
-          <button class="ff-fatigue-btn-secondary" id="ff-fatigue-breathe-btn">Box Breathing</button>
-          <button class="ff-fatigue-btn-secondary" id="ff-fatigue-dismiss-btn">Still Reading</button>
+        <div class="zw-fatigue-actions">
+          <button class="zw-btn-primary" id="zw-fatigue-play-btn">90s Reset</button>
+          <button class="zw-btn-secondary" id="zw-fatigue-breathe-btn">Box Breath</button>
+          <button class="zw-btn-secondary" id="zw-fatigue-dismiss-btn">Still Reading</button>
         </div>
       `;
 
       document.body.appendChild(prompt);
 
-      prompt.querySelector('#ff-fatigue-play-btn').addEventListener('click', () => {
+      prompt.querySelector('#zw-fatigue-play-btn').addEventListener('click', () => {
         prompt.remove();
-        if (window.ZenWebGames) {
-          window.ZenWebGames.launchGame('fluid', 90);
-        }
+        if (window.ZenWebGames) window.ZenWebGames.launchGame('fluid', 90);
       });
 
-      prompt.querySelector('#ff-fatigue-breathe-btn').addEventListener('click', () => {
+      prompt.querySelector('#zw-fatigue-breathe-btn').addEventListener('click', () => {
         prompt.remove();
-        if (window.ZenWebGames) {
-          window.ZenWebGames.startBreathingTransition();
-        }
+        if (window.ZenWebGames) window.ZenWebGames.startBreathingTransition();
       });
 
-      prompt.querySelector('#ff-fatigue-dismiss-btn').addEventListener('click', () => {
+      prompt.querySelector('#zw-fatigue-dismiss-btn').addEventListener('click', () => {
         prompt.remove();
       });
     }
 
     /* ==========================================================================
-       FLOATING QUICK-ACCESS FOCUS PILL
+       BUBBLY FLOATING QUICK-ACCESS PILL
        ========================================================================== */
 
     mountFloatingPill() {
@@ -688,25 +765,25 @@
       const pill = document.createElement('div');
       pill.id = 'zenweb-floating-pill';
       pill.innerHTML = `
-        <button class="ff-pill-btn" id="ff-pill-audio" title="Ambient Focus Sound">
+        <button class="zw-pill-btn" id="zw-pill-audio" title="Toggle Ambient Audio">
           <span>🎧</span>
-          <span class="ff-pill-tooltip">Focus Noise</span>
+          <span class="zw-pill-tooltip">Focus Noise</span>
         </button>
-        <button class="ff-pill-btn" id="ff-pill-ruler" title="Reading Ruler">
+        <button class="zw-pill-btn" id="zw-pill-ruler" title="Toggle Frosted Ruler">
           <span>📏</span>
-          <span class="ff-pill-tooltip">Reading Ruler</span>
+          <span class="zw-pill-tooltip">Frosted Ruler</span>
         </button>
-        <button class="ff-pill-btn" id="ff-pill-bionic" title="Bionic Reading">
+        <button class="zw-pill-btn" id="zw-pill-bionic" title="Toggle Bionic Reading">
           <span>📖</span>
-          <span class="ff-pill-tooltip">Bionic Text</span>
+          <span class="zw-pill-tooltip">Bionic Text</span>
         </button>
-        <button class="ff-pill-btn" id="ff-pill-game" title="Micro Focus Break">
+        <button class="zw-pill-btn" id="zw-pill-game" title="Take 90s Focus Break">
           <span>🎮</span>
-          <span class="ff-pill-tooltip">90s Break</span>
+          <span class="zw-pill-tooltip">90s Reset</span>
         </button>
-        <button class="ff-pill-btn" id="ff-pill-sidepanel" title="AI Assistant">
+        <button class="zw-pill-btn" id="zw-pill-sidepanel" title="AI Co-Pilot Panel">
           <span>✨</span>
-          <span class="ff-pill-tooltip">AI Co-Pilot</span>
+          <span class="zw-pill-tooltip">AI Co-Pilot</span>
         </button>
       `;
 
@@ -714,32 +791,32 @@
       this.floatingPillEl = pill;
 
       // Audio toggle
-      const audioBtn = pill.querySelector('#ff-pill-audio');
+      const audioBtn = pill.querySelector('#zw-pill-audio');
       audioBtn.addEventListener('click', () => {
         if (!window.ZenWebAudio) return;
         if (window.ZenWebAudio.isPlaying) {
           window.ZenWebAudio.stop();
-          audioBtn.classList.remove('ff-active');
+          audioBtn.classList.remove('zw-active');
         } else {
           window.ZenWebAudio.start(this.settings.soundEngine?.type || 'brown');
-          audioBtn.classList.add('ff-active');
+          audioBtn.classList.add('zw-active');
         }
       });
 
       // Ruler toggle
-      const rulerBtn = pill.querySelector('#ff-pill-ruler');
+      const rulerBtn = pill.querySelector('#zw-pill-ruler');
       rulerBtn.addEventListener('click', () => {
         this.settings.readingRuler = !this.settings.readingRuler;
-        rulerBtn.classList.toggle('ff-active', this.settings.readingRuler);
+        rulerBtn.classList.toggle('zw-active', this.settings.readingRuler);
         this.updateRulerVisibility();
         chrome.storage?.sync?.set({ readingRuler: this.settings.readingRuler });
       });
 
       // Bionic toggle
-      const bionicBtn = pill.querySelector('#ff-pill-bionic');
+      const bionicBtn = pill.querySelector('#zw-pill-bionic');
       bionicBtn.addEventListener('click', () => {
         this.settings.bionicReading = !this.settings.bionicReading;
-        bionicBtn.classList.toggle('ff-active', this.settings.bionicReading);
+        bionicBtn.classList.toggle('zw-active', this.settings.bionicReading);
         if (this.settings.bionicReading) {
           this.enableBionicReading();
         } else {
@@ -748,15 +825,13 @@
         chrome.storage?.sync?.set({ bionicReading: this.settings.bionicReading });
       });
 
-      // Micro Break Game launcher
-      pill.querySelector('#ff-pill-game').addEventListener('click', () => {
-        if (window.ZenWebGames) {
-          window.ZenWebGames.launchGame('fluid', 90);
-        }
+      // Game launcher
+      pill.querySelector('#zw-pill-game').addEventListener('click', () => {
+        if (window.ZenWebGames) window.ZenWebGames.launchGame('fluid', 90);
       });
 
-      // AI Side Panel opener
-      pill.querySelector('#ff-pill-sidepanel').addEventListener('click', () => {
+      // Side panel
+      pill.querySelector('#zw-pill-sidepanel').addEventListener('click', () => {
         chrome.runtime?.sendMessage({ type: 'OPEN_SIDE_PANEL' });
       });
     }
@@ -767,13 +842,12 @@
 
     extractCleanText(container = document.body) {
       const clone = container.cloneNode(true);
-      // Remove unwanted elements
-      clone.querySelectorAll('script, style, noscript, nav, footer, aside, [id^="zenweb-"]').forEach(el => el.remove());
+      clone.querySelectorAll('script, style, noscript, nav, footer, aside, [id^="zenweb-"], [class^="zw-"]').forEach(el => el.remove());
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }
 
     /* ==========================================================================
-       MESSAGING DISPATCHER
+       RUNTIME MESSAGING DISPATCHER
        ========================================================================== */
 
     setupMessageListeners() {
@@ -781,14 +855,14 @@
         switch (msg.type) {
           case 'UPDATE_SETTINGS':
             this.settings = { ...this.settings, ...msg.settings };
-            this.applyThemeAndStyles();
-            this.updateRulerVisibility();
-            if (msg.settings.bionicReading !== undefined) {
-              msg.settings.bionicReading ? this.enableBionicReading() : this.disableBionicReading();
+
+            // Full State Dispatch
+            if (this.settings.enabled === false) {
+              this.applyDisabledState();
+            } else {
+              this.applyActiveState();
             }
-            if (msg.settings.smartChunking !== undefined) {
-              msg.settings.smartChunking ? this.applySmartChunking() : this.removeSmartChunking();
-            }
+
             sendResponse({ success: true });
             break;
 
@@ -839,7 +913,7 @@
     }
   }
 
-  // Initialize ZenWeb on DOM Ready
+  // Self-mount on DOM Ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => new ZenWebContent());
   } else {

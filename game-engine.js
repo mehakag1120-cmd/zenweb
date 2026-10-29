@@ -97,37 +97,37 @@ class ZenWebGameEngine {
     const modal = document.createElement('div');
     modal.id = 'zenweb-lockout-modal';
     modal.innerHTML = `
-      <div class="ff-lockout-card">
-        <div class="ff-lockout-icon">🛡️</div>
-        <div class="ff-lockout-title">Dopamine Protection Active</div>
-        <div class="ff-lockout-desc">
+      <div class="zw-lockout-card">
+        <div class="zw-lockout-icon">🛡️</div>
+        <div class="zw-lockout-title">Dopamine Protection Active</div>
+        <div class="zw-lockout-desc">
           Micro-breaks are designed to refresh your cognitive focus, not trigger dopamine rabbit holes or hyperfixation.
         </div>
-        <div class="ff-lockout-time-left" id="ff-lockout-timer">${mins}m ${secs < 10 ? '0' : ''}${secs}s remaining</div>
-        <div class="ff-lockout-desc" style="font-size: 13px;">
+        <div class="zw-lockout-time-left" id="zw-lockout-timer">${mins}m ${secs < 10 ? '0' : ''}${secs}s remaining</div>
+        <div class="zw-lockout-desc" style="font-size: 13px;">
           Take a sip of water, stretch your shoulders, or try a 30-second breathing exercise.
         </div>
         <div style="display:flex; gap: 10px; margin-top: 10px;">
-          <button class="ff-fatigue-btn-primary" id="ff-lockout-breathe-btn">Guided Breathing</button>
-          <button class="ff-fatigue-btn-secondary" id="ff-lockout-close-btn">Return to Reading</button>
+          <button class="zw-btn-primary" id="zw-lockout-breathe-btn">Guided Breathing</button>
+          <button class="zw-btn-secondary" id="zw-lockout-close-btn">Return to Reading</button>
         </div>
       </div>
     `;
 
     document.body.appendChild(modal);
 
-    modal.querySelector('#ff-lockout-close-btn').addEventListener('click', () => {
+    modal.querySelector('#zw-lockout-close-btn').addEventListener('click', () => {
       modal.remove();
     });
 
-    modal.querySelector('#ff-lockout-breathe-btn').addEventListener('click', () => {
+    modal.querySelector('#zw-lockout-breathe-btn').addEventListener('click', () => {
       modal.remove();
       this.startBreathingTransition();
     });
 
     // Real-time countdown on lockout modal
     const interval = setInterval(() => {
-      const el = document.getElementById('ff-lockout-timer');
+      const el = document.getElementById('zw-lockout-timer');
       if (!el) {
         clearInterval(interval);
         return;
@@ -161,25 +161,25 @@ class ZenWebGameEngine {
     const modal = document.createElement('div');
     modal.id = 'zenweb-game-modal';
     modal.innerHTML = `
-      <div class="ff-game-container">
-        <div class="ff-game-hud">
-          <div class="ff-game-title-group">
+      <div class="zw-game-container">
+        <div class="zw-game-hud">
+          <div class="zw-game-title-group">
             <span style="font-size: 18px;">✨</span>
-            <span class="ff-game-title">${titles[gameType] || 'Focus Reset Micro-Game'}</span>
+            <span class="zw-game-title">${titles[gameType] || 'Focus Reset Micro-Game'}</span>
           </div>
-          <div class="ff-game-timer-pill">
-            <div class="ff-game-timer-circle"></div>
-            <span id="ff-game-countdown">${this.timeRemaining}s</span>
+          <div class="zw-game-timer-pill">
+            <div class="zw-game-timer-circle"></div>
+            <span id="zw-game-countdown">${this.timeRemaining}s</span>
           </div>
         </div>
 
-        <div class="ff-game-canvas-wrapper">
+        <div class="zw-game-canvas-wrapper">
           <canvas id="zenweb-game-canvas"></canvas>
         </div>
 
-        <div class="ff-game-footer">
+        <div class="zw-game-footer">
           <span>🧠 Hard-limited to protect attention. Transition resets automatically at 0s.</span>
-          <button class="ff-game-close-btn" id="ff-game-quit-btn">End Break Early</button>
+          <button class="zw-game-close-btn" id="zw-game-quit-btn">End Break Early</button>
         </div>
       </div>
     `;
@@ -187,7 +187,7 @@ class ZenWebGameEngine {
     document.body.appendChild(modal);
     this.modalEl = modal;
 
-    modal.querySelector('#ff-game-quit-btn').addEventListener('click', () => {
+    modal.querySelector('#zw-game-quit-btn').addEventListener('click', () => {
       this.terminateGame(false);
     });
   }
@@ -257,7 +257,7 @@ class ZenWebGameEngine {
     this.timerInterval = setInterval(() => {
       this.timeRemaining--;
 
-      const countEl = document.getElementById('ff-game-countdown');
+      const countEl = document.getElementById('zw-game-countdown');
       if (countEl) {
         countEl.textContent = `${this.timeRemaining}s`;
         if (this.timeRemaining <= 10) {
@@ -330,31 +330,31 @@ class ZenWebGameEngine {
         <div style="font-size: 13px; font-weight: 700; color: #b388ff; letter-spacing: 0.1em; text-transform: uppercase;">
           Cognitive Re-centering
         </div>
-        <div class="ff-breathing-phase-text" id="ff-breath-phase">Inhale Gently...</div>
-        <div class="ff-breathing-subtext">
+        <div class="zw-breathing-phase-text" id="zw-breath-phase">Inhale Gently...</div>
+        <div class="zw-breathing-subtext">
           Sync your breath with the expanding orb to ground your nervous system before returning.
         </div>
 
-        <div class="ff-breathing-circle-container">
-          <div class="ff-breathing-outer-ring"></div>
-          <div class="ff-breathing-orb ff-breathing-anim-box" id="ff-breath-orb">
-            <span id="ff-breath-seconds">4s</span>
+        <div class="zw-breathing-circle-container">
+          <div class="zw-breathing-outer-ring"></div>
+          <div class="zw-breathing-orb zw-breathing-anim-box" id="zw-breath-orb">
+            <span id="zw-breath-seconds">4s</span>
           </div>
         </div>
 
-        <div class="ff-breathing-countdown">
-          Returning to article in <span id="ff-breath-total-countdown">30</span>s
+        <div class="zw-breathing-countdown">
+          Returning to article in <span id="zw-breath-total-countdown">30</span>s
         </div>
-        <button class="ff-game-close-btn" id="ff-breath-skip-btn" style="margin-top: 24px;">Skip Directly to Work</button>
+        <button class="zw-game-close-btn" id="zw-breath-skip-btn" style="margin-top: 24px;">Skip Directly to Work</button>
       </div>
     `;
 
     document.body.appendChild(breathingModal);
 
     let remainingTotal = 30;
-    const phaseText = breathingModal.querySelector('#ff-breath-phase');
-    const breathSecs = breathingModal.querySelector('#ff-breath-seconds');
-    const totalCount = breathingModal.querySelector('#ff-breath-total-countdown');
+    const phaseText = breathingModal.querySelector('#zw-breath-phase');
+    const breathSecs = breathingModal.querySelector('#zw-breath-seconds');
+    const totalCount = breathingModal.querySelector('#zw-breath-total-countdown');
 
     const phases = [
       { text: 'Inhale Slowly...', duration: 4 },
@@ -385,7 +385,7 @@ class ZenWebGameEngine {
       }
     }, 1000);
 
-    breathingModal.querySelector('#ff-breath-skip-btn').addEventListener('click', () => {
+    breathingModal.querySelector('#zw-breath-skip-btn').addEventListener('click', () => {
       clearInterval(interval);
       this.finishReset(breathingModal);
     });

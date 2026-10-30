@@ -1479,6 +1479,27 @@ html[data-zenweb-theme="pixel-dark"] .js-year-link:hover {
   letter-spacing: 0.04em !important;
 }
 
+/* ==========================================================================
+   GITHUB NATIVE PROFILE & PINNED REPOSITORY DE-DUPLICATION
+   Completely suppresses duplicate pinned repositories list and redundant sidebar
+   when Bento Matrix restructuring is activated.
+   ========================================================================== */
+
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] .js-pinned-items-reorder-container,
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] [data-pinned-items-reorder-container],
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] .pinned-items-container,
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] ol.js-pinned-items-reorder-list,
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] .pinned-item-list-item,
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] .Layout-sidebar {
+  display: none !important;
+}
+
+html[data-zenweb-theme="pixel-dark"][data-zenweb-restructured="true"] .Layout-main {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 1 100% !important;
+}
+
 /* Master Bento Matrix Container */
 .zw-bento-matrix {
   all: initial;

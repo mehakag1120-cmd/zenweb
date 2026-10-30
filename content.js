@@ -957,40 +957,89 @@
        A. Developer Profile Bento Transformation (Max Observability & Polish)
        -------------------------------------------------------------------------- */
     applyDeveloperProfileBentoRestructuring() {
-      // 1. Locate Native Containers
+      // 1. Locate and Cleanly Hide Native Redundant Containers (Overrides GitHub Primer !important)
       const sidebar = document.querySelector('.Layout-sidebar, [itemtype*="Person"], .user-profile-sticky-bar');
-      const pinnedList = document.querySelector('ol.js-pinned-items-reorder-list, .pinned-items-list, div[data-pinned-items-reorder-container], .js-pinned-items-reorder-list');
       const mainTarget = document.querySelector('.Layout-main, main, [role="main"]') || document.body;
 
-      // Cleanly hide native cramped sidebar and duplicate pinned container
       if (sidebar) {
         this.aiHiddenNodes.add(sidebar);
-        sidebar.style.display = 'none';
-      }
-      if (pinnedList) {
-        this.aiHiddenNodes.add(pinnedList);
-        pinnedList.style.display = 'none';
+        sidebar.style.setProperty('display', 'none', 'important');
       }
 
-      // Also hide duplicate "Popular repositories" header if present to avoid repetition
-      const popularHeader = document.querySelector('h2.f4.mb-2, [class*="popular-repositories"]');
-      if (popularHeader) {
-        this.aiHiddenNodes.add(popularHeader);
-        popularHeader.style.display = 'none';
+      // Hide all occurrences of native pinned repository containers and headers
+      const pinnedSelectors = `
+        .js-pinned-items-reorder-container,
+        [data-pinned-items-reorder-container],
+        .pinned-items-container,
+        ol.js-pinned-items-reorder-list,
+        .pinned-item-list-item,
+        h2.f4.mb-2,
+        [class*="popular-repositories"],
+        a[href*="/customize_pinned_items"]
+      `;
+      const redundantPinnedElements = document.querySelectorAll(pinnedSelectors);
+      redundantPinnedElements.forEach(el => {
+        const container = el.closest('.js-pinned-items-reorder-container, [data-pinned-items-reorder-container]') || el;
+        this.aiHiddenNodes.add(container);
+        container.style.setProperty('display', 'none', 'important');
+      });
+
+      // 2. Clean, De-duplicated Profile Attributes Extraction
+      // A. Extract Pronouns first
+      let pronouns = '';
+      const pronounEl = document.querySelector('[itemprop="pronouns"], .user-profile-pronouns, [class*="pronoun"]');
+      if (pronounEl) {
+        pronouns = pronounEl.innerText.replace(/[()·•[\]]/g, '').trim();
       }
 
-      // 2. Extract Profile Attributes
+      // B. Extract pure GitHub Handle (e.g. "mehakag1120-cmd")
+      let handle = '';
+      const handleEl = document.querySelector('.vcard-username, [itemprop="additionalName"], .p-nickname, [class*="username"]');
+      if (handleEl) {
+        const rawHandle = handleEl.innerText.trim();
+        const tokenMatch = rawHandle.match(/^[^\s·•/()]+/);
+        handle = tokenMatch ? tokenMatch[0].replace(/^@/, '').trim() : '';
+        if (!pronouns && rawHandle.includes('·')) {
+          pronouns = rawHandle.split('·')[1].replace(/[()·•[\]]/g, '').trim();
+        }
+      }
+      if (!handle) {
+        handle = window.location.pathname.replace(/^\//, '').split('/')[0] || 'Developer';
+      }
+
+      // C. Extract pure Display Name (e.g. "meg")
+      let name = '';
+      const nameEl = document.querySelector('.vcard-fullname, [itemprop="name"], .p-name');
+      if (nameEl) {
+        name = nameEl.innerText.trim();
+      } else {
+        const vcardH1 = document.querySelector('h1.vcard-names');
+        if (vcardH1) {
+          const firstSpan = vcardH1.querySelector('span:first-child');
+          if (firstSpan && !firstSpan.classList.contains('vcard-username')) {
+            name = firstSpan.innerText.trim();
+          }
+        }
+      }
+
+      // De-duplicate: Ensure display name does not repeat handle or pronouns
+      if (name) {
+        if (handle) {
+          name = name.replace(new RegExp('@?' + handle.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi'), '');
+        }
+        if (pronouns) {
+          name = name.replace(new RegExp(pronouns.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi'), '');
+        }
+        name = name.replace(/^[·•\s\-_()]+|[·•\s\-_()]+$/g, '').trim();
+      }
+
+      // Normalize if name is empty or identical to handle
+      if (name && name.toLowerCase() === handle.toLowerCase()) {
+        name = '';
+      }
+
       const avatarImg = document.querySelector('.avatar-user, [itemprop="image"], img.avatar, [class*="avatar"] img');
       const avatarSrc = avatarImg ? avatarImg.src : '';
-
-      const nameEl = document.querySelector('.vcard-fullname, [itemprop="name"], h1.vcard-names span, h1.vcard-names, [class*="profile-name"]');
-      const name = nameEl ? nameEl.innerText.trim() : '';
-
-      const handleEl = document.querySelector('.vcard-username, [itemprop="additionalName"], [class*="username"]');
-      const handle = handleEl ? handleEl.innerText.trim() : (window.location.pathname.replace(/^\//, '').split('/')[0] || 'Developer');
-
-      const pronounEl = document.querySelector('[itemprop="pronouns"], [class*="pronoun"]');
-      const pronouns = pronounEl ? pronounEl.innerText.trim() : '';
 
       const bioEl = document.querySelector('.user-profile-bio, .p-note, [class*="user-bio"]');
       const bio = bioEl ? bioEl.innerText.trim() : '';
@@ -1042,7 +1091,7 @@
           </div>
           <div class="zw-ai-reasoning-box">
             <div class="zw-ai-reasoning-text">
-              <strong>AI AGENT THOUGHT:</strong> Restructured page architecture into a balanced Bento Grid: unified profile identity hero, ${projects.length || 4} pinned project containers with live language telemetry, and decoupled layout noise.
+              <strong>AI AGENT THOUGHT:</strong> Restructured page architecture into a balanced Bento Grid: unified profile identity hero, ${projects.length || 4} pinned project containers with live language telemetry, and decoupled redundant native containers.
             </div>
           </div>
         </div>
@@ -1052,7 +1101,7 @@
       const briefingTakeaways = window.ZenWebAI?.generateProfileBriefing({
         name, handle, pronouns, bio, projects
       }) || [
-        `Profile Identity: ${name || handle} — Public Developer Portfolio & Engineering Showcase.`,
+        `Profile Identity: ${name ? `${name} (@${handle})` : `@${handle}`}${pronouns ? ` [${pronouns}]` : ''} — Public Developer Portfolio & Engineering Showcase.`,
         `Bio & Focus: "${bio || 'Active developer'}" — Software architecture & web systems.`,
         `Featured Repositories: ${projects.length} open-source projects highlighted in high observability cards.`,
         `Bento Matrix Telemetry: Balanced 2-column grid applied with live language beacons.`,
@@ -1084,10 +1133,13 @@
         </div>
       `;
 
-      // Hero Identity Tile
+      // Hero Identity Tile (Clean, Non-repetitive)
       const pronounBadge = pronouns ? `<span class="zw-hero-pronoun">${this.escapeHTML(pronouns)}</span>` : '';
       const bioHTML = bio ? `<div class="zw-hero-bio">“${this.escapeHTML(bio)}”</div>` : '';
       const avatarHTML = avatarSrc ? `<div class="zw-hero-avatar-frame"><img src="${this.escapeHTML(avatarSrc)}" alt="${this.escapeHTML(name || handle)}"/></div>` : '';
+
+      const heroNameHTML = name ? `<span class="zw-hero-name">${this.escapeHTML(name)}</span>` : '';
+      const heroHandleHTML = `<span class="zw-hero-handle">@${this.escapeHTML(handle)}</span>`;
 
       const heroHTML = `
         <div class="zw-bento-hero-tile">
@@ -1095,8 +1147,8 @@
             ${avatarHTML}
             <div class="zw-hero-meta">
               <div class="zw-hero-title-row">
-                <span class="zw-hero-name">${this.escapeHTML(name || handle)}</span>
-                <span class="zw-hero-handle">@${this.escapeHTML(handle)}</span>
+                ${heroNameHTML}
+                ${heroHandleHTML}
                 ${pronounBadge}
               </div>
               ${bioHTML}

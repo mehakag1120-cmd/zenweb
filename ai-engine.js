@@ -109,9 +109,27 @@ class ZenWebAIEngine {
    */
   generateProfileBriefing(profile = {}) {
     const bullets = [];
-    const nameStr = profile.name ? `${profile.name} (@${profile.handle || ''})` : `@${profile.handle || 'Developer'}`;
-    const pronounStr = profile.pronouns ? ` [${profile.pronouns}]` : '';
-    bullets.push(`Profile Identity: ${nameStr}${pronounStr} — Public Developer Portfolio & Engineering Hub.`);
+    
+    // Clean and de-duplicate identity tokens
+    const cleanName = profile.name && profile.name.toLowerCase() !== (profile.handle || '').toLowerCase()
+      ? profile.name.trim()
+      : '';
+    const cleanHandle = (profile.handle || 'Developer').replace(/^@/, '').trim();
+    const cleanPronouns = (profile.pronouns || '').replace(/[()·•[\]]/g, '').trim();
+
+    let idStr = '';
+    if (cleanName && cleanHandle) {
+      idStr = `${cleanName} (@${cleanHandle})`;
+    } else if (cleanName) {
+      idStr = cleanName;
+    } else {
+      idStr = `@${cleanHandle}`;
+    }
+    if (cleanPronouns) {
+      idStr += ` [${cleanPronouns}]`;
+    }
+
+    bullets.push(`Profile Identity: ${idStr} — Public Developer Portfolio & Engineering Hub.`);
 
     if (profile.bio) {
       bullets.push(`Creator Statement: "${profile.bio}" — Active exploration of software architecture.`);
@@ -122,14 +140,14 @@ class ZenWebAIEngine {
     if (profile.projects && profile.projects.length > 0) {
       profile.projects.slice(0, 3).forEach((proj, idx) => {
         const langStr = proj.language ? ` [${proj.language}]` : '';
-        const descStr = proj.description ? ` — ${proj.description}` : ' — Public repository';
-        bullets.push(`Project ${idx + 1} (${proj.name}${langStr}):${descStr}`);
+        const descStr = proj.description ? ` — ${proj.description}` : ' — Public engineering repository.';
+        bullets.push(`Project ${idx + 1} (${proj.name}${langStr})${descStr}`);
       });
     }
 
     // Pad to 5 points with high-observability structural takeaways
     if (bullets.length < 5) {
-      bullets.push(`Bento Grid Telemetry: Repositories and profile cards reorganized into a balanced high-observability matrix.`);
+      bullets.push(`Bento Grid Telemetry: Pinned repositories and profile hero unified into a balanced high-observability matrix.`);
     }
     if (bullets.length < 5) {
       bullets.push(`Cognitive Usability: High-contrast brutalist styling applied with distraction filtering and live language beacons.`);

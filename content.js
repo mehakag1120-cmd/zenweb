@@ -158,16 +158,18 @@
     initPixelParticles(width, height) {
       this.pixels = [];
       this.gridCrosshairs = [];
-      const gridSize = 40;
+      const gridSize = 50;
 
-      // Generate fixed coordinate crosshairs
-      for (let x = 20; x < width; x += gridSize * 2) {
-        for (let y = 20; y < height; y += gridSize * 2) {
-          if (Math.random() > 0.4) {
+      // Generate fixed coordinate crosshairs (+)
+      for (let x = 25; x < width; x += gridSize * 2) {
+        for (let y = 25; y < height; y += gridSize * 2) {
+          if (Math.random() > 0.45) {
+            const isPink = Math.random() > 0.8;
             this.gridCrosshairs.push({
               x,
               y,
-              alpha: 0.12 + Math.random() * 0.18,
+              color: isPink ? '#FF007A' : '#00FF66',
+              alpha: 0.16 + Math.random() * 0.22,
               pulseSpeed: 1 + Math.random() * 2,
               phase: Math.random() * Math.PI * 2
             });
@@ -175,21 +177,45 @@
         }
       }
 
-      // Generate sliding pixel packets
-      const particleCount = Math.max(28, Math.floor(width / 38));
-      const colors = ['#00FF66', '#FF007A', '#F4F6FB', '#00FF66'];
+      // Generate prominent, chunky sliding pixel packets (Baseten aesthetic)
+      const particleCount = Math.max(22, Math.floor(width / 52));
+      const colors = ['#00FF66', '#FF007A', '#F4F6FB', '#00FF66', '#38BDF8'];
 
       for (let i = 0; i < particleCount; i++) {
-        const isWide = Math.random() > 0.6;
+        // Diverse, clearly visible chunky sizes:
+        // - Wide multi-byte data packets: 26-38px x 10-14px
+        // - Medium chunky blocks: 16-24px x 8-11px
+        // - Chunky square blocks: 12-16px x 12-16px
+        const roll = Math.random();
+        let w = 18;
+        let h = 9;
+        let styleType = 'medium';
+
+        if (roll < 0.38) {
+          w = 26 + Math.floor(Math.random() * 12); // 26-38px wide
+          h = 10 + Math.floor(Math.random() * 4);  // 10-14px tall
+          styleType = 'wide';
+        } else if (roll < 0.72) {
+          w = 16 + Math.floor(Math.random() * 8);  // 16-24px wide
+          h = 8 + Math.floor(Math.random() * 3);   // 8-11px tall
+          styleType = 'medium';
+        } else {
+          const sz = 12 + Math.floor(Math.random() * 4); // 12-16px square
+          w = sz;
+          h = sz;
+          styleType = 'square';
+        }
+
         this.pixels.push({
           x: Math.random() * width,
-          y: Math.floor((Math.random() * height) / gridSize) * gridSize + 20,
-          w: isWide ? 6 : 4,
-          h: 4,
-          vx: 24 + Math.random() * 38,
+          y: Math.floor((Math.random() * height) / gridSize) * gridSize + 25 - (h / 2),
+          w,
+          h,
+          styleType,
+          vx: 30 + Math.random() * 45,
           color: colors[Math.floor(Math.random() * colors.length)],
-          alpha: 0.25 + Math.random() * 0.45,
-          trail: []
+          alpha: 0.38 + Math.random() * 0.45,
+          trailSteps: 4 + Math.floor(Math.random() * 3) // 4 to 6 chunky trailing segments
         });
       }
     }
@@ -222,51 +248,71 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      // 1. Draw Subtle Technical Grid Dots
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
-      const gridSize = 40;
-      for (let x = 20; x < w; x += gridSize) {
-        for (let y = 20; y < h; y += gridSize) {
-          ctx.fillRect(x, y, 1.5, 1.5);
+      const gridSize = 50;
+
+      // 1. Draw Crisp Technical Grid Dots
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.055)';
+      for (let x = 25; x < w; x += gridSize) {
+        for (let y = 25; y < h; y += gridSize) {
+          ctx.fillRect(x - 1, y - 1, 2.5, 2.5);
         }
       }
 
-      // 2. Draw Pulsing Coordinate Crosshairs (+)
+      // 2. Draw Prominent Pulsing Coordinate Crosshairs (+)
       this.gridCrosshairs.forEach(ch => {
         const pulse = 0.5 + 0.5 * Math.sin(now * 0.002 * ch.pulseSpeed + ch.phase);
-        ctx.fillStyle = '#00FF66';
+        ctx.fillStyle = ch.color || '#00FF66';
         ctx.globalAlpha = ch.alpha * pulse;
-        // Horizontal bar
-        ctx.fillRect(ch.x - 3, ch.y, 7, 1);
-        // Vertical bar
-        ctx.fillRect(ch.x, ch.y - 3, 1, 7);
+        // Horizontal bar: 13px wide x 2px thick
+        ctx.fillRect(ch.x - 6, ch.y - 1, 13, 2);
+        // Vertical bar: 2px wide x 13px tall
+        ctx.fillRect(ch.x - 1, ch.y - 6, 2, 13);
       });
 
-      // 3. Draw Sliding Pixels & Motion Trails
+      // 3. Draw Large Sliding Pixels & Chunky Segmented Trails
       this.pixels.forEach(p => {
         p.x += p.vx * dt;
 
-        p.trail.unshift({ x: p.x, y: p.y });
-        if (p.trail.length > 5) p.trail.pop();
-
-        if (p.x > w + 40) {
-          p.x = -20;
-          p.y = Math.floor((Math.random() * h) / gridSize) * gridSize + 20;
-          p.trail = [];
+        if (p.x > w + 120) {
+          p.x = -80;
+          p.y = Math.floor((Math.random() * h) / gridSize) * gridSize + 25 - (p.h / 2);
         }
 
-        // Draw phosphor motion trail
-        p.trail.forEach((pos, idx) => {
-          const trailAlpha = (p.alpha * (1 - (idx + 1) / (p.trail.length + 1))) * 0.55;
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = Math.max(0, trailAlpha);
-          ctx.fillRect(pos.x - idx * (p.w + 2), pos.y, p.w, p.h);
-        });
+        // Draw segmented trailing pixel dashes behind the lead head
+        const stepSpacing = p.w * 0.65 + 6;
+        for (let step = 1; step <= p.trailSteps; step++) {
+          const trailX = p.x - step * stepSpacing;
+          if (trailX > -50 && trailX < w + 50) {
+            const decay = 1 - (step / (p.trailSteps + 1));
+            const trailW = Math.max(5, Math.floor(p.w * decay));
+            const trailH = Math.max(4, Math.floor(p.h * (0.4 + 0.6 * decay)));
+            const trailY = p.y + (p.h - trailH) / 2;
 
-        // Main Pixel Head
-        ctx.fillStyle = p.color;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha * decay * 0.6;
+            ctx.fillRect(trailX, trailY, trailW, trailH);
+          }
+        }
+
+        // Main Pixel Head with Soft Luminescent Glow
+        ctx.save();
         ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 10;
+
+        // Draw solid main head block
         ctx.fillRect(p.x, p.y, p.w, p.h);
+
+        // Bright inner core highlight for substantial blocks
+        if (p.w >= 18) {
+          ctx.fillStyle = '#ffffff';
+          ctx.globalAlpha = Math.min(1, p.alpha * 0.75);
+          ctx.shadowBlur = 0;
+          ctx.fillRect(p.x + 3, p.y + 2, Math.max(4, p.w - 6), Math.max(2, p.h - 4));
+        }
+
+        ctx.restore();
       });
 
       ctx.globalAlpha = 1;

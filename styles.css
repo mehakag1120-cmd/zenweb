@@ -657,6 +657,49 @@ html[data-zenweb-theme="pixel-dark"] .js-year-link:hover {
   color: #ffffff !important;
 }
 
+.zw-pixel-close:hover svg path {
+  stroke: #ffffff !important;
+}
+
+/* Minimize Button (Collapse/Expand toggle) */
+.zw-pixel-minimize {
+  all: initial;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 7px !important;
+  border-radius: 4px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  transition: all 0.15s ease !important;
+}
+
+.zw-pixel-minimize:hover {
+  background: rgba(0, 255, 102, 0.12) !important;
+  border-color: var(--zw-green, #00FF66) !important;
+}
+
+.zw-pixel-minimize:hover svg path {
+  stroke: var(--zw-green, #00FF66) !important;
+}
+
+/* Collapsed Briefing State */
+.zw-briefing-collapsed {
+  border-bottom: none !important;
+}
+
+.zw-briefing-collapsed .zw-pixel-window-header {
+  border-bottom: 1px solid var(--zw-gray-border, #272a3d) !important;
+}
+
+/* Right-side header controls container */
+.zw-header-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
 .zw-overview-body {
   padding: 22px 26px !important;
 }

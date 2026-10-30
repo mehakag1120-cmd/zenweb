@@ -1109,14 +1109,26 @@
       ];
 
       const briefingHTML = `
-        <div class="zw-pixel-window zw-overview-window" style="margin: 0 !important;">
+        <div class="zw-pixel-window zw-overview-window" style="margin: 0 !important;" id="zw-bento-briefing-window">
           <div class="zw-pixel-window-header">
             <div class="zw-header-left">
               <span class="zw-pixel-pill-pink">AI BRIEFING</span>
               <span class="zw-pixel-tag">EXECUTIVE CORE</span>
             </div>
+            <div class="zw-header-right" style="display:flex; align-items:center; gap:8px;">
+              <button class="zw-pixel-minimize" id="zw-briefing-minimize" title="Minimize briefing">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+                  <path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+              <button class="zw-pixel-close" id="zw-briefing-close" title="Close briefing">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none">
+                  <path d="M18 6L6 18M6 6l12 12" stroke="#9499aa" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="zw-overview-body">
+          <div class="zw-overview-body" id="zw-bento-briefing-body">
             <div class="zw-overview-badge-row">
               <span class="zw-badge-accent-pink">CORE TAKEAWAYS</span>
               <span style="font-size:11px; color:#9499aa;">Developer Profile Overview (5 key takeaways)</span>
@@ -1230,6 +1242,33 @@
           editBtn.click();
         } else {
           this.showToast("Developer profile action triggered.");
+        }
+      });
+
+      // Briefing Minimize/Close Handlers
+      matrix.querySelector('#zw-briefing-minimize')?.addEventListener('click', () => {
+        const body = matrix.querySelector('#zw-bento-briefing-body');
+        const btn = matrix.querySelector('#zw-briefing-minimize');
+        const window_ = matrix.querySelector('#zw-bento-briefing-window');
+        if (body) {
+          const isCollapsed = body.style.display === 'none';
+          body.style.display = isCollapsed ? '' : 'none';
+          if (window_) {
+            window_.classList.toggle('zw-briefing-collapsed', !isCollapsed);
+          }
+          if (btn) {
+            btn.innerHTML = isCollapsed
+              ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/></svg>'
+              : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M12 5v14M5 12h14" stroke="#00FF66" stroke-width="2.5" stroke-linecap="round"/></svg>';
+            btn.title = isCollapsed ? 'Minimize briefing' : 'Expand briefing';
+          }
+        }
+      });
+
+      matrix.querySelector('#zw-briefing-close')?.addEventListener('click', () => {
+        const window_ = matrix.querySelector('#zw-bento-briefing-window');
+        if (window_) {
+          window_.style.display = 'none';
         }
       });
     }
@@ -1393,9 +1432,20 @@
             <span class="zw-pixel-pill-pink">AI BRIEFING</span>
             <span class="zw-pixel-tag">EXECUTIVE CORE</span>
           </div>
-          <button class="zw-pixel-close" id="zw-overview-close">✕</button>
+          <div class="zw-header-right" style="display:flex; align-items:center; gap:8px;">
+            <button class="zw-pixel-minimize" id="zw-overview-minimize" title="Minimize briefing">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+                <path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="zw-pixel-close" id="zw-overview-close" title="Close briefing">
+              <svg viewBox="0 0 24 24" width="12" height="12" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="#9499aa" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        <div class="zw-overview-body">
+        <div class="zw-overview-body" id="zw-editorial-briefing-body">
           <div class="zw-overview-badge-row">
             <span class="zw-badge-accent-pink">CORE TAKEAWAYS</span>
             <span style="font-size:11px; color:#9499aa;">High-visibility scannable mode (5 key takeaways)</span>
@@ -1412,7 +1462,23 @@
         mainEl.appendChild(card);
       }
 
-      card.querySelector('#zw-overview-close').addEventListener('click', () => card.remove());
+      card.querySelector('#zw-overview-close').addEventListener('click', () => card.style.display = 'none');
+
+      card.querySelector('#zw-overview-minimize')?.addEventListener('click', () => {
+        const body = card.querySelector('#zw-editorial-briefing-body');
+        const btn = card.querySelector('#zw-overview-minimize');
+        if (body) {
+          const isCollapsed = body.style.display === 'none';
+          body.style.display = isCollapsed ? '' : 'none';
+          card.classList.toggle('zw-briefing-collapsed', !isCollapsed);
+          if (btn) {
+            btn.innerHTML = isCollapsed
+              ? '<svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/></svg>'
+              : '<svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M12 5v14M5 12h14" stroke="#00FF66" stroke-width="2.5" stroke-linecap="round"/></svg>';
+            btn.title = isCollapsed ? 'Minimize briefing' : 'Expand briefing';
+          }
+        }
+      });
 
       if (window.ZenWebAI) {
         window.ZenWebAI.generate3BulletSummary(cleanText, 5).then(bullets => {

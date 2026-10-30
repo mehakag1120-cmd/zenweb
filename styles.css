@@ -236,7 +236,7 @@ html[data-zenweb-theme="pixel-dark"] iframe[src*="ad"] {
   z-index: 1 !important;
   pointer-events: none !important;
   contain: strict !important;
-  opacity: 0.70 !important;
+  opacity: 0.50 !important;
   mix-blend-mode: screen !important;
 }
 

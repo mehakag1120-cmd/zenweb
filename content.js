@@ -47,17 +47,17 @@
       id: 'sorbet',
       name: 'Sorbet',
       mode: 'light',
-      bodyBg: '#FFF0F5',
-      textColor: '#4A0E2E',
-      titleColor: '#9D174D',
-      linkColor: '#BE185D',
-      inputBg: '#FFFFFF',
-      inputColor: '#4A0E2E',
-      inputBorder: '#FBCFE8',
-      caretColor: '#FF2E93',
-      buttonBg: '#FFF0F5',
-      buttonColor: '#BE185D',
-      buttonBorder: '#F472B6',
+      bodyBg: '#F8D7E3', /* Decreased exposure: warm strawberry ice cream */
+      textColor: '#500724', /* Deep raspberry sorbet */
+      titleColor: '#831843',
+      linkColor: '#9D174D',
+      inputBg: '#FFF5F8',
+      inputColor: '#500724',
+      inputBorder: '#F472B6',
+      caretColor: '#BE185D',
+      buttonBg: '#BE185D',
+      buttonColor: '#FFFFFF',
+      buttonBorder: '#9D174D',
       font: 'Fredoka',
       fontHeading: 'Fredoka'
     },
@@ -65,13 +65,13 @@
       id: 'surf',
       name: 'Surf',
       mode: 'light',
-      bodyBg: '#E0F2FE',
-      textColor: '#3E2723',
-      titleColor: '#2B1704',
-      linkColor: '#0284C7',
+      bodyBg: '#BAE6FD', /* Decreased exposure: saturated ocean azure */
+      textColor: '#1E293B', /* Coastal slate & chocolate */
+      titleColor: '#0C4A6E', /* Deep ocean navy */
+      linkColor: '#0369A1',
       inputBg: '#FFFFFF',
-      inputColor: '#3E2723',
-      inputBorder: '#7DD3FC',
+      inputColor: '#1E293B',
+      inputBorder: '#38BDF8',
       caretColor: '#0284C7',
       buttonBg: '#0284C7',
       buttonColor: '#FFFFFF',
@@ -83,16 +83,16 @@
       id: 'beige',
       name: 'Beige',
       mode: 'light',
-      bodyBg: '#F7F4EE',
-      textColor: '#2C221E',
-      titleColor: '#1C1512',
-      linkColor: '#8C6D53',
+      bodyBg: '#EBE4D8', /* Decreased exposure: warm almond linen */
+      textColor: '#2C1D11', /* Deep roasted coffee */
+      titleColor: '#1A120B', /* Dark espresso */
+      linkColor: '#634832',
       inputBg: '#FFFFFF',
-      inputColor: '#2C221E',
-      inputBorder: '#D6CEBF',
-      caretColor: '#8C6D53',
-      buttonBg: '#EFECE4',
-      buttonColor: '#2C221E',
+      inputColor: '#2C1D11',
+      inputBorder: '#C4B9A5',
+      caretColor: '#634832',
+      buttonBg: '#D8CEBF',
+      buttonColor: '#1A120B',
       buttonBorder: '#8C6D53',
       font: 'Newsreader',
       fontHeading: 'Newsreader'
@@ -108,7 +108,7 @@
       this.pixels = [];
       this.gridCrosshairs = [];
       this.strobingHearts = [];
-      this.surfingHearts = [];
+      this.surfingSharks = [];
       this.lastActivityTime = Date.now();
       this.lastScrollY = window.scrollY;
       this.scrollStuckStartTime = null;
@@ -262,6 +262,9 @@
       if (target === 'pixel-dark') target = 'cyberpunk';
       if (!['cyberpunk', 'sorbet', 'surf', 'beige'].includes(target)) target = 'cyberpunk';
 
+      // 1. Revert previous contrast normalization inline styles to clean slate
+      this.revertContrastNormalization();
+
       this.settings = { ...(this.settings || {}), theme: target };
       const root = document.documentElement;
       root.setAttribute('data-zenweb-theme', target);
@@ -288,11 +291,10 @@
       chrome.storage?.sync?.set({ theme: target });
     }
 
-    /* 8-bit Pixel Heart Renderer */
+    /* 8-bit Pixel Heart Renderer for Sorbet Theme */
     drawPixelHeart(ctx, cx, cy, pixelSize, color, alpha) {
       if (alpha <= 0.01) return;
       ctx.save();
-      ctx.fillStyle = color;
       ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
       // 7 columns x 6 rows pixel heart map
       const matrix = [
@@ -306,11 +308,56 @@
       const startX = Math.round(cx - (3.5 * pixelSize));
       const startY = Math.round(cy - (3 * pixelSize));
 
+      // Crisp contrast shadow against strawberry background
+      ctx.shadowColor = 'rgba(131, 24, 67, 0.45)';
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = color;
+
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 7; c++) {
           if (matrix[r][c]) {
             ctx.fillRect(startX + c * pixelSize, startY + r * pixelSize, pixelSize, pixelSize);
           }
+        }
+      }
+      ctx.restore();
+    }
+
+    /* 8-bit Pixel Shark Renderer for Sea Surf Theme */
+    drawPixelShark(ctx, cx, cy, pixelSize, bodyColor, alpha) {
+      if (alpha <= 0.01) return;
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+
+      // 16 cols x 8 rows 8-bit Shark sprite
+      // 0 = transparent, 1 = bodyColor, 2 = eye (dark), 3 = white belly/teeth
+      const matrix = [
+        [0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+        [1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+        [1,1,0,0,1,1,1,1,1,1,1,1,1,0,0,0],
+        [0,1,1,1,1,1,1,2,1,1,1,1,1,1,1,0],
+        [0,0,1,1,3,3,3,3,3,3,1,3,1,1,0,0],
+        [0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0],
+        [1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0]
+      ];
+
+      const startX = Math.round(cx - (8 * pixelSize));
+      const startY = Math.round(cy - (4 * pixelSize));
+
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 16; c++) {
+          const val = matrix[r][c];
+          if (!val) continue;
+
+          if (val === 1) {
+            ctx.fillStyle = bodyColor;
+          } else if (val === 2) {
+            ctx.fillStyle = '#0C4A6E';
+          } else if (val === 3) {
+            ctx.fillStyle = '#FFFFFF';
+          }
+          ctx.fillRect(startX + c * pixelSize, startY + r * pixelSize, pixelSize, pixelSize);
         }
       }
       ctx.restore();
@@ -382,43 +429,42 @@
           });
         }
       } else if (theme === 'sorbet') {
-        // Sorbet Theme: Strobing pixel hearts phasing in and out of view all over the screen
-        // Colors: baby pink, baby blue, sunshine yellow, and dark pink sorbet
-        const heartCount = Math.max(35, Math.floor((width * height) / 28000));
-        const sorbetColors = ['#F472B6', '#F9A8D4', '#38BDF8', '#7DD3FC', '#FDE047', '#FEF08A', '#BE185D'];
+        // Sorbet Theme: High-visibility strobing pixel hearts phasing in and out of view across the screen
+        const heartCount = Math.max(45, Math.floor((width * height) / 22000));
+        const sorbetColors = ['#E11D48', '#FF1493', '#BE185D', '#0284C7', '#EAB308', '#9D174D', '#F43F5E'];
 
         for (let i = 0; i < heartCount; i++) {
-          const pixelSize = 2 + Math.floor(Math.random() * 2.5); // 2 to 4px per pixel (14 to 28px heart)
+          const pixelSize = 4 + Math.floor(Math.random() * 3); // 4 to 6px per pixel (28px to 42px hearts)
           this.strobingHearts.push({
             x: Math.random() * width,
             y: Math.random() * height,
             pixelSize,
             color: sorbetColors[Math.floor(Math.random() * sorbetColors.length)],
-            maxAlpha: 0.35 + Math.random() * 0.5,
-            strobeSpeed: 0.8 + Math.random() * 2.2,
+            maxAlpha: 0.80 + Math.random() * 0.20,
+            strobeSpeed: 1.2 + Math.random() * 2.0,
             phase: Math.random() * Math.PI * 2
           });
         }
       } else if (theme === 'surf') {
-        // Surf Theme: Tiny pixel hearts strobing and shining, surfing smoothly from left to right
-        // Colors: baby blue, azure blue, sand, and seafoam white
-        const surfCount = Math.max(30, Math.floor(width / 40));
-        const surfColors = ['#0284C7', '#38BDF8', '#BAE6FD', '#F5E6CA', '#FFFFFF', '#0EA5E9'];
+        // Surf Theme: Pixel Sharks surfing smoothly from left to right on waves!
+        this.surfingSharks = [];
+        const sharkCount = Math.max(16, Math.floor(width / 75));
+        const sharkColors = ['#0284C7', '#0F4C81', '#0369A1', '#1D4ED8', '#0284C7', '#0EA5E9'];
 
-        for (let i = 0; i < surfCount; i++) {
-          const pixelSize = 1.6 + Math.random() * 0.8; // Tiny pixel hearts (11px to 17px)
-          this.surfingHearts.push({
+        for (let i = 0; i < sharkCount; i++) {
+          const pixelSize = 2.8 + Math.random() * 1.4; // 45px to 68px wide sharks
+          this.surfingSharks.push({
             x: Math.random() * width,
-            baseY: Math.random() * height,
+            baseY: 60 + Math.random() * (height - 120),
             y: 0,
             pixelSize,
-            color: surfColors[Math.floor(Math.random() * surfColors.length)],
-            vx: 45 + Math.random() * 45, // Surfing horizontal velocity
-            waveAmp: 8 + Math.random() * 12, // Undulating wave amplitude
-            waveFreq: 0.012 + Math.random() * 0.008,
+            color: sharkColors[Math.floor(Math.random() * sharkColors.length)],
+            vx: 55 + Math.random() * 50,
+            waveAmp: 10 + Math.random() * 14,
+            waveFreq: 0.008 + Math.random() * 0.006,
             wavePhase: Math.random() * Math.PI * 2,
-            alpha: 0.45 + Math.random() * 0.45,
-            shimmerSpeed: 1 + Math.random() * 2
+            alpha: 0.80 + Math.random() * 0.20,
+            shimmerSpeed: 1.2 + Math.random() * 2
           });
         }
       } else if (theme === 'beige') {
@@ -517,33 +563,38 @@
           ctx.restore();
         });
       } else if (theme === 'sorbet') {
-        // Sorbet Theme: Strobing pixel hearts phasing in and out across the screen
+        // Sorbet Theme: High-visibility strobing pixel hearts phasing in and out
         this.strobingHearts.forEach(heart => {
           const strobe = 0.5 + 0.5 * Math.sin(now * 0.0025 * heart.strobeSpeed + heart.phase);
-          const currentAlpha = heart.maxAlpha * (0.08 + 0.92 * strobe);
+          const currentAlpha = heart.maxAlpha * (0.25 + 0.75 * strobe);
           this.drawPixelHeart(ctx, heart.x, heart.y, heart.pixelSize, heart.color, currentAlpha);
         });
       } else if (theme === 'surf') {
-        // Surf Theme: Tiny pixel hearts strobing and shining, surfing smoothly from left to right
-        this.surfingHearts.forEach(heart => {
-          heart.x += heart.vx * dt;
-          heart.y = heart.baseY + Math.sin(heart.x * heart.waveFreq + heart.wavePhase) * heart.waveAmp + Math.cos(now * 0.0025 + heart.wavePhase) * 3;
+        // Surf Theme: Pixel Sharks surfing from left to right on ocean waves!
+        this.surfingSharks.forEach(shark => {
+          shark.x += shark.vx * dt;
+          shark.y = shark.baseY + Math.sin(shark.x * shark.waveFreq + shark.wavePhase) * shark.waveAmp + Math.cos(now * 0.003 + shark.wavePhase) * 3;
 
-          if (heart.x > w + 40) {
-            heart.x = -30;
-            heart.baseY = Math.random() * h;
+          if (shark.x > w + 100) {
+            shark.x = -80;
+            shark.baseY = 60 + Math.random() * (h - 120);
           }
 
-          const shimmer = 0.45 + 0.55 * Math.sin(now * 0.006 * heart.shimmerSpeed + heart.x * 0.02);
-          const currentAlpha = heart.alpha * shimmer;
+          const shimmer = 0.65 + 0.35 * Math.sin(now * 0.005 * shark.shimmerSpeed + shark.x * 0.02);
+          const currentAlpha = shark.alpha * shimmer;
 
-          // Tiny sparkling wake droplets
-          ctx.fillStyle = heart.color;
-          ctx.globalAlpha = currentAlpha * 0.35;
-          ctx.fillRect(heart.x - 8, heart.y + 2, 4, 2);
-          ctx.fillRect(heart.x - 16, heart.y + 3, 3, 1.5);
+          // Surf wake & spray droplets behind shark
+          ctx.save();
+          ctx.fillStyle = '#FFFFFF';
+          ctx.globalAlpha = currentAlpha * 0.75;
+          ctx.fillRect(shark.x - 14, shark.y + 2, 5, 2.5);
+          ctx.fillRect(shark.x - 22, shark.y + 4, 4, 2);
+          ctx.fillStyle = '#38BDF8';
+          ctx.globalAlpha = currentAlpha * 0.55;
+          ctx.fillRect(shark.x - 30, shark.y + 5, 6, 2);
+          ctx.restore();
 
-          this.drawPixelHeart(ctx, heart.x, heart.y, heart.pixelSize, heart.color, currentAlpha);
+          this.drawPixelShark(ctx, shark.x, shark.y, shark.pixelSize, shark.color, currentAlpha);
         });
       } else if (theme === 'beige') {
         // Beige: No animated elements - keeping it clean and office appropriate
@@ -663,8 +714,8 @@
           }
         } else {
           // Light Mode Collisions (Sorbet, Surf, Beige)
-          if (isBrightBg && this.isBrightText(comp.color)) {
-            // Text is too bright on light canvas (e.g. pale white text on pink/blue/beige canvas)
+          // Normalizes any low-contrast, light grey, white, or lingering neon green text
+          if (this.isLowContrastTextOnLight(comp.color)) {
             if (el.tagName === 'A' || el.closest('a')) {
               el.style.setProperty('color', theme.linkColor, 'important');
               el.style.setProperty('-webkit-text-fill-color', theme.linkColor, 'important');
@@ -872,6 +923,20 @@
       const b = parseInt(m[3], 10);
       const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
       return lum >= 0.68;
+    }
+
+    isLowContrastTextOnLight(colorStr) {
+      if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return false;
+      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return false;
+      if (m[4] !== undefined && parseFloat(m[4]) < 0.25) return true;
+      const r = parseInt(m[1], 10);
+      const g = parseInt(m[2], 10);
+      const b = parseInt(m[3], 10);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      // High green or neon or high luminance (>0.48) is washed out on light backgrounds
+      const isNeonGreen = g > 175 && r < 120;
+      return lum >= 0.48 || isNeonGreen;
     }
 
     isDarkColor(colorStr) {

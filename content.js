@@ -1,9 +1,13 @@
 /**
- * ZenWeb Content Orchestrator (v2.1)
- * Screen Activity Monitoring AI Agent (with explicit user permission),
- * 15-minute randomized focus reset mini-games, 30-minute water break reminders,
- * Webpage Data Restructuring (scannable bullet cards, circular bold fonts),
- * and Sliding Pixel Background Canvas inspired by books.baseten.com.
+ * ZenWeb Content Orchestrator (v2.2)
+ * Human-crafted pixel-digital aesthetic inspired by books.baseten.com
+ * Features:
+ * 1. Sliding pixel matrix canvas (anti-aliased, DPR-scaled, GPU accelerated)
+ * 2. Screen activity monitoring AI agent with explicit user permission dialog
+ * 3. 15-minute randomized focus reset breaks (Dino Jump, Tetris, Whack-a-Dino)
+ * 4. 30-minute water break hydration alerts with daily tracking
+ * 5. Webpage data restructuring into scannable bullet cards with circular bold typography
+ * 6. Bottom-left tactile digital dock
  */
 
 (function () {
@@ -15,19 +19,22 @@
   class ZenWebContent {
     constructor() {
       this.settings = null;
-      this.observer = null;
       this.slidingPixelCanvas = null;
       this.slidingPixelCtx = null;
       this.pixelAnimId = null;
       this.pixels = [];
+      this.gridDots = [];
       this.lastActivityTime = Date.now();
       this.lastScrollY = window.scrollY;
       this.scrollStuckStartTime = null;
       this.activityInterval = null;
       this.waterTimerInterval = null;
-      this.modifiedNodesCache = new Map();
-      this.restructuredCardsCache = new Map();
+      this.restructuredCardsMap = new Map(); // originalElement -> cardElement
+      this.isRestructured = false;
+
+      // Expose globally for verification suites & extension calls
       window.__ZENWEB_CONTENT_INSTANCE__ = this;
+      window.ZenWebContentInstance = this;
 
       this.init();
     }
@@ -35,29 +42,29 @@
     async init() {
       this.settings = await this.loadSettings();
 
-      // 1. Mount Sliding Pixel Canvas (Inspired by books.baseten.com)
+      // 1. Mount Sliding Pixel Canvas
       this.mountSlidingPixelCanvas();
 
-      // 2. Mount Floating Action Dock
+      // 2. Mount Bottom-Left Floating Control Dock
       this.mountFloatingDock();
 
-      // 3. Check Screen Monitoring Permission Dialog
+      // 3. Prompt for Screen Activity Monitoring permission if not yet decided
       this.checkScreenMonitoringPermission();
 
-      // 4. Apply State
+      // 4. Apply Initial State
       if (this.settings.enabled !== false) {
         this.applyActiveState();
       } else {
         this.applyDisabledState();
       }
 
-      // 5. Setup Screen Activity Monitoring
+      // 5. Setup Screen Activity & Dwell Fatigue Monitoring
       this.setupActivityMonitor();
 
-      // 6. Setup Local Water & Focus Timers
+      // 6. Setup Hydration & Reset Interval Checkers
       this.setupTimers();
 
-      // 7. Setup Runtime Message Listeners
+      // 7. Setup Chrome Runtime Message Listeners
       this.setupMessageListeners();
     }
 
@@ -68,7 +75,9 @@
     async loadSettings() {
       return new Promise((resolve) => {
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-          chrome.storage.sync.get(null, (items) => resolve(items || {}));
+          chrome.storage.sync.get(null, (items) => {
+            resolve(items || {});
+          });
         } else {
           resolve({});
         }
@@ -76,7 +85,7 @@
     }
 
     /* ==========================================================================
-       1. SLIDING PIXEL BACKGROUND CANVAS (books.baseten.com aesthetic)
+       1. SLIDING PIXEL BACKGROUND CANVAS (books.baseten.com Aesthetic)
        ========================================================================== */
 
     mountSlidingPixelCanvas() {
@@ -85,35 +94,55 @@
       const canvas = document.createElement('canvas');
       canvas.id = 'zenweb-pixel-canvas';
       canvas.className = 'zw-pixel-background';
-      document.body.appendChild(canvas);
+      document.documentElement.appendChild(canvas);
 
       this.slidingPixelCanvas = canvas;
-      this.slidingPixelCtx = canvas.getContext('2d');
+      this.slidingPixelCtx = canvas.getContext('2d', { alpha: true });
 
-      const resize = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+      const handleResize = () => {
+        if (!this.slidingPixelCanvas) return;
+        const dpr = window.devicePixelRatio || 1;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        this.slidingPixelCanvas.width = width * dpr;
+        this.slidingPixelCanvas.height = height * dpr;
+        this.slidingPixelCanvas.style.width = `${width}px`;
+        this.slidingPixelCanvas.style.height = `${height}px`;
+
+        if (this.slidingPixelCtx) {
+          this.slidingPixelCtx.resetTransform?.();
+          this.slidingPixelCtx.scale(dpr, dpr);
+        }
+
+        this.initPixelParticles(width, height);
       };
-      window.addEventListener('resize', resize);
-      resize();
 
-      // Generate initial sliding pixel nodes
+      window.addEventListener('resize', handleResize, { passive: true });
+      handleResize();
+      this.startPixelAnimation();
+    }
+
+    initPixelParticles(width, height) {
       this.pixels = [];
-      const count = 35;
-      for (let i = 0; i < count; i++) {
+      const particleCount = Math.max(24, Math.floor(width / 45));
+
+      // Palette strictly cohesive with Baseten Books (white/gray/black base with neon accents)
+      const colors = ['#00FF66', '#FF007A', '#F4F6FB', '#00FF66'];
+
+      for (let i = 0; i < particleCount; i++) {
+        const size = Math.random() > 0.7 ? 5 : 3;
         this.pixels.push({
-          x: Math.random() * window.innerWidth,
-          y: Math.random() * window.innerHeight,
-          w: Math.random() > 0.6 ? 6 : 4,
-          h: Math.random() > 0.6 ? 6 : 4,
-          vx: 8 + Math.random() * 18, // Smooth horizontal slide
-          vy: (Math.random() - 0.5) * 6,
-          color: Math.random() > 0.3 ? '#00FF66' : '#FF007A',
-          alpha: 0.15 + Math.random() * 0.35
+          x: Math.random() * width,
+          y: Math.floor((Math.random() * height) / 36) * 36 + 18, // Snap to grid lane
+          w: size,
+          h: size,
+          vx: 18 + Math.random() * 32, // Horizontal slide
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 0.18 + Math.random() * 0.35,
+          trail: []
         });
       }
-
-      this.startPixelAnimation();
     }
 
     startPixelAnimation() {
@@ -126,8 +155,8 @@
 
         if (this.settings?.enabled && this.settings?.slidingPixels !== false) {
           this.renderSlidingPixels(dt);
-        } else if (this.slidingPixelCtx) {
-          this.slidingPixelCtx.clearRect(0, 0, this.slidingPixelCanvas.width, this.slidingPixelCanvas.height);
+        } else if (this.slidingPixelCtx && this.slidingPixelCanvas) {
+          this.slidingPixelCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         }
 
         this.pixelAnimId = requestAnimationFrame(loop);
@@ -139,36 +168,47 @@
     renderSlidingPixels(dt) {
       if (!this.slidingPixelCtx || !this.slidingPixelCanvas) return;
       const ctx = this.slidingPixelCtx;
-      const w = this.slidingPixelCanvas.width;
-      const h = this.slidingPixelCanvas.height;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
 
       ctx.clearRect(0, 0, w, h);
 
-      // Subtle matrix dot grid
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
-      const gridSize = 40;
-      for (let x = 0; x < w; x += gridSize) {
-        for (let y = 0; y < h; y += gridSize) {
+      // Discrete Matrix Dot Grid (Subtle, crisp technical publishing background)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.035)';
+      const gridSize = 36;
+      for (let x = 18; x < w; x += gridSize) {
+        for (let y = 18; y < h; y += gridSize) {
           ctx.fillRect(x, y, 1.5, 1.5);
         }
       }
 
-      // Sliding pixels with anti-aliased trails
+      // Sliding Pixels with Motion Trails
       this.pixels.forEach(p => {
         p.x += p.vx * dt;
-        p.y += p.vy * dt;
 
-        if (p.x > w + 20) p.x = -20;
-        if (p.y > h + 20) p.y = -20;
-        if (p.y < -20) p.y = h + 20;
+        // Record trail positions
+        p.trail.unshift({ x: p.x, y: p.y });
+        if (p.trail.length > 4) p.trail.pop();
 
+        // Wrap around screen boundaries
+        if (p.x > w + 40) {
+          p.x = -20;
+          p.y = Math.floor((Math.random() * h) / gridSize) * gridSize + 18;
+          p.trail = [];
+        }
+
+        // Draw Motion Trails
+        p.trail.forEach((pos, idx) => {
+          const trailAlpha = (p.alpha * (1 - (idx + 1) / (p.trail.length + 1))) * 0.6;
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, trailAlpha);
+          ctx.fillRect(pos.x - idx * (p.w + 2), pos.y, p.w, p.h);
+        });
+
+        // Main Pixel Head
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
         ctx.fillRect(p.x, p.y, p.w, p.h);
-
-        // Motion trail dot
-        ctx.globalAlpha = p.alpha * 0.4;
-        ctx.fillRect(p.x - p.w * 1.5, p.y, p.w, p.h);
       });
 
       ctx.globalAlpha = 1;
@@ -179,6 +219,7 @@
        ========================================================================== */
 
     checkScreenMonitoringPermission() {
+      // If already granted, nothing to show
       if (this.settings.screenMonitoringPermission === true) return;
       if (document.getElementById('zenweb-permission-dialog')) return;
 
@@ -188,21 +229,33 @@
       dialog.innerHTML = `
         <div class="zw-pixel-window zw-permission-card">
           <div class="zw-pixel-window-header">
-            <span class="zw-pixel-tag">[SYSTEM PROTOCOL // PERMISSION]</span>
-            <span class="zw-pixel-status-green">AWAITING_CONSENT</span>
+            <div class="zw-header-left">
+              <span class="zw-pixel-pill-green">CONSENT REQUIRED</span>
+              <span class="zw-pixel-tag">AI SCREEN MONITOR</span>
+            </div>
+            <button class="zw-pixel-close" id="zw-permission-close" title="Close dialog">✕</button>
           </div>
           <div class="zw-permission-body">
             <div class="zw-agent-avatar">🤖</div>
             <div class="zw-permission-content">
-              <h3>Enable AI Screen Activity Monitor?</h3>
+              <h3>Allow Screen Activity Monitoring?</h3>
               <p>
-                To protect your focus and prevent executive freeze, ZenWeb's AI Agent monitors your reading pace and idle dwell time on this tab.
+                ZenWeb uses on-device pacing telemetry to detect cognitive fatigue and reading stalls. When you stay stuck on a section for several minutes, the agent offers a gentle 90-second focus reset.
               </p>
-              <ul class="zw-permission-list">
-                <li><span class="zw-bullet-pink">■</span> <strong>100% On-Device & Private:</strong> Zero screen recording or data transmission.</li>
-                <li><span class="zw-bullet-green">■</span> <strong>Idle Stall Detection:</strong> Offers gentle resets when reading momentum stops.</li>
-                <li><span class="zw-bullet-green">■</span> <strong>Automated Rhythm:</strong> 15-min focus breaks & 30-min water alerts.</li>
-              </ul>
+              <div class="zw-permission-specs">
+                <div class="zw-spec-item">
+                  <span class="zw-bullet-green">■</span>
+                  <span><strong>100% On-Device & Private:</strong> Zero screen recordings or server telemetry.</span>
+                </div>
+                <div class="zw-spec-item">
+                  <span class="zw-bullet-pink">■</span>
+                  <span><strong>Fatigue Detection:</strong> Suggests refreshing breaks when reading momentum slows.</span>
+                </div>
+                <div class="zw-spec-item">
+                  <span class="zw-bullet-white">■</span>
+                  <span><strong>Scheduled Rhythm:</strong> 15-minute micro-resets & 30-minute water reminders.</span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="zw-permission-actions">
@@ -218,21 +271,37 @@
 
       document.body.appendChild(dialog);
 
-      dialog.querySelector('#zw-grant-permission-btn').addEventListener('click', () => {
+      const grantBtn = dialog.querySelector('#zw-grant-permission-btn');
+      const denyBtn = dialog.querySelector('#zw-deny-permission-btn');
+      const closeBtn = dialog.querySelector('#zw-permission-close');
+
+      const handleGrant = () => {
         this.settings.screenMonitoringPermission = true;
-        chrome.storage.sync.set({ screenMonitoringPermission: true });
+        this.settings.screenActivityMonitoring = true;
+        chrome.storage.sync.set({
+          screenMonitoringPermission: true,
+          screenActivityMonitoring: true
+        });
         dialog.remove();
         this.showToast("✓ AI Screen Activity Monitor Enabled!");
         this.updateDockState();
-      });
+      };
 
-      dialog.querySelector('#zw-deny-permission-btn').addEventListener('click', () => {
+      const handleDeny = () => {
         this.settings.screenMonitoringPermission = false;
-        chrome.storage.sync.set({ screenMonitoringPermission: false });
+        this.settings.screenActivityMonitoring = false;
+        chrome.storage.sync.set({
+          screenMonitoringPermission: false,
+          screenActivityMonitoring: false
+        });
         dialog.remove();
         this.showToast("Screen monitor paused. You can enable it anytime in the popup.");
         this.updateDockState();
-      });
+      };
+
+      grantBtn.addEventListener('click', handleGrant);
+      denyBtn.addEventListener('click', handleDeny);
+      closeBtn.addEventListener('click', handleDeny);
     }
 
     /* ==========================================================================
@@ -248,7 +317,6 @@
         window.addEventListener(evt, resetActivity, { passive: true });
       });
 
-      // Periodically check if user has stalled on screen
       if (this.activityInterval) clearInterval(this.activityInterval);
       this.activityInterval = setInterval(() => {
         if (!this.settings?.enabled) return;
@@ -256,18 +324,18 @@
         if (this.settings.screenActivityMonitoring === false) return;
 
         const currentY = window.scrollY;
-        const delta = Math.abs(currentY - this.lastScrollY);
+        const scrollDelta = Math.abs(currentY - this.lastScrollY);
         const idleThresholdMs = (this.settings.idleThresholdMinutes || 3) * 60 * 1000;
 
-        // If stationary on screen
-        if (delta < 50) {
+        // User hasn't scrolled significantly
+        if (scrollDelta < 40) {
           if (!this.scrollStuckStartTime) {
             this.scrollStuckStartTime = Date.now();
           } else {
             const dwellDuration = Date.now() - this.scrollStuckStartTime;
             if (dwellDuration >= idleThresholdMs) {
               this.showIdleAlert();
-              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10 mins
+              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10 minutes
             }
           }
         } else {
@@ -285,19 +353,22 @@
       prompt.className = 'zw-pixel-window zw-idle-toast';
       prompt.innerHTML = `
         <div class="zw-pixel-window-header">
-          <span class="zw-pixel-tag">[AI AGENT // IDLE DETECTED]</span>
-          <span class="zw-pixel-close" id="zw-idle-close">✕</span>
+          <div class="zw-header-left">
+            <span class="zw-pixel-pill-pink">FATIGUE PAUSE</span>
+            <span class="zw-pixel-tag">IDLE DETECTED</span>
+          </div>
+          <button class="zw-pixel-close" id="zw-idle-close">✕</button>
         </div>
         <div class="zw-idle-body">
-          <div style="font-size: 28px;">🧠</div>
-          <div>
-            <strong>Cognitive Pause Detected</strong>
-            <p>You've been lingering on this section for several minutes. Ready for a quick focus reset break?</p>
+          <div class="zw-idle-icon">🧠</div>
+          <div class="zw-idle-text">
+            <strong>Reading Momentum Stalled</strong>
+            <p>You've lingered on this section for several minutes without scrolling. Ready for a quick 90-second focus reset?</p>
           </div>
         </div>
         <div class="zw-idle-actions">
-          <button class="zw-btn-pixel-primary" id="zw-idle-game-btn">[🎮 90s FOCUS RESET]</button>
-          <button class="zw-btn-pixel-secondary" id="zw-idle-water-btn">[💧 DRINK WATER]</button>
+          <button class="zw-btn-pixel-primary" id="zw-idle-game-btn">[🎮 90s RESET]</button>
+          <button class="zw-btn-pixel-secondary" id="zw-idle-water-btn">[💧 WATER BREAK]</button>
           <button class="zw-btn-pixel-ghost" id="zw-idle-keep-reading">[RESUME]</button>
         </div>
       `;
@@ -319,7 +390,7 @@
     }
 
     /* ==========================================================================
-       4. 30-MINUTE WATER BREAK REMINDER
+       4. 30-MINUTE WATER BREAK HYDRATION REMINDER
        ========================================================================== */
 
     triggerWaterBreakReminder() {
@@ -331,15 +402,18 @@
       modal.innerHTML = `
         <div class="zw-pixel-window zw-water-card">
           <div class="zw-pixel-window-header">
-            <span class="zw-pixel-tag">[HYDRATION PROTOCOL // 30-MIN]</span>
-            <span class="zw-pixel-status-green">ALERT_ACTIVE</span>
+            <div class="zw-header-left">
+              <span class="zw-pixel-pill-cyan">HYDRATION PROTOCOL</span>
+              <span class="zw-pixel-tag">30-MIN CHECK-IN</span>
+            </div>
+            <button class="zw-pixel-close" id="zw-water-close">✕</button>
           </div>
           <div class="zw-water-body">
             <div class="zw-water-icon">💧</div>
             <div class="zw-water-text">
-              <h3>Hydration Check-In</h3>
+              <h3>Time for a Water Break</h3>
               <p>
-                You've been focused for 30 minutes! Drinking water boosts oxygen flow to the prefrontal cortex and resets mental clarity.
+                You've been immersed in reading for 30 minutes. A quick glass of water restores cerebral blood flow and sharpens analytical concentration.
               </p>
             </div>
           </div>
@@ -356,9 +430,12 @@
 
       document.body.appendChild(modal);
 
+      modal.querySelector('#zw-water-close').addEventListener('click', () => modal.remove());
+
       modal.querySelector('#zw-logged-water-btn').addEventListener('click', () => {
         chrome.runtime?.sendMessage({ type: 'LOG_WATER_BREAK' }, (res) => {
-          this.showToast(`💧 Awesome! Total water breaks logged today: ${res?.count || 1}`);
+          const count = res?.count || 1;
+          this.showToast(`💧 Great job! Total water breaks logged today: ${count}`);
         });
         if (window.ZenWebAudio) window.ZenWebAudio.playZenChime();
         modal.remove();
@@ -371,7 +448,6 @@
     }
 
     setupTimers() {
-      // Local fallback in case background alarm is delayed
       if (this.waterTimerInterval) clearInterval(this.waterTimerInterval);
       this.waterTimerInterval = setInterval(() => {
         if (!this.settings?.enabled) return;
@@ -392,59 +468,84 @@
        ========================================================================== */
 
     applyDataRestructuring() {
+      if (this.isRestructured) return;
+      this.isRestructured = true;
+
       const root = document.documentElement;
       root.setAttribute('data-zenweb-theme', 'pixel-dark');
       root.setAttribute('data-zenweb-font', 'circular-digital');
       root.setAttribute('data-zenweb-restructured', 'true');
 
-      // Top Executive Briefing Card
+      // Inject Executive Briefing Card at the top of main content
       this.injectExecutiveOverview();
 
-      // Restructure dense paragraphs into scannable cards with bullet points
-      const paragraphs = document.querySelectorAll('article p, main p, .content p, [role="main"] p');
-      paragraphs.forEach((p, idx) => {
-        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code, nav, footer')) return;
-        if (this.restructuredCardsCache.has(p)) return;
+      // Find substantial paragraph elements across broad selectors
+      const selector = `
+        article p, main p, [role="main"] p, .post p, .article-body p, 
+        section p, .entry-content p, #content p, .markdown-body p, 
+        div[class*="content"] p, div[class*="article"] p, div[class*="post"] p,
+        body > p, div > p
+      `.trim();
+
+      const paragraphs = Array.from(document.querySelectorAll(selector));
+      let blockIndex = 1;
+
+      paragraphs.forEach((p) => {
+        // Guard against ZenWeb internal elements, code blocks, navigation, etc.
+        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code, nav, footer, aside, header')) return;
+        if (this.restructuredCardsMap.has(p)) return;
 
         const text = p.innerText?.trim() || '';
-        // Only restructure paragraphs with substance (>200 chars or >3 sentences)
+        // Only restructure paragraphs with real reading substance (>140 chars or >2 sentences)
         const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)/g);
-        if (sentences && sentences.length >= 3 && text.length > 180) {
-          this.restructuredCardsCache.set(p, p.innerHTML);
+        if (sentences && sentences.length >= 2 && text.length >= 130) {
+          // Create the restructured replacement card
+          const card = document.createElement('div');
+          card.className = 'zw-restructured-card';
 
           let bulletHTML = '';
           sentences.forEach(s => {
             const cleanSentence = s.trim();
-            if (cleanSentence.length > 15) {
-              // Highlight initial words
+            if (cleanSentence.length > 12) {
               const parts = cleanSentence.split(' ');
-              const lead = parts.slice(0, 3).join(' ');
-              const tail = parts.slice(3).join(' ');
+              const leadCount = Math.min(3, Math.max(1, Math.floor(parts.length * 0.25)));
+              const lead = parts.slice(0, leadCount).join(' ');
+              const tail = parts.slice(leadCount).join(' ');
+
               bulletHTML += `
                 <li class="zw-bullet-item">
                   <span class="zw-bullet-marker">■</span>
-                  <span class="zw-bullet-text"><strong>${lead}</strong> ${tail}</span>
+                  <span class="zw-bullet-text"><strong>${this.escapeHTML(lead)}</strong> ${this.escapeHTML(tail)}</span>
                 </li>
               `;
             }
           });
 
-          p.innerHTML = `
-            <div class="zw-restructured-card">
-              <div class="zw-card-pill-row">
-                <span class="zw-pixel-tag">[BLOCK // 0${(idx % 9) + 1}]</span>
-                <span class="zw-card-meta">${sentences.length} SCANNABLE POINTS</span>
-              </div>
-              <ul class="zw-bullet-list">
-                ${bulletHTML}
-              </ul>
+          const blockNum = blockIndex < 10 ? `0${blockIndex}` : `${blockIndex}`;
+          blockIndex++;
+
+          card.innerHTML = `
+            <div class="zw-card-pill-row">
+              <span class="zw-pixel-tag">[BLOCK // ${blockNum}]</span>
+              <span class="zw-card-meta">${sentences.length} KEY POINTS</span>
             </div>
+            <ul class="zw-bullet-list">
+              ${bulletHTML}
+            </ul>
           `;
+
+          // Lossless swap: hide original p, insert card immediately after
+          p.style.display = 'none';
+          p.insertAdjacentElement('afterend', card);
+          this.restructuredCardsMap.set(p, card);
         }
       });
     }
 
     removeDataRestructuring() {
+      if (!this.isRestructured) return;
+      this.isRestructured = false;
+
       const root = document.documentElement;
       root.removeAttribute('data-zenweb-theme');
       root.removeAttribute('data-zenweb-font');
@@ -452,31 +553,35 @@
 
       document.getElementById('zenweb-executive-card')?.remove();
 
-      this.restructuredCardsCache.forEach((origHTML, el) => {
-        if (el && el.parentNode) {
-          el.innerHTML = origHTML;
+      // Restore all original paragraph elements
+      this.restructuredCardsMap.forEach((card, originalP) => {
+        if (card && card.parentNode) {
+          card.remove();
+        }
+        if (originalP) {
+          originalP.style.display = '';
         }
       });
-      this.restructuredCardsCache.clear();
+      this.restructuredCardsMap.clear();
     }
 
     injectExecutiveOverview() {
       if (document.getElementById('zenweb-executive-card')) return;
 
-      const mainEl = document.querySelector('article, main, [role="main"]') || document.body;
+      const mainEl = document.querySelector('article, main, [role="main"], #content, .post, .article') || document.body;
       const cleanText = this.extractCleanText(mainEl);
-      if (cleanText.split(/\s+/).length < 200) return;
+      if (cleanText.split(/\s+/).length < 120) return;
 
       const card = document.createElement('div');
       card.id = 'zenweb-executive-card';
       card.className = 'zw-pixel-window zw-overview-window';
       card.innerHTML = `
         <div class="zw-pixel-window-header">
-          <div class="zw-overview-header-left">
-            <span class="zw-pixel-tag">[AI BRIEFING // EXECUTIVE OVERVIEW]</span>
-            <span class="zw-pixel-status-green">RESTRUCTURED</span>
+          <div class="zw-header-left">
+            <span class="zw-pixel-pill-pink">AI BRIEFING</span>
+            <span class="zw-pixel-tag">EXECUTIVE CORE</span>
           </div>
-          <span class="zw-pixel-close" id="zw-overview-close">✕</span>
+          <button class="zw-pixel-close" id="zw-overview-close">✕</button>
         </div>
         <div class="zw-overview-body">
           <div class="zw-overview-badge-row">
@@ -504,7 +609,7 @@
             list.innerHTML = bullets.map((b, i) => `
               <li class="zw-overview-bullet-item">
                 <span class="zw-bullet-num">0${i + 1}</span>
-                <span>${b}</span>
+                <span>${this.escapeHTML(b)}</span>
               </li>
             `).join('');
           }
@@ -523,15 +628,15 @@
       dock.id = 'zenweb-dock';
       dock.className = 'zw-floating-dock';
       dock.innerHTML = `
-        <button class="zw-dock-btn" id="zw-dock-game" title="Take 90s Focus Reset Game">
+        <button class="zw-dock-btn" id="zw-dock-game" title="Launch 90s Focus Reset Game">
           <span>🎮</span>
           <span class="zw-dock-label">RESET</span>
         </button>
-        <button class="zw-dock-btn" id="zw-dock-water" title="Hydration Check-in">
+        <button class="zw-dock-btn" id="zw-dock-water" title="Log Hydration Break">
           <span>💧</span>
           <span class="zw-dock-label">WATER</span>
         </button>
-        <button class="zw-dock-btn" id="zw-dock-restructure" title="Toggle Bullet Restructuring">
+        <button class="zw-dock-btn" id="zw-dock-restructure" title="Toggle Scannable Bullet Cards">
           <span>⚡</span>
           <span class="zw-dock-label">CARDS</span>
         </button>
@@ -553,10 +658,10 @@
 
       dock.querySelector('#zw-dock-restructure').addEventListener('click', () => {
         this.settings.dataRestructuring = !this.settings.dataRestructuring;
-        chrome.storage.sync.set({ dataRestructuring: this.settings.dataRestructuring });
+        chrome.storage?.sync?.set({ dataRestructuring: this.settings.dataRestructuring });
         if (this.settings.dataRestructuring) {
           this.applyDataRestructuring();
-          this.showToast("✓ Webpage data restructured into scannable bullet cards!");
+          this.showToast("✓ Webpage restructured into scannable bullet cards!");
         } else {
           this.removeDataRestructuring();
           this.showToast("Original webpage text restored.");
@@ -568,10 +673,10 @@
           this.checkScreenMonitoringPermission();
         } else {
           this.settings.screenActivityMonitoring = !this.settings.screenActivityMonitoring;
-          chrome.storage.sync.set({ screenActivityMonitoring: this.settings.screenActivityMonitoring });
+          chrome.storage?.sync?.set({ screenActivityMonitoring: this.settings.screenActivityMonitoring });
           this.updateDockState();
           this.showToast(this.settings.screenActivityMonitoring
-            ? "AI Screen Activity Monitor: ACTIVE"
+            ? "✓ AI Screen Activity Monitor: ACTIVE"
             : "AI Screen Activity Monitor: PAUSED");
         }
       });
@@ -637,6 +742,17 @@
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }
 
+    escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag] || tag));
+    }
+
     showToast(msg) {
       const existing = document.getElementById('zenweb-toast');
       if (existing) existing.remove();
@@ -650,7 +766,7 @@
       setTimeout(() => {
         toast.classList.add('zw-fade-out');
         setTimeout(() => toast.remove(), 300);
-      }, 3500);
+      }, 3200);
     }
 
     setupMessageListeners() {
@@ -687,7 +803,7 @@
 
           case 'TOGGLE_RESTRUCTURE':
             this.settings.dataRestructuring = !this.settings.dataRestructuring;
-            chrome.storage.sync.set({ dataRestructuring: this.settings.dataRestructuring });
+            chrome.storage?.sync?.set({ dataRestructuring: this.settings.dataRestructuring });
             if (this.settings.dataRestructuring) {
               this.applyDataRestructuring();
             } else {

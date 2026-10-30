@@ -1,11 +1,11 @@
 /**
- * ZenWeb Micro-Gaming Suite (v2.1)
+ * ZenWeb Micro-Gaming Suite (v2.2)
  * High-performance (60-120 FPS) Canvas gaming engine inspired by books.baseten.com.
  * Features 3 randomized mini-games for 15-minute focus resets:
- * 1. Dino Jump (Pixel T-Rex jumping cacti)
- * 2. Tetris (10x20 falling tetromino matrix)
- * 3. Whack-A-Dino (3x3 pop-up digital arcade grid)
- * Hard-limited to 90 seconds to prevent hyperfixation traps.
+ * 1. Dino Jump (Pixel T-Rex jumping cacti with responsive jump physics & dust particles)
+ * 2. Tetris Matrix (10x20 matrix, cohesive palette, ghost piece projection & on-screen controls)
+ * 3. Whack-A-Dino (3x3 digital arcade pod grid with combo streaks & pixel pop-ups)
+ * Enforced 90-second hard countdown with transition into 30-second breathing reset.
  */
 
 class ZenWebGameEngine {
@@ -18,10 +18,11 @@ class ZenWebGameEngine {
     this.timeRemaining = 90;
     this.timerInterval = null;
     this.isInputLocked = false;
+    this.boundGlobalKey = null;
   }
 
   /**
-   * Randomly picks one of the three mini-games
+   * Randomly selects one of the three mini-games
    */
   getRandomGameType() {
     const games = ['dino', 'tetris', 'whack'];
@@ -45,6 +46,14 @@ class ZenWebGameEngine {
     this.renderGameModal(selected);
     this.initCanvas(selected);
     this.startCountdown();
+
+    // Global Escape key handler to return to reading cleanly
+    this.boundGlobalKey = (e) => {
+      if (e.key === 'Escape') {
+        this.terminateGame(false);
+      }
+    };
+    window.addEventListener('keydown', this.boundGlobalKey);
   }
 
   renderGameModal(gameType) {
@@ -55,9 +64,9 @@ class ZenWebGameEngine {
     };
 
     const hints = {
-      dino: 'Press [SPACEBAR], [UP ARROW], or [CLICK] to Jump over cacti',
-      tetris: '[ARROWS] Move/Rotate | [DOWN] Soft Drop | [SPACE] Hard Drop',
-      whack: '[CLICK / TAP] popping green & golden dinos! Avoid red glitch dinos.'
+      dino: 'Press [SPACE], [UP ARROW], or [CLICK] to jump over obstacles.',
+      tetris: '[ARROWS] Move/Rotate | [DOWN] Soft Drop | [SPACE] Hard Drop | [ESC] Exit',
+      whack: '[CLICK] green & golden dinos! Avoid pink glitch dinos. [ESC] Exit'
     };
 
     const modal = document.createElement('div');
@@ -65,15 +74,18 @@ class ZenWebGameEngine {
     modal.className = 'zw-game-backdrop';
     modal.innerHTML = `
       <div class="zw-game-window">
-        <!-- Digital Window Header -->
+        <!-- Header -->
         <div class="zw-game-header">
           <div class="zw-game-title-group">
             <span class="zw-pixel-pill">[RESET PROTOCOL]</span>
             <span class="zw-game-title">${titles[gameType] || 'FOCUS MINI-GAME'}</span>
           </div>
-          <div class="zw-game-clock">
-            <span class="zw-clock-dot"></span>
-            <span id="zw-game-timer-display">${this.timeRemaining}s</span>
+          <div class="zw-game-header-right">
+            <div class="zw-game-clock">
+              <span class="zw-clock-dot"></span>
+              <span id="zw-game-timer-display">${this.timeRemaining}s</span>
+            </div>
+            <button class="zw-pixel-close" id="zw-game-close-x" title="Return to reading (Esc)">✕</button>
           </div>
         </div>
 
@@ -82,7 +94,18 @@ class ZenWebGameEngine {
           <canvas id="zenweb-game-canvas"></canvas>
         </div>
 
-        <!-- Footer & Controls Guide -->
+        <!-- On-Screen Controls for Tetris -->
+        ${gameType === 'tetris' ? `
+          <div class="zw-tetris-touch-bar">
+            <button class="zw-btn-touch" id="zw-t-left">◀ LEFT</button>
+            <button class="zw-btn-touch zw-btn-touch-primary" id="zw-t-rot">▲ ROTATE</button>
+            <button class="zw-btn-touch" id="zw-t-down">▼ SOFT</button>
+            <button class="zw-btn-touch" id="zw-t-right">▶ RIGHT</button>
+            <button class="zw-btn-touch zw-btn-touch-pink" id="zw-t-drop">⤓ DROP</button>
+          </div>
+        ` : ''}
+
+        <!-- Footer -->
         <div class="zw-game-footer">
           <div class="zw-game-hint">
             <span class="zw-badge-hint">CONTROLS</span>
@@ -99,37 +122,46 @@ class ZenWebGameEngine {
     modal.querySelector('#zw-game-close-btn').addEventListener('click', () => {
       this.terminateGame(false);
     });
+
+    modal.querySelector('#zw-game-close-x').addEventListener('click', () => {
+      this.terminateGame(false);
+    });
   }
 
   initCanvas(gameType) {
     this.canvasEl = document.getElementById('zenweb-game-canvas');
     if (!this.canvasEl) return;
 
-    this.ctx = this.canvasEl.getContext('2d');
+    this.ctx = this.canvasEl.getContext('2d', { alpha: false });
     const rect = this.canvasEl.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
 
-    // Retina anti-aliasing normalization
-    this.canvasEl.width = rect.width * dpr;
-    this.canvasEl.height = rect.height * dpr;
-    this.ctx.scale(dpr, dpr);
+    // Retina anti-aliasing scaling
+    const cssWidth = Math.min(rect.width || 720, window.innerWidth - 40);
+    const cssHeight = Math.min(rect.height || 420, window.innerHeight - 180);
 
-    const width = rect.width;
-    const height = rect.height;
+    this.canvasEl.width = cssWidth * dpr;
+    this.canvasEl.height = cssHeight * dpr;
+    this.canvasEl.style.width = `${cssWidth}px`;
+    this.canvasEl.style.height = `${cssHeight}px`;
+
+    this.ctx.resetTransform?.();
+    this.ctx.scale(dpr, dpr);
 
     // Instantiate chosen game
     switch (gameType) {
       case 'dino':
-        this.currentGame = new DinoJumpGame(this.canvasEl, this.ctx, width, height);
+        this.currentGame = new DinoJumpGame(this.canvasEl, this.ctx, cssWidth, cssHeight);
         break;
       case 'tetris':
-        this.currentGame = new TetrisGame(this.canvasEl, this.ctx, width, height);
+        this.currentGame = new TetrisGame(this.canvasEl, this.ctx, cssWidth, cssHeight);
+        this.bindTetrisTouchControls();
         break;
       case 'whack':
-        this.currentGame = new WhackADinoGame(this.canvasEl, this.ctx, width, height);
+        this.currentGame = new WhackADinoGame(this.canvasEl, this.ctx, cssWidth, cssHeight);
         break;
       default:
-        this.currentGame = new DinoJumpGame(this.canvasEl, this.ctx, width, height);
+        this.currentGame = new DinoJumpGame(this.canvasEl, this.ctx, cssWidth, cssHeight);
     }
 
     // High-FPS delta loop
@@ -147,6 +179,26 @@ class ZenWebGameEngine {
     };
 
     this.animFrameId = requestAnimationFrame(loop);
+  }
+
+  bindTetrisTouchControls() {
+    if (!this.modalEl) return;
+    const bind = (id, fn) => {
+      const btn = this.modalEl.querySelector(id);
+      if (btn) {
+        const handler = (e) => {
+          e.preventDefault();
+          if (this.currentGame && !this.isInputLocked) fn();
+        };
+        btn.addEventListener('pointerdown', handler);
+      }
+    };
+
+    bind('#zw-t-left', () => this.currentGame.move(-1, 0));
+    bind('#zw-t-right', () => this.currentGame.move(1, 0));
+    bind('#zw-t-rot', () => this.currentGame.rotate());
+    bind('#zw-t-down', () => this.currentGame.move(0, 1));
+    bind('#zw-t-drop', () => this.currentGame.hardDrop());
   }
 
   startCountdown() {
@@ -174,6 +226,11 @@ class ZenWebGameEngine {
     if (this.isInputLocked) return;
     this.isInputLocked = true;
 
+    if (this.boundGlobalKey) {
+      window.removeEventListener('keydown', this.boundGlobalKey);
+      this.boundGlobalKey = null;
+    }
+
     if (this.timerInterval) clearInterval(this.timerInterval);
     if (this.currentGame?.destroy) this.currentGame.destroy();
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
@@ -182,7 +239,7 @@ class ZenWebGameEngine {
     if (window.ZenWebAudio) window.ZenWebAudio.playZenChime();
 
     // Reset background 15-min break timer
-    chrome.runtime?.sendMessage({ type: 'RESET_BREAK_TIMER' });
+    chrome.runtime?.sendMessage?.({ type: 'RESET_BREAK_TIMER' });
 
     if (this.modalEl) {
       this.modalEl.classList.add('zw-fade-out');
@@ -207,10 +264,10 @@ class ZenWebGameEngine {
       <div class="zw-game-window" style="max-width: 480px; text-align: center; padding: 28px;">
         <div class="zw-pixel-pill">[NEURAL RE-CENTER]</div>
         <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; color: #fff; margin: 12px 0 6px 0;">
-          30-Second Reset Complete
+          Focus Reset Complete
         </h2>
         <p style="color: #9e9eb0; font-size: 13.5px; margin-bottom: 24px;">
-          Breathe in sync with the pulsing matrix orb before diving back into reading.
+          Breathe in sync with the pulsing matrix orb to clear cognitive fatigue.
         </p>
 
         <div class="zw-breath-orb-wrap">
@@ -218,7 +275,7 @@ class ZenWebGameEngine {
           <div class="zw-breath-orb" id="zw-breath-orb">4s</div>
         </div>
 
-        <div style="font-family: monospace; font-size: 13px; color: #00FF66; margin-top: 18px;" id="zw-breath-phase">
+        <div style="font-family: 'Space Mono', monospace; font-size: 13px; color: #00FF66; margin-top: 18px;" id="zw-breath-phase">
           INHALE SLOWLY...
         </div>
 
@@ -230,7 +287,7 @@ class ZenWebGameEngine {
 
     document.body.appendChild(modal);
 
-    let secs = 15;
+    let secs = 20;
     const orb = modal.querySelector('#zw-breath-orb');
     const phase = modal.querySelector('#zw-breath-phase');
 
@@ -274,15 +331,15 @@ class DinoJumpGame {
     this.width = width;
     this.height = height;
 
-    this.groundY = height - 45;
+    this.groundY = height - 48;
     this.dino = {
-      x: 60,
-      y: this.groundY - 36,
+      x: 64,
+      y: this.groundY - 38,
       w: 32,
-      h: 36,
+      h: 38,
       vy: 0,
       jumpForce: -620,
-      gravity: 1600,
+      gravity: 1650,
       isGrounded: true
     };
 
@@ -290,6 +347,7 @@ class DinoJumpGame {
     this.spawnTimer = 1.2;
     this.speed = 280;
     this.score = 0;
+    this.highScore = parseInt(localStorage.getItem('zw_dino_hi') || '0', 10);
     this.gameOver = false;
     this.particles = [];
 
@@ -321,7 +379,7 @@ class DinoJumpGame {
   }
 
   restart() {
-    this.dino.y = this.groundY - 36;
+    this.dino.y = this.groundY - 38;
     this.dino.vy = 0;
     this.dino.isGrounded = true;
     this.obstacles = [];
@@ -331,11 +389,11 @@ class DinoJumpGame {
   }
 
   createJumpSparks(x, y) {
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 10; i++) {
       this.particles.push({
         x, y,
-        vx: (Math.random() - 0.5) * 120,
-        vy: (Math.random() - 1) * 80,
+        vx: (Math.random() - 0.5) * 140,
+        vy: (Math.random() - 1) * 90,
         life: 0.35,
         color: '#00FF66'
       });
@@ -343,7 +401,7 @@ class DinoJumpGame {
   }
 
   update(dt) {
-    // Particles
+    // Particle Physics
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.x += p.vx * dt;
@@ -354,7 +412,7 @@ class DinoJumpGame {
 
     if (this.gameOver) return;
 
-    // Dino Physics
+    // Dino Gravity
     this.dino.vy += this.dino.gravity * dt;
     this.dino.y += this.dino.vy * dt;
 
@@ -367,105 +425,82 @@ class DinoJumpGame {
     // Obstacle Spawning
     this.spawnTimer -= dt;
     if (this.spawnTimer <= 0) {
-      const isTall = Math.random() > 0.5;
+      const isTall = Math.random() > 0.45;
       this.obstacles.push({
         x: this.width + 20,
-        y: isTall ? this.groundY - 44 : this.groundY - 30,
+        y: isTall ? this.groundY - 46 : this.groundY - 32,
         w: isTall ? 22 : 18,
-        h: isTall ? 44 : 30,
+        h: isTall ? 46 : 32,
         isTall
       });
       this.spawnTimer = 1.1 + Math.random() * 0.9;
     }
 
-    // Move obstacles & collision
+    // Move Obstacles & Collision Check
     for (let i = this.obstacles.length - 1; i >= 0; i--) {
       const obs = this.obstacles[i];
       obs.x -= this.speed * dt;
 
-      // AABB Box collision with 4px forgiveness
+      // 4px collision inset for fair hitboxes
       if (
-        this.dino.x + 4 < obs.x + obs.w &&
-        this.dino.x + this.dino.w - 4 > obs.x &&
+        this.dino.x + 5 < obs.x + obs.w &&
+        this.dino.x + this.dino.w - 5 > obs.x &&
         this.dino.y + 4 < obs.y + obs.h &&
         this.dino.y + this.dino.h - 4 > obs.y
       ) {
         this.gameOver = true;
         this.createJumpSparks(this.dino.x + 16, this.dino.y + 16);
+        if (this.score > this.highScore) {
+          this.highScore = this.score;
+          try { localStorage.setItem('zw_dino_hi', this.highScore); } catch(e){}
+        }
       }
 
       if (obs.x + obs.w < -20) {
         this.obstacles.splice(i, 1);
         this.score += 10;
-        this.speed = Math.min(520, this.speed + 8); // Gently ramp up
+        this.speed = Math.min(520, this.speed + 7);
       }
     }
   }
 
   render() {
-    this.ctx.fillStyle = '#0a0a0e';
+    this.ctx.fillStyle = '#090a0f';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // Pixel matrix stars
-    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-    for (let x = 30; x < this.width; x += 60) {
-      this.ctx.fillRect(x, 25 + Math.sin(x) * 15, 2, 2);
+    // Matrix scanline backdrop
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+    for (let y = 0; y < this.groundY; y += 12) {
+      this.ctx.fillRect(0, y, this.width, 1);
     }
 
-    // Ground Line
-    this.ctx.strokeStyle = '#262833';
+    // Ground line
+    this.ctx.strokeStyle = '#272a3d';
     this.ctx.lineWidth = 2;
     this.ctx.beginPath();
     this.ctx.moveTo(0, this.groundY);
     this.ctx.lineTo(this.width, this.groundY);
     this.ctx.stroke();
 
-    // Ground dashed grid pattern
+    // Animated dashed ground pixels
     this.ctx.fillStyle = '#00FF66';
-    for (let x = (Date.now() / 8) % 40; x < this.width; x += 40) {
-      this.ctx.fillRect(this.width - x, this.groundY + 3, 12, 2);
+    const offset = (Date.now() / 9) % 36;
+    for (let x = offset; x < this.width; x += 36) {
+      this.ctx.fillRect(this.width - x, this.groundY + 3, 14, 2);
     }
 
-    // Dino Character (Pixelated Block Form)
-    this.ctx.fillStyle = '#00FF66';
-    this.ctx.shadowColor = '#00FF66';
-    this.ctx.shadowBlur = 8;
-    // Dino Head
-    this.ctx.fillRect(this.dino.x + 12, this.dino.y, 18, 14);
-    // Eye
-    this.ctx.fillStyle = '#0a0a0e';
-    this.ctx.fillRect(this.dino.x + 22, this.dino.y + 3, 3, 3);
-    // Body
-    this.ctx.fillStyle = '#00FF66';
-    this.ctx.fillRect(this.dino.x + 4, this.dino.y + 14, 20, 16);
-    // Legs
-    const runCycle = Math.floor(Date.now() / 120) % 2;
-    if (this.dino.isGrounded) {
-      if (runCycle === 0) {
-        this.ctx.fillRect(this.dino.x + 6, this.dino.y + 30, 4, 6);
-        this.ctx.fillRect(this.dino.x + 16, this.dino.y + 30, 4, 4);
-      } else {
-        this.ctx.fillRect(this.dino.x + 6, this.dino.y + 30, 4, 4);
-        this.ctx.fillRect(this.dino.x + 16, this.dino.y + 30, 4, 6);
-      }
-    } else {
-      this.ctx.fillRect(this.dino.x + 8, this.dino.y + 30, 5, 4);
-    }
-    this.ctx.shadowBlur = 0;
+    // Draw Pixel Dino Character
+    this.renderDinoSprite();
 
-    // Obstacles (Pixel Cacti)
+    // Draw Obstacles (Pixel Cacti)
     this.ctx.fillStyle = '#FF007A';
-    this.ctx.shadowColor = '#FF007A';
-    this.ctx.shadowBlur = 8;
     this.obstacles.forEach(obs => {
       this.ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
-      // Cactus arms
       if (obs.isTall) {
-        this.ctx.fillRect(obs.x - 5, obs.y + 10, 5, 8);
-        this.ctx.fillRect(obs.x + obs.w, obs.y + 14, 5, 8);
+        this.ctx.fillRect(obs.x - 5, obs.y + 12, 5, 10);
+        this.ctx.fillRect(obs.x + obs.w, obs.y + 16, 5, 10);
       }
     });
-    this.ctx.shadowBlur = 0;
 
     // Particles
     this.particles.forEach(p => {
@@ -474,21 +509,57 @@ class DinoJumpGame {
     });
 
     // Score HUD
-    this.ctx.font = "bold 15px 'Plus Jakarta Sans', monospace";
-    this.ctx.fillStyle = '#f2f4f8';
-    this.ctx.fillText(`SCORE: ${this.score}`, 24, 34);
+    this.ctx.font = "bold 13px 'Space Mono', monospace";
+    this.ctx.textAlign = 'left';
+    this.ctx.fillStyle = '#00FF66';
+    this.ctx.fillText(`SCORE: ${this.score}`, 24, 32);
+    this.ctx.fillStyle = '#8f96a3';
+    this.ctx.fillText(`HI: ${this.highScore}`, 140, 32);
 
     if (this.gameOver) {
-      this.ctx.fillStyle = 'rgba(10, 10, 14, 0.85)';
+      this.ctx.fillStyle = 'rgba(9, 10, 15, 0.88)';
       this.ctx.fillRect(0, 0, this.width, this.height);
-      this.ctx.font = "bold 22px 'Plus Jakarta Sans', monospace";
+
+      this.ctx.font = "bold 22px 'Chivo', sans-serif";
       this.ctx.fillStyle = '#FF007A';
       this.ctx.textAlign = 'center';
       this.ctx.fillText("COLLISION DETECTED", this.width / 2, this.height / 2 - 12);
-      this.ctx.font = "14px monospace";
+
+      this.ctx.font = "13px 'Space Mono', monospace";
       this.ctx.fillStyle = '#00FF66';
-      this.ctx.fillText("TAP OR PRESS SPACE TO RESPAWN", this.width / 2, this.height / 2 + 20);
+      this.ctx.fillText("PRESS [SPACE] OR TAP TO RESPAWN", this.width / 2, this.height / 2 + 20);
       this.ctx.textAlign = 'left';
+    }
+  }
+
+  renderDinoSprite() {
+    const x = this.dino.x;
+    const y = this.dino.y;
+    this.ctx.fillStyle = '#00FF66';
+
+    // Head
+    this.ctx.fillRect(x + 12, y, 18, 14);
+    // Eye
+    this.ctx.fillStyle = '#090a0f';
+    this.ctx.fillRect(x + 22, y + 3, 3, 3);
+    // Body
+    this.ctx.fillStyle = '#00FF66';
+    this.ctx.fillRect(x + 4, y + 14, 20, 16);
+    // Tiny arm
+    this.ctx.fillRect(x + 22, y + 18, 5, 3);
+
+    // Running legs animation
+    const runCycle = Math.floor(Date.now() / 110) % 2;
+    if (this.dino.isGrounded) {
+      if (runCycle === 0) {
+        this.ctx.fillRect(x + 6, y + 30, 4, 7);
+        this.ctx.fillRect(x + 16, y + 30, 4, 4);
+      } else {
+        this.ctx.fillRect(x + 6, y + 30, 4, 4);
+        this.ctx.fillRect(x + 16, y + 30, 4, 7);
+      }
+    } else {
+      this.ctx.fillRect(x + 8, y + 30, 5, 5);
     }
   }
 
@@ -499,7 +570,7 @@ class DinoJumpGame {
 }
 
 /* ==========================================================================
-   MINI-GAME 2: TETRIS (CLASSIC 10x20 FALLING MATRIX)
+   MINI-GAME 2: TETRIS MATRIX (10x20 CLASSIC SPATIAL RESET)
    ========================================================================== */
 
 class TetrisGame {
@@ -523,15 +594,15 @@ class TetrisGame {
     this.dropInterval = 0.55;
     this.dropTimer = 0;
 
-    // Tetrominoes
+    // Cohesive Baseten Palette for Tetrominoes
     this.shapes = [
-      { id: 1, color: '#00FF66', matrix: [[1,1,1,1]] }, // I
-      { id: 2, color: '#FFD600', matrix: [[1,1],[1,1]] }, // O
-      { id: 3, color: '#FF007A', matrix: [[0,1,0],[1,1,1]] }, // T
-      { id: 4, color: '#00E5FF', matrix: [[1,1,0],[0,1,1]] }, // S
-      { id: 5, color: '#FF3D00', matrix: [[0,1,1],[1,1,0]] }, // Z
-      { id: 6, color: '#7C4DFF', matrix: [[1,0,0],[1,1,1]] }, // J
-      { id: 7, color: '#FF9100', matrix: [[0,0,1],[1,1,1]] }  // L
+      { id: 1, color: '#00FF66', matrix: [[1,1,1,1]] }, // I (Neon Green)
+      { id: 2, color: '#F4F6FB', matrix: [[1,1],[1,1]] }, // O (Arctic White)
+      { id: 3, color: '#FF007A', matrix: [[0,1,0],[1,1,1]] }, // T (Cyber Pink)
+      { id: 4, color: '#38BDF8', matrix: [[1,1,0],[0,1,1]] }, // S (Ice Cyan)
+      { id: 5, color: '#FB7185', matrix: [[0,1,1],[1,1,0]] }, // Z (Coral Pink)
+      { id: 6, color: '#A855F7', matrix: [[1,0,0],[1,1,1]] }, // J (Electric Purple)
+      { id: 7, color: '#FBBF24', matrix: [[0,0,1],[1,1,1]] }  // L (Warm Gold)
     ];
 
     this.currentPiece = this.spawnPiece();
@@ -573,7 +644,7 @@ class TetrisGame {
   move(dx, dy) {
     this.currentPiece.x += dx;
     this.currentPiece.y += dy;
-    if (this.collides()) {
+    if (this.collides(this.currentPiece)) {
       this.currentPiece.x -= dx;
       this.currentPiece.y -= dy;
       if (dy > 0) {
@@ -588,7 +659,7 @@ class TetrisGame {
     const orig = this.currentPiece.matrix;
     const rotated = orig[0].map((_, i) => orig.map(row => row[i]).reverse());
     this.currentPiece.matrix = rotated;
-    if (this.collides()) {
+    if (this.collides(this.currentPiece)) {
       this.currentPiece.matrix = orig; // Wall kick fallback
     }
   }
@@ -597,8 +668,19 @@ class TetrisGame {
     while (this.move(0, 1)) {}
   }
 
-  collides() {
-    const { matrix, x, y } = this.currentPiece;
+  getGhostY() {
+    const ghost = {
+      ...this.currentPiece,
+      y: this.currentPiece.y
+    };
+    while (!this.collides({ ...ghost, y: ghost.y + 1 })) {
+      ghost.y++;
+    }
+    return ghost.y;
+  }
+
+  collides(piece) {
+    const { matrix, x, y } = piece;
     for (let r = 0; r < matrix.length; r++) {
       for (let c = 0; c < matrix[r].length; c++) {
         if (matrix[r][c]) {
@@ -625,7 +707,7 @@ class TetrisGame {
     this.clearLines();
     this.currentPiece = this.spawnPiece();
 
-    if (this.collides()) {
+    if (this.collides(this.currentPiece)) {
       // Grid full - gentle reset
       this.grid = Array.from({ length: this.rows }, () => Array(this.cols).fill(0));
       this.score = 0;
@@ -643,8 +725,8 @@ class TetrisGame {
       }
     }
     if (cleared > 0) {
-      const pts = [0, 100, 300, 500, 800];
-      this.score += pts[cleared] || 400;
+      const points = [0, 100, 300, 500, 800];
+      this.score += points[cleared] || 400;
       this.lines += cleared;
     }
   }
@@ -658,16 +740,16 @@ class TetrisGame {
   }
 
   render() {
-    this.ctx.fillStyle = '#0a0a0e';
+    this.ctx.fillStyle = '#090a0f';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // Matrix Border Box
-    this.ctx.strokeStyle = '#262833';
+    // Matrix Frame
+    this.ctx.strokeStyle = '#272a3d';
     this.ctx.lineWidth = 2;
     this.ctx.strokeRect(this.startX - 2, this.startY - 2, this.gridWidth + 4, this.gridHeight + 4);
 
-    // Grid Background
-    this.ctx.fillStyle = '#12131a';
+    // Matrix Background
+    this.ctx.fillStyle = '#12131c';
     this.ctx.fillRect(this.startX, this.startY, this.gridWidth, this.gridHeight);
 
     // Draw Grid Cells
@@ -688,32 +770,47 @@ class TetrisGame {
       }
     }
 
-    // Active Falling Piece
+    // Ghost Piece Projection
     if (this.currentPiece) {
-      const { matrix, x, y, color } = this.currentPiece;
-      this.ctx.fillStyle = color;
-      this.ctx.shadowColor = color;
-      this.ctx.shadowBlur = 6;
+      const ghostY = this.getGhostY();
+      const { matrix, x, color } = this.currentPiece;
+      this.ctx.strokeStyle = color;
+      this.ctx.lineWidth = 1;
+
       for (let r = 0; r < matrix.length; r++) {
         for (let c = 0; c < matrix[r].length; c++) {
           if (matrix[r][c]) {
             const px = this.startX + (x + c) * this.blockSize;
-            const py = this.startY + (y + r) * this.blockSize;
+            const py = this.startY + (ghostY + r) * this.blockSize;
+            if (py >= this.startY) {
+              this.ctx.strokeRect(px + 2, py + 2, this.blockSize - 4, this.blockSize - 4);
+            }
+          }
+        }
+      }
+
+      // Active Falling Piece
+      this.ctx.fillStyle = color;
+      for (let r = 0; r < matrix.length; r++) {
+        for (let c = 0; c < matrix[r].length; c++) {
+          if (matrix[r][c]) {
+            const px = this.startX + (x + c) * this.blockSize;
+            const py = this.startY + (this.currentPiece.y + r) * this.blockSize;
             if (py >= this.startY) {
               this.ctx.fillRect(px + 1, py + 1, this.blockSize - 2, this.blockSize - 2);
             }
           }
         }
       }
-      this.ctx.shadowBlur = 0;
     }
 
-    // HUD Side Display
-    this.ctx.font = "bold 14px 'Plus Jakarta Sans', monospace";
+    // HUD Display
+    this.ctx.font = "bold 13px 'Space Mono', monospace";
+    this.ctx.textAlign = 'left';
     this.ctx.fillStyle = '#00FF66';
-    this.ctx.fillText(`SCORE: ${this.score}`, 24, 34);
-    this.ctx.fillStyle = '#f2f4f8';
-    this.ctx.fillText(`LINES: ${this.lines}`, 24, 56);
+    this.ctx.fillText(`SCORE: ${this.score}`, 24, 32);
+    this.ctx.fillStyle = '#8f96a3';
+    this.ctx.fillText(`LINES: ${this.lines}`, 24, 52);
   }
 
   destroy() {
@@ -783,7 +880,7 @@ class WhackADinoGame {
             this.combo += 2;
             const pts = 30 * Math.min(this.combo, 4);
             this.score += pts;
-            this.spawnText(hole.x + 40, hole.y + 20, `+${pts} ULTRA!`, '#FFD600');
+            this.spawnText(hole.x + 40, hole.y + 20, `+${pts} ULTRA!`, '#FBBF24');
           } else if (hole.type === 'glitch') {
             this.combo = 0;
             this.score = Math.max(0, this.score - 10);
@@ -793,7 +890,7 @@ class WhackADinoGame {
       });
 
       if (!hit) {
-        this.combo = 0; // Miss reset
+        this.combo = 0;
       }
     };
 
@@ -812,7 +909,6 @@ class WhackADinoGame {
   }
 
   update(dt) {
-    // Spawner
     this.nextSpawn -= dt;
     if (this.nextSpawn <= 0) {
       const inactive = this.holes.filter(h => !h.active);
@@ -822,16 +918,14 @@ class WhackADinoGame {
         pick.whacked = false;
         pick.timeLeft = 0.9 + Math.random() * 0.7;
 
-        // 70% normal green dino, 20% golden dino, 10% glitch red dino
         const roll = Math.random();
         if (roll < 0.20) pick.type = 'golden';
-        else if (roll < 0.32) pick.type = 'glitch';
+        else if (roll < 0.35) pick.type = 'glitch';
         else pick.type = 'normal';
       }
       this.nextSpawn = 0.45 + Math.random() * 0.5;
     }
 
-    // Active dinos timer
     this.holes.forEach(hole => {
       if (hole.active) {
         hole.timeLeft -= dt;
@@ -841,7 +935,6 @@ class WhackADinoGame {
       }
     });
 
-    // Floating text update
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.y += p.vy * dt;
@@ -851,52 +944,47 @@ class WhackADinoGame {
   }
 
   render() {
-    this.ctx.fillStyle = '#0a0a0e';
+    this.ctx.fillStyle = '#090a0f';
     this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // Draw Grid Holes
+    // Draw Grid Holes (Blocky brutalist terminals)
     this.holes.forEach(hole => {
       this.ctx.fillStyle = '#14151e';
-      this.ctx.strokeStyle = '#262833';
+      this.ctx.strokeStyle = '#272a3d';
       this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-      this.ctx.roundRect(hole.x, hole.y, hole.size, hole.size, 10);
-      this.ctx.fill();
-      this.ctx.stroke();
+      this.ctx.fillRect(hole.x, hole.y, hole.size, hole.size);
+      this.ctx.strokeRect(hole.x, hole.y, hole.size, hole.size);
 
       if (hole.active) {
         const cx = hole.x + hole.size / 2;
         const cy = hole.y + hole.size / 2;
 
         let dinoColor = '#00FF66';
-        if (hole.type === 'golden') dinoColor = '#FFD600';
+        if (hole.type === 'golden') dinoColor = '#FBBF24';
         if (hole.type === 'glitch') dinoColor = '#FF007A';
 
-        this.ctx.fillStyle = dinoColor;
-        this.ctx.shadowColor = dinoColor;
-        this.ctx.shadowBlur = 10;
-
         if (hole.whacked) {
-          // Whacked state
-          this.ctx.font = '24px monospace';
-          this.ctx.textAlign = 'center';
-          this.ctx.fillText("💥", cx, cy + 8);
+          // Whacked pixel burst
+          this.ctx.fillStyle = dinoColor;
+          this.ctx.fillRect(cx - 8, cy - 8, 16, 16);
+          this.ctx.fillRect(cx - 16, cy - 2, 32, 4);
+          this.ctx.fillRect(cx - 2, cy - 16, 4, 32);
         } else {
           // Pixel Dino Head
-          this.ctx.fillRect(cx - 14, cy - 16, 28, 22);
-          // Dino snout
-          this.ctx.fillRect(cx - 4, cy - 10, 22, 16);
-          // Eye
-          this.ctx.fillStyle = '#0a0a0e';
-          this.ctx.fillRect(cx + 6, cy - 8, 4, 4);
+          this.ctx.fillStyle = dinoColor;
+          this.ctx.fillRect(cx - 14, cy - 14, 28, 20);
+          this.ctx.fillRect(cx - 4, cy - 8, 20, 14);
+
+          // Dino Eye
+          this.ctx.fillStyle = '#090a0f';
+          this.ctx.fillRect(cx + 4, cy - 8, 4, 4);
         }
-        this.ctx.shadowBlur = 0;
       }
     });
 
     // Floating Points Particles
     this.particles.forEach(p => {
-      this.ctx.font = "bold 15px 'Plus Jakarta Sans', monospace";
+      this.ctx.font = "bold 14px 'Space Mono', monospace";
       this.ctx.fillStyle = p.color;
       this.ctx.globalAlpha = Math.max(0, p.alpha);
       this.ctx.textAlign = 'center';
@@ -905,14 +993,14 @@ class WhackADinoGame {
     });
 
     // Score HUD
-    this.ctx.font = "bold 15px 'Plus Jakarta Sans', monospace";
+    this.ctx.font = "bold 13px 'Space Mono', monospace";
     this.ctx.fillStyle = '#00FF66';
     this.ctx.textAlign = 'left';
-    this.ctx.fillText(`SCORE: ${this.score}`, 24, 34);
+    this.ctx.fillText(`SCORE: ${this.score}`, 24, 32);
 
     if (this.combo > 1) {
       this.ctx.fillStyle = '#FF007A';
-      this.ctx.fillText(`COMBO x${Math.min(this.combo, 4)}!`, 150, 34);
+      this.ctx.fillText(`COMBO x${Math.min(this.combo, 4)}!`, 150, 32);
     }
   }
 

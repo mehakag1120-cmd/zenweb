@@ -10,14 +10,14 @@
     body {
       margin: 0;
       padding: 0;
-      background: #0a0a0e;
-      color: #f2f4f8;
+      background: #090a0f;
+      color: #f4f6fb;
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .demo-nav {
-      background: #12131a;
-      border-bottom: 2px solid #262835;
+      background: #12131c;
+      border-bottom: 2px solid #272a3d;
       padding: 16px 32px;
       display: flex;
       justify-content: space-between;
@@ -35,8 +35,8 @@
 
     /* Verification Console Window */
     .demo-console {
-      background: #12131a;
-      border: 2px solid #262835;
+      background: #12131c;
+      border: 2px solid #272a3d;
       border-radius: 8px;
       padding: 24px;
       box-shadow: 6px 6px 0px #000;
@@ -46,7 +46,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 2px solid #262835;
+      border-bottom: 2px solid #272a3d;
       padding-bottom: 12px;
       margin-bottom: 18px;
     }
@@ -65,8 +65,8 @@
       justify-content: center;
       gap: 8px;
       padding: 11px 16px;
-      background: #181924;
-      border: 1.5px solid #262835;
+      background: #181926;
+      border: 1.5px solid #272a3d;
       color: #ffffff;
       font-family: 'Space Mono', monospace;
       font-size: 11.5px;
@@ -76,6 +76,7 @@
       box-shadow: 3px 3px 0px #000;
       transition: all 0.15s ease;
       text-align: center;
+      user-select: none;
     }
 
     .demo-btn:hover {
@@ -84,14 +85,19 @@
       transform: translate(-1px, -1px);
     }
 
+    .demo-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #000;
+    }
+
     .demo-btn-pink:hover {
       border-color: #FF007A;
       color: #FF007A;
     }
 
     .demo-article {
-      background: #12131a;
-      border: 2px solid #262835;
+      background: #12131c;
+      border: 2px solid #272a3d;
       border-radius: 8px;
       padding: 36px 40px;
       box-shadow: 6px 6px 0px #000;
@@ -149,44 +155,44 @@
         <div>
           <span class="zw-pixel-tag">[TEST SUITE // CONTROLS]</span>
           <h2 style="font-family:'Chivo', sans-serif; font-size:18px; margin:4px 0 0 0; color:#fff;">
-            ZenWeb v2.1 Interactive Feature Deck
+            ZenWeb v2.2 Interactive Feature Deck
           </h2>
         </div>
-        <span class="zw-pixel-status-green">ONLINE</span>
+        <span class="zw-pixel-pill-green">ONLINE</span>
       </div>
 
       <p style="font-size:13.5px; color:#8f96a3; margin:0 0 12px 0;">
-        Trigger each core subsystem directly or use the ZenWeb extension icon & bottom dock:
+        Trigger each core subsystem directly or use the ZenWeb extension icon & bottom-left dock:
       </p>
 
       <div class="demo-btn-grid">
         <!-- Mini-Games -->
-        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('dino', 90)">
+        <button class="demo-btn" onclick="window.ZenWebGames?.launchGame('dino', 90)">
           <span>🦖</span> [PLAY DINO JUMP]
         </button>
-        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('tetris', 90)">
+        <button class="demo-btn" onclick="window.ZenWebGames?.launchGame('tetris', 90)">
           <span>🧱</span> [PLAY TETRIS MATRIX]
         </button>
-        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('whack', 90)">
+        <button class="demo-btn" onclick="window.ZenWebGames?.launchGame('whack', 90)">
           <span>🎯</span> [WHACK-A-DINO]
         </button>
-        <button class="demo-btn demo-btn-pink" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('random', 90)">
+        <button class="demo-btn demo-btn-pink" onclick="window.ZenWebGames?.launchGame('random', 90)">
           <span>🎲</span> [15-MIN RANDOM RESET]
         </button>
 
         <!-- Hydration & Monitoring -->
-        <button class="demo-btn demo-btn-pink" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.triggerWaterBreakReminder()">
+        <button class="demo-btn demo-btn-pink" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.triggerWaterBreakReminder()">
           <span>💧</span> [30-MIN WATER ALERT]
         </button>
-        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.checkScreenMonitoringPermission()">
+        <button class="demo-btn" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.checkScreenMonitoringPermission()">
           <span>🤖</span> [AGENT PERMISSION]
         </button>
 
         <!-- Data Restructuring -->
-        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.applyDataRestructuring()">
+        <button class="demo-btn" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.applyDataRestructuring()">
           <span>⚡</span> [RESTRUCTURE DATA]
         </button>
-        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.removeDataRestructuring()" style="color:#8f96a3;">
+        <button class="demo-btn" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.removeDataRestructuring()" style="color:#8f96a3;">
           <span>✕</span> [RESTORE ORIGINAL]
         </button>
       </div>
@@ -208,7 +214,7 @@
         🚨 NOISY COMMERCIAL BANNER: SPONSORED PROMOTION DETECTED (SUPPRESSED BY DISTRACTION SHIELD)
       </div>
 
-      <!-- Long dense paragraph to demonstrate conversion into scannable bullet cards -->
+      <!-- Long dense paragraphs to demonstrate conversion into scannable bullet cards -->
       <p>
         The performance characteristics of transformer-based inference workloads diverge substantially from traditional state-free web applications. Because modern large language models require gigabytes of high-bandwidth memory simply to preserve key-value caches across multi-turn generation steps, memory bandwidth saturation represents the primary operational bottleneck rather than raw compute FLOPS. When request concurrency scales unpredictably in enterprise environments, standard serving runtimes experience catastrophic queue latency escalation and memory fragmentation.
       </p>
@@ -232,21 +238,10 @@
 
   </div>
 
-  <!-- Expose instance for demo script hooks -->
+  <!-- Scripts -->
   <script src="audio-engine.js"></script>
   <script src="ai-engine.js"></script>
   <script src="game-engine.js"></script>
   <script src="content.js"></script>
-  <script>
-    // Hook for direct demo buttons
-    window.addEventListener('DOMContentLoaded', () => {
-      // Find the initialized content instance
-      setTimeout(() => {
-        if (window.__ZENWEB_CONTENT_INSTANCE__) {
-          window.ZenWebContentInstance = window.__ZENWEB_CONTENT_INSTANCE__;
-        }
-      }, 400);
-    });
-  </script>
 </body>
 </html>

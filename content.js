@@ -330,8 +330,8 @@
       `);
 
       elements.forEach(el => {
-        // Skip ZenWeb internal UI elements
-        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
+        // Skip ZenWeb internal UI elements and GitHub contribution calendar elements
+        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], .ContributionCalendar, .js-calendar-graph, .js-yearly-contributions, [data-level]')) return;
 
         const inlineStyle = el.getAttribute('style');
         if (inlineStyle && !el.hasAttribute('data-zw-orig-style')) {
@@ -363,6 +363,9 @@
         }
       });
 
+      // Style GitHub Contribution Calendar in rich hues of pink
+      this.styleGitHubContributionGrid();
+
       // Setup MutationObserver for dynamic SPA content loading (e.g. Times of India, Reddit, Twitter)
       if (!this.domMutationObserver) {
         let throttleTimer = null;
@@ -386,6 +389,54 @@
       }
     }
 
+    styleGitHubContributionGrid() {
+      // Find all contribution day cells across table and SVG modes
+      const days = document.querySelectorAll(`
+        td.ContributionCalendar-day, rect.ContributionCalendar-day, 
+        .ContributionCalendar-grid [data-level], .ContributionCalendar-day
+      `);
+
+      if (days.length === 0) return;
+
+      const pinkShades = {
+        '0': { bg: '#171827', border: '#272a3e' },
+        '1': { bg: '#5c183d', border: 'rgba(255, 0, 122, 0.45)' },
+        '2': { bg: '#9e145e', border: 'rgba(255, 0, 122, 0.7)' },
+        '3': { bg: '#d8006b', border: '#FF007A' },
+        '4': { bg: '#FF007A', border: '#ff70b3' }
+      };
+
+      days.forEach(el => {
+        const level = el.getAttribute('data-level') || '0';
+        const shade = pinkShades[level] || pinkShades['0'];
+
+        if (!el.hasAttribute('data-zw-orig-style') && el.getAttribute('style')) {
+          el.setAttribute('data-zw-orig-style', el.getAttribute('style'));
+        }
+
+        el.style.setProperty('background-color', shade.bg, 'important');
+        el.style.setProperty('fill', shade.bg, 'important');
+        el.style.setProperty('border', `1px solid ${shade.border}`, 'important');
+        el.style.setProperty('border-radius', '2px', 'important');
+        this.normalizedStyleElements.add(el);
+      });
+
+      // Style the legend dots at the bottom right
+      const legendItems = document.querySelectorAll('.ContributionCalendar-legend [data-level], ul.legend [data-level]');
+      legendItems.forEach(item => {
+        const level = item.getAttribute('data-level') || '0';
+        const shade = pinkShades[level] || pinkShades['0'];
+        if (!item.hasAttribute('data-zw-orig-style') && item.getAttribute('style')) {
+          item.setAttribute('data-zw-orig-style', item.getAttribute('style'));
+        }
+        item.style.setProperty('background-color', shade.bg, 'important');
+        item.style.setProperty('fill', shade.bg, 'important');
+        item.style.setProperty('border', `1px solid ${shade.border}`, 'important');
+        item.style.setProperty('border-radius', '2px', 'important');
+        this.normalizedStyleElements.add(item);
+      });
+    }
+
     revertContrastNormalization() {
       if (this.domMutationObserver) {
         this.domMutationObserver.disconnect();
@@ -401,6 +452,9 @@
             el.style.removeProperty('background-color');
             el.style.removeProperty('color');
             el.style.removeProperty('-webkit-text-fill-color');
+            el.style.removeProperty('fill');
+            el.style.removeProperty('border');
+            el.style.removeProperty('border-radius');
           }
         }
       });

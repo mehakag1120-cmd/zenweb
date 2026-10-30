@@ -193,10 +193,11 @@ html[data-zenweb-theme="pixel-dark"] header:not([id^="zenweb-"]):not([class^="zw
 html[data-zenweb-theme="pixel-dark"] aside:not([id^="zenweb-"]):not([class^="zw-"]),
 html[data-zenweb-theme="pixel-dark"] ul:not([class^="zw-"]),
 html[data-zenweb-theme="pixel-dark"] ol:not([class^="zw-"]),
-html[data-zenweb-theme="pixel-dark"] table:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] table:not([class^="zw-"]):not(.ContributionCalendar-grid),
 html[data-zenweb-theme="pixel-dark"] tbody:not([class^="zw-"]),
 html[data-zenweb-theme="pixel-dark"] tr:not([class^="zw-"]),
-html[data-zenweb-theme="pixel-dark"] td:not([class^="zw-"]) {
+html[data-zenweb-theme="pixel-dark"] td:not([class^="zw-"]):not(.ContributionCalendar-day):not([data-level]),
+html[data-zenweb-theme="pixel-dark"] th:not([class^="zw-"]):not(.ContributionCalendar-label) {
   background-color: transparent !important;
   border-color: var(--zw-gray-border) !important;
   box-shadow: none !important;
@@ -221,6 +222,136 @@ html[data-zenweb-theme="pixel-dark"] iframe[src*="ad"] {
   border: 1px dashed var(--zw-gray-border) !important;
   opacity: 0.18 !important;
   filter: grayscale(1) !important;
+}
+
+/* ==========================================================================
+   GITHUB CONTRIBUTION MATRIX: CYBER-PINK PALETTE ENGINE
+   Fixes grid transparency bug and renders contribution heatmap in rich hues of pink.
+   ========================================================================== */
+
+/* Contribution Graph Container */
+html[data-zenweb-theme="pixel-dark"] .js-yearly-contributions,
+html[data-zenweb-theme="pixel-dark"] .ContributionCalendar,
+html[data-zenweb-theme="pixel-dark"] .js-calendar-graph,
+html[data-zenweb-theme="pixel-dark"] .graph-before-activity-overview {
+  background-color: #10111a !important;
+  border: 1.5px solid var(--zw-gray-border, #272a3d) !important;
+  border-radius: 8px !important;
+  padding: 16px 18px !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+}
+
+/* Calendar Month & Day Labels (Jan, Feb, Mon, Wed, etc.) */
+html[data-zenweb-theme="pixel-dark"] .ContributionCalendar-label,
+html[data-zenweb-theme="pixel-dark"] .ContributionCalendar-day[aria-hidden="true"],
+html[data-zenweb-theme="pixel-dark"] .js-calendar-graph text {
+  color: #9499aa !important;
+  fill: #9499aa !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 11px !important;
+}
+
+/* Level 0: Visible dark plum-charcoal tile with crisp cyber border (NEVER transparent!) */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day[data-level="0"],
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day[data-level="0"],
+html[data-zenweb-theme="pixel-dark"] [data-level="0"]:not([class^="zw-"]) {
+  background-color: #171827 !important;
+  fill: #171827 !important;
+  border: 1px solid #272a3e !important;
+  border-radius: 2px !important;
+  outline: none !important;
+}
+
+/* Level 1: Soft Dusty Rose / Deep Magenta Tint */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day[data-level="1"],
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day[data-level="1"],
+html[data-zenweb-theme="pixel-dark"] [data-level="1"]:not([class^="zw-"]) {
+  background-color: #5c183d !important;
+  fill: #5c183d !important;
+  border: 1px solid rgba(255, 0, 122, 0.45) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 3px rgba(255, 0, 122, 0.25) !important;
+}
+
+/* Level 2: Vibrant Raspberry Pink */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day[data-level="2"],
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day[data-level="2"],
+html[data-zenweb-theme="pixel-dark"] [data-level="2"]:not([class^="zw-"]) {
+  background-color: #9e145e !important;
+  fill: #9e145e !important;
+  border: 1px solid rgba(255, 0, 122, 0.7) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 6px rgba(255, 0, 122, 0.45) !important;
+}
+
+/* Level 3: Hot Cyber Pink */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day[data-level="3"],
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day[data-level="3"],
+html[data-zenweb-theme="pixel-dark"] [data-level="3"]:not([class^="zw-"]) {
+  background-color: #d8006b !important;
+  fill: #d8006b !important;
+  border: 1px solid #FF007A !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 8px rgba(255, 0, 122, 0.7) !important;
+}
+
+/* Level 4: Brilliant Neon Hyper-Pink (Peak Activity) */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day[data-level="4"],
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day[data-level="4"],
+html[data-zenweb-theme="pixel-dark"] [data-level="4"]:not([class^="zw-"]) {
+  background-color: #FF007A !important;
+  fill: #FF007A !important;
+  border: 1px solid #ff70b3 !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 12px rgba(255, 0, 122, 0.95) !important;
+}
+
+/* Interactive Hover State for Contribution Day Tiles */
+html[data-zenweb-theme="pixel-dark"] td.ContributionCalendar-day:hover,
+html[data-zenweb-theme="pixel-dark"] rect.ContributionCalendar-day:hover {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 1px !important;
+  transform: scale(1.15) !important;
+  transition: transform 0.1s ease !important;
+  z-index: 10 !important;
+}
+
+/* CSS Variables Override on the Calendar Container (Covers GitHub's dynamic inline styles) */
+html[data-zenweb-theme="pixel-dark"] {
+  --color-calendar-graph-day-bg: #171827 !important;
+  --color-calendar-graph-day-border: #272a3e !important;
+  --color-calendar-graph-day-L1-bg: #5c183d !important;
+  --color-calendar-graph-day-L1-border: rgba(255, 0, 122, 0.45) !important;
+  --color-calendar-graph-day-L2-bg: #9e145e !important;
+  --color-calendar-graph-day-L2-border: rgba(255, 0, 122, 0.7) !important;
+  --color-calendar-graph-day-L3-bg: #d8006b !important;
+  --color-calendar-graph-day-L3-border: #FF007A !important;
+  --color-calendar-graph-day-L4-bg: #FF007A !important;
+  --color-calendar-graph-day-L4-border: #ff70b3 !important;
+  --color-calendar-halloween-graph-day-L1-bg: #5c183d !important;
+  --color-calendar-halloween-graph-day-L2-bg: #9e145e !important;
+  --color-calendar-halloween-graph-day-L3-bg: #d8006b !important;
+  --color-calendar-halloween-graph-day-L4-bg: #FF007A !important;
+}
+
+/* Year Filter Navigation Buttons (e.g. 2026, 2025) */
+html[data-zenweb-theme="pixel-dark"] .js-year-link,
+html[data-zenweb-theme="pixel-dark"] #year-link-2026,
+html[data-zenweb-theme="pixel-dark"] [id*="year-link"] {
+  background: #141520 !important;
+  border: 1px solid var(--zw-gray-border, #272a3d) !important;
+  color: var(--zw-white, #f4f6fb) !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 12px !important;
+  border-radius: 4px !important;
+  padding: 6px 12px !important;
+}
+
+html[data-zenweb-theme="pixel-dark"] .js-year-link.selected,
+html[data-zenweb-theme="pixel-dark"] .js-year-link:hover {
+  background: rgba(255, 0, 122, 0.15) !important;
+  border-color: var(--zw-pink, #FF007A) !important;
+  color: var(--zw-pink, #FF007A) !important;
 }
 
 /* ==========================================================================

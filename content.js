@@ -618,6 +618,29 @@
     applyContrastNormalization() {
       const theme = this.getActiveThemeConfig();
 
+      // 0. Eliminate Blank Commercial Blocks & Top Leaderboard Ad Voids
+      const adSlots = document.querySelectorAll(`
+        [class*="top_ad"], [id*="top_ad"], [class*="leaderboard"], [id*="leaderboard"],
+        [class*="ad-wrapper"], [class*="ad_wrapper"], [class*="ad-banner"], [class*="ad-container"],
+        [class*="ad_container"], [class*="ad-placeholder"], [class*="ad-slot"], [class*="adbox"],
+        [class*="ad-holder"], [class*="ad-space"], [class*="ad-frame"], [class*="dfp-"],
+        [id^="google_ads"], [id^="div-gpt-ad"], [data-ad-unit], [data-ad-slot]
+      `);
+      adSlots.forEach(el => {
+        if (el.closest('#zenweb-root, [class^="zw-"], [id^="zenweb-"]')) return;
+        if (!el.hasAttribute('data-zw-orig-style')) {
+          el.setAttribute('data-zw-orig-style', el.getAttribute('style') || '');
+        }
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('height', '0px', 'important');
+        el.style.setProperty('min-height', '0px', 'important');
+        el.style.setProperty('max-height', '0px', 'important');
+        el.style.setProperty('margin', '0px', 'important');
+        el.style.setProperty('padding', '0px', 'important');
+        el.style.setProperty('overflow', 'hidden', 'important');
+        this.normalizedStyleElements.add(el);
+      });
+
       // 1. Universal Form Controls & Inputs Guardian (Eliminates white-on-white / unreadable login fields)
       const formControls = document.querySelectorAll(`
         input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([class^="zw-"]),
@@ -687,6 +710,11 @@
 
         // Check if background needs neutralizing
         if (comp.backgroundColor && (theme.mode === 'dark' ? this.isBrightBackground(comp.backgroundColor) : this.isDarkBackground(comp.backgroundColor))) {
+          el.style.setProperty('background-color', 'transparent', 'important');
+          el.style.setProperty('background-image', 'none', 'important');
+          this.normalizedStyleElements.add(el);
+        } else if (theme.mode === 'light' && this.isBrightBackground(comp.backgroundColor) && (el.tagName === 'HEADER' || el.className?.toString().match(/header|masthead|branding/i) || el.id?.match(/header/i))) {
+          // In light themes (Beige, Sorbet, Surf), headers with bright white backgrounds should be transparent so they don't produce stark white blocks
           el.style.setProperty('background-color', 'transparent', 'important');
           el.style.setProperty('background-image', 'none', 'important');
           this.normalizedStyleElements.add(el);

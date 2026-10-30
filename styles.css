@@ -452,6 +452,33 @@ html[data-zenweb-theme="pixel-dark"] [class*="item"]:not([class^="zw-"]) {
   border-color: var(--zw-gray-border) !important;
 }
 
+/* Neutralize bright white newspaper headers, mastheads & branding in Cyberpunk */
+html[data-zenweb-theme="cyberpunk"] header,
+html[data-zenweb-theme="pixel-dark"] header,
+html[data-zenweb-theme="cyberpunk"] [class*="masthead"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="masthead"]:not([class^="zw-"]),
+html[data-zenweb-theme="cyberpunk"] [class*="branding"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="branding"]:not([class^="zw-"]),
+html[data-zenweb-theme="cyberpunk"] [id*="header"]:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [id*="header"]:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="cyberpunk"] [class*="top_header"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="top_header"]:not([class^="zw-"]) {
+  background-color: var(--zw-black, #090a0f) !important;
+  background-image: none !important;
+  color: var(--zw-white, #f4f6fb) !important;
+  border-color: var(--zw-gray-border, #272a3d) !important;
+}
+
+/* Invert bright newspaper logos that are black-on-white images in Cyberpunk */
+html[data-zenweb-theme="cyberpunk"] header img,
+html[data-zenweb-theme="pixel-dark"] header img,
+html[data-zenweb-theme="cyberpunk"] [class*="masthead"] img,
+html[data-zenweb-theme="pixel-dark"] [class*="masthead"] img,
+html[data-zenweb-theme="cyberpunk"] [class*="logo"] img:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="logo"] img:not([class^="zw-"]) {
+  filter: invert(0.92) hue-rotate(180deg) brightness(1.1) !important;
+}
+
 /* Suppress jarring white ad boxes and promotional banners */
 html[data-zenweb-theme="cyberpunk"] [class*="ad-"]:not([class^="zw-"]),
 html[data-zenweb-theme="pixel-dark"] [class*="ad-"]:not([class^="zw-"]),
@@ -653,12 +680,12 @@ html[data-zenweb-theme="pixel-dark"] #zenweb-pixel-canvas {
 }
 
 html[data-zenweb-theme="sorbet"] #zenweb-pixel-canvas {
-  opacity: 0.95 !important;
+  opacity: 0.50 !important;
   mix-blend-mode: normal !important;
 }
 
 html[data-zenweb-theme="surf"] #zenweb-pixel-canvas {
-  opacity: 0.95 !important;
+  opacity: 0.50 !important;
   mix-blend-mode: normal !important;
 }
 
@@ -2044,9 +2071,13 @@ html[data-zenweb-theme="sorbet"] body {
 
 /* Headings in Sorbet: Bold rounded font in deep raspberry sorbet */
 html[data-zenweb-theme="sorbet"] h1,
+html[data-zenweb-theme="sorbet"] h1 *,
 html[data-zenweb-theme="sorbet"] [class*="headline-main"],
+html[data-zenweb-theme="sorbet"] [class*="headline-main"] *,
 html[data-zenweb-theme="sorbet"] [class*="main-title"],
-html[data-zenweb-theme="sorbet"] [class*="lead-title"] {
+html[data-zenweb-theme="sorbet"] [class*="main-title"] *,
+html[data-zenweb-theme="sorbet"] [class*="lead-title"],
+html[data-zenweb-theme="sorbet"] [class*="lead-title"] * {
   font-family: 'Fredoka', sans-serif !important;
   font-size: 40px !important;
   line-height: 1.22 !important;
@@ -2060,9 +2091,13 @@ html[data-zenweb-theme="sorbet"] [class*="lead-title"] {
 }
 
 html[data-zenweb-theme="sorbet"] h2,
+html[data-zenweb-theme="sorbet"] h2 *,
 html[data-zenweb-theme="sorbet"] [class*="headline"],
+html[data-zenweb-theme="sorbet"] [class*="headline"] *,
 html[data-zenweb-theme="sorbet"] [class*="story-title"],
-html[data-zenweb-theme="sorbet"] [class*="article-title"] {
+html[data-zenweb-theme="sorbet"] [class*="story-title"] *,
+html[data-zenweb-theme="sorbet"] [class*="article-title"],
+html[data-zenweb-theme="sorbet"] [class*="article-title"] * {
   font-family: 'Fredoka', sans-serif !important;
   font-size: 30px !important;
   font-weight: 700 !important;
@@ -2072,8 +2107,11 @@ html[data-zenweb-theme="sorbet"] [class*="article-title"] {
 }
 
 html[data-zenweb-theme="sorbet"] h3,
+html[data-zenweb-theme="sorbet"] h3 *,
 html[data-zenweb-theme="sorbet"] [class*="sub-headline"],
-html[data-zenweb-theme="sorbet"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) {
+html[data-zenweb-theme="sorbet"] [class*="sub-headline"] *,
+html[data-zenweb-theme="sorbet"] [class*="title"]:not([class*="tag"]):not([class*="meta"]),
+html[data-zenweb-theme="sorbet"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) * {
   font-family: 'Fredoka', sans-serif !important;
   font-size: 24px !important;
   font-weight: 600 !important;
@@ -2083,8 +2121,11 @@ html[data-zenweb-theme="sorbet"] [class*="title"]:not([class*="tag"]):not([class
 }
 
 html[data-zenweb-theme="sorbet"] h4,
+html[data-zenweb-theme="sorbet"] h4 *,
 html[data-zenweb-theme="sorbet"] h5,
-html[data-zenweb-theme="sorbet"] h6 {
+html[data-zenweb-theme="sorbet"] h5 *,
+html[data-zenweb-theme="sorbet"] h6,
+html[data-zenweb-theme="sorbet"] h6 * {
   font-family: 'Fredoka', sans-serif !important;
   font-weight: 600 !important;
   color: #9D174D !important;
@@ -2093,17 +2134,25 @@ html[data-zenweb-theme="sorbet"] h6 {
 
 /* Hyperlinks and Headline Links in Sorbet - strictly sorbet pinks, zero green */
 html[data-zenweb-theme="sorbet"] a,
-html[data-zenweb-theme="sorbet"] a > *,
+html[data-zenweb-theme="sorbet"] a *,
 html[data-zenweb-theme="sorbet"] [role="link"],
-html[data-zenweb-theme="sorbet"] [role="link"] > *,
+html[data-zenweb-theme="sorbet"] [role="link"] *,
 html[data-zenweb-theme="sorbet"] h1 a,
+html[data-zenweb-theme="sorbet"] h1 a *,
 html[data-zenweb-theme="sorbet"] h2 a,
+html[data-zenweb-theme="sorbet"] h2 a *,
 html[data-zenweb-theme="sorbet"] h3 a,
+html[data-zenweb-theme="sorbet"] h3 a *,
 html[data-zenweb-theme="sorbet"] [class*="headline"] a,
+html[data-zenweb-theme="sorbet"] [class*="headline"] a *,
 html[data-zenweb-theme="sorbet"] [class*="story"] a,
+html[data-zenweb-theme="sorbet"] [class*="story"] a *,
 html[data-zenweb-theme="sorbet"] [class*="title"] a,
+html[data-zenweb-theme="sorbet"] [class*="title"] a *,
 html[data-zenweb-theme="sorbet"] a[class*="headline"],
-html[data-zenweb-theme="sorbet"] a[class*="title"] {
+html[data-zenweb-theme="sorbet"] a[class*="headline"] *,
+html[data-zenweb-theme="sorbet"] a[class*="title"],
+html[data-zenweb-theme="sorbet"] a[class*="title"] * {
   color: #9D174D !important;
   -webkit-text-fill-color: #9D174D !important;
   text-decoration: underline !important;
@@ -2113,8 +2162,9 @@ html[data-zenweb-theme="sorbet"] a[class*="title"] {
 }
 
 html[data-zenweb-theme="sorbet"] a:hover,
-html[data-zenweb-theme="sorbet"] a:hover > *,
-html[data-zenweb-theme="sorbet"] [role="link"]:hover {
+html[data-zenweb-theme="sorbet"] a:hover *,
+html[data-zenweb-theme="sorbet"] [role="link"]:hover,
+html[data-zenweb-theme="sorbet"] [role="link"]:hover * {
   color: #0284C7 !important; /* Baby blue on hover */
   -webkit-text-fill-color: #0284C7 !important;
   text-decoration-color: #38BDF8 !important;
@@ -2292,9 +2342,13 @@ html[data-zenweb-theme="surf"] body {
 }
 
 html[data-zenweb-theme="surf"] h1,
+html[data-zenweb-theme="surf"] h1 *,
 html[data-zenweb-theme="surf"] [class*="headline-main"],
+html[data-zenweb-theme="surf"] [class*="headline-main"] *,
 html[data-zenweb-theme="surf"] [class*="main-title"],
-html[data-zenweb-theme="surf"] [class*="lead-title"] {
+html[data-zenweb-theme="surf"] [class*="main-title"] *,
+html[data-zenweb-theme="surf"] [class*="lead-title"],
+html[data-zenweb-theme="surf"] [class*="lead-title"] * {
   font-family: 'Comfortaa', sans-serif !important;
   font-size: 40px !important;
   line-height: 1.25 !important;
@@ -2308,9 +2362,13 @@ html[data-zenweb-theme="surf"] [class*="lead-title"] {
 }
 
 html[data-zenweb-theme="surf"] h2,
+html[data-zenweb-theme="surf"] h2 *,
 html[data-zenweb-theme="surf"] [class*="headline"],
+html[data-zenweb-theme="surf"] [class*="headline"] *,
 html[data-zenweb-theme="surf"] [class*="story-title"],
-html[data-zenweb-theme="surf"] [class*="article-title"] {
+html[data-zenweb-theme="surf"] [class*="story-title"] *,
+html[data-zenweb-theme="surf"] [class*="article-title"],
+html[data-zenweb-theme="surf"] [class*="article-title"] * {
   font-family: 'Comfortaa', sans-serif !important;
   font-size: 30px !important;
   font-weight: 700 !important;
@@ -2320,8 +2378,11 @@ html[data-zenweb-theme="surf"] [class*="article-title"] {
 }
 
 html[data-zenweb-theme="surf"] h3,
+html[data-zenweb-theme="surf"] h3 *,
 html[data-zenweb-theme="surf"] [class*="sub-headline"],
-html[data-zenweb-theme="surf"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) {
+html[data-zenweb-theme="surf"] [class*="sub-headline"] *,
+html[data-zenweb-theme="surf"] [class*="title"]:not([class*="tag"]):not([class*="meta"]),
+html[data-zenweb-theme="surf"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) * {
   font-family: 'Comfortaa', sans-serif !important;
   font-size: 24px !important;
   font-weight: 700 !important;
@@ -2329,19 +2390,39 @@ html[data-zenweb-theme="surf"] [class*="title"]:not([class*="tag"]):not([class*=
   -webkit-text-fill-color: #0369A1 !important;
 }
 
+html[data-zenweb-theme="surf"] h4,
+html[data-zenweb-theme="surf"] h4 *,
+html[data-zenweb-theme="surf"] h5,
+html[data-zenweb-theme="surf"] h5 *,
+html[data-zenweb-theme="surf"] h6,
+html[data-zenweb-theme="surf"] h6 * {
+  font-family: 'Comfortaa', sans-serif !important;
+  font-weight: 700 !important;
+  color: #0369A1 !important;
+  -webkit-text-fill-color: #0369A1 !important;
+}
+
 /* Hyperlinks and Headline Links in Surf - strictly ocean azure, zero green */
 html[data-zenweb-theme="surf"] a,
-html[data-zenweb-theme="surf"] a > *,
+html[data-zenweb-theme="surf"] a *,
 html[data-zenweb-theme="surf"] [role="link"],
-html[data-zenweb-theme="surf"] [role="link"] > *,
+html[data-zenweb-theme="surf"] [role="link"] *,
 html[data-zenweb-theme="surf"] h1 a,
+html[data-zenweb-theme="surf"] h1 a *,
 html[data-zenweb-theme="surf"] h2 a,
+html[data-zenweb-theme="surf"] h2 a *,
 html[data-zenweb-theme="surf"] h3 a,
+html[data-zenweb-theme="surf"] h3 a *,
 html[data-zenweb-theme="surf"] [class*="headline"] a,
+html[data-zenweb-theme="surf"] [class*="headline"] a *,
 html[data-zenweb-theme="surf"] [class*="story"] a,
+html[data-zenweb-theme="surf"] [class*="story"] a *,
 html[data-zenweb-theme="surf"] [class*="title"] a,
+html[data-zenweb-theme="surf"] [class*="title"] a *,
 html[data-zenweb-theme="surf"] a[class*="headline"],
-html[data-zenweb-theme="surf"] a[class*="title"] {
+html[data-zenweb-theme="surf"] a[class*="headline"] *,
+html[data-zenweb-theme="surf"] a[class*="title"],
+html[data-zenweb-theme="surf"] a[class*="title"] * {
   color: #0369A1 !important; /* Azure ocean blue */
   -webkit-text-fill-color: #0369A1 !important;
   text-decoration: underline !important;
@@ -2350,7 +2431,9 @@ html[data-zenweb-theme="surf"] a[class*="title"] {
 }
 
 html[data-zenweb-theme="surf"] a:hover,
-html[data-zenweb-theme="surf"] [role="link"]:hover {
+html[data-zenweb-theme="surf"] a:hover *,
+html[data-zenweb-theme="surf"] [role="link"]:hover,
+html[data-zenweb-theme="surf"] [role="link"]:hover * {
   color: #0C4A6E !important;
   -webkit-text-fill-color: #0C4A6E !important;
 }
@@ -2485,9 +2568,13 @@ html[data-zenweb-theme="beige"] body {
 
 /* BIGGER HEADINGS FOR BEIGE THEME */
 html[data-zenweb-theme="beige"] h1,
+html[data-zenweb-theme="beige"] h1 *,
 html[data-zenweb-theme="beige"] [class*="headline-main"],
+html[data-zenweb-theme="beige"] [class*="headline-main"] *,
 html[data-zenweb-theme="beige"] [class*="main-title"],
-html[data-zenweb-theme="beige"] [class*="lead-title"] {
+html[data-zenweb-theme="beige"] [class*="main-title"] *,
+html[data-zenweb-theme="beige"] [class*="lead-title"],
+html[data-zenweb-theme="beige"] [class*="lead-title"] * {
   font-family: 'Newsreader', Georgia, serif !important;
   font-size: 48px !important; /* Prominently enlarged */
   line-height: 1.18 !important;
@@ -2501,9 +2588,13 @@ html[data-zenweb-theme="beige"] [class*="lead-title"] {
 }
 
 html[data-zenweb-theme="beige"] h2,
+html[data-zenweb-theme="beige"] h2 *,
 html[data-zenweb-theme="beige"] [class*="headline"],
+html[data-zenweb-theme="beige"] [class*="headline"] *,
 html[data-zenweb-theme="beige"] [class*="story-title"],
-html[data-zenweb-theme="beige"] [class*="article-title"] {
+html[data-zenweb-theme="beige"] [class*="story-title"] *,
+html[data-zenweb-theme="beige"] [class*="article-title"],
+html[data-zenweb-theme="beige"] [class*="article-title"] * {
   font-family: 'Newsreader', Georgia, serif !important;
   font-size: 36px !important; /* Prominently enlarged */
   line-height: 1.25 !important;
@@ -2514,8 +2605,11 @@ html[data-zenweb-theme="beige"] [class*="article-title"] {
 }
 
 html[data-zenweb-theme="beige"] h3,
+html[data-zenweb-theme="beige"] h3 *,
 html[data-zenweb-theme="beige"] [class*="sub-headline"],
-html[data-zenweb-theme="beige"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) {
+html[data-zenweb-theme="beige"] [class*="sub-headline"] *,
+html[data-zenweb-theme="beige"] [class*="title"]:not([class*="tag"]):not([class*="meta"]),
+html[data-zenweb-theme="beige"] [class*="title"]:not([class*="tag"]):not([class*="meta"]) * {
   font-family: 'Newsreader', Georgia, serif !important;
   font-size: 26px !important;
   font-weight: 700 !important;
@@ -2524,8 +2618,11 @@ html[data-zenweb-theme="beige"] [class*="title"]:not([class*="tag"]):not([class*
 }
 
 html[data-zenweb-theme="beige"] h4,
+html[data-zenweb-theme="beige"] h4 *,
 html[data-zenweb-theme="beige"] h5,
-html[data-zenweb-theme="beige"] h6 {
+html[data-zenweb-theme="beige"] h5 *,
+html[data-zenweb-theme="beige"] h6,
+html[data-zenweb-theme="beige"] h6 * {
   font-family: 'Newsreader', Georgia, serif !important;
   font-size: 22px !important;
   font-weight: 600 !important;
@@ -2535,17 +2632,25 @@ html[data-zenweb-theme="beige"] h6 {
 
 /* Hyperlinks and Headline Links in Beige - warm mocha bronze, zero green */
 html[data-zenweb-theme="beige"] a,
-html[data-zenweb-theme="beige"] a > *,
+html[data-zenweb-theme="beige"] a *,
 html[data-zenweb-theme="beige"] [role="link"],
-html[data-zenweb-theme="beige"] [role="link"] > *,
+html[data-zenweb-theme="beige"] [role="link"] *,
 html[data-zenweb-theme="beige"] h1 a,
+html[data-zenweb-theme="beige"] h1 a *,
 html[data-zenweb-theme="beige"] h2 a,
+html[data-zenweb-theme="beige"] h2 a *,
 html[data-zenweb-theme="beige"] h3 a,
+html[data-zenweb-theme="beige"] h3 a *,
 html[data-zenweb-theme="beige"] [class*="headline"] a,
+html[data-zenweb-theme="beige"] [class*="headline"] a *,
 html[data-zenweb-theme="beige"] [class*="story"] a,
+html[data-zenweb-theme="beige"] [class*="story"] a *,
 html[data-zenweb-theme="beige"] [class*="title"] a,
+html[data-zenweb-theme="beige"] [class*="title"] a *,
 html[data-zenweb-theme="beige"] a[class*="headline"],
-html[data-zenweb-theme="beige"] a[class*="title"] {
+html[data-zenweb-theme="beige"] a[class*="headline"] *,
+html[data-zenweb-theme="beige"] a[class*="title"],
+html[data-zenweb-theme="beige"] a[class*="title"] * {
   color: #634832 !important; /* Warm bronze / saddle brown */
   -webkit-text-fill-color: #634832 !important;
   text-decoration: underline !important;
@@ -2553,7 +2658,10 @@ html[data-zenweb-theme="beige"] a[class*="title"] {
   text-underline-offset: 3px !important;
 }
 
-html[data-zenweb-theme="beige"] a:hover {
+html[data-zenweb-theme="beige"] a:hover,
+html[data-zenweb-theme="beige"] a:hover *,
+html[data-zenweb-theme="beige"] [role="link"]:hover,
+html[data-zenweb-theme="beige"] [role="link"]:hover * {
   color: #1A120B !important;
   -webkit-text-fill-color: #1A120B !important;
 }

@@ -249,11 +249,27 @@ class ZenWebAIEngine {
    * High-salience extractive sentence scoring (TextRank-inspired)
    */
   heuristicKeyPointExtraction(text, count = 3) {
-    const sentences = text
+    const rawSentences = text
       .replace(/([.?!])\s+(?=[A-Z])/g, "$1|")
       .split("|")
       .map(s => s.trim())
-      .filter(s => s.length > 25 && s.length < 220);
+      .filter(s => s.length > 25 && s.length < 240);
+
+    // Strict noise rejection for non-editorial / navigation / multilingual selector strings
+    const sentences = rawSentences.filter(s => {
+      // Reject low space density (e.g. concatenated words without spaces like "EditionUSUSUKIN...")
+      const words = s.split(/\s+/);
+      if (words.length < 5 && s.length > 35) return false;
+
+      // Reject non-Latin multilingual scripts (Hindi, Marathi, Bengali, Telugu, Gujarati, etc.)
+      if (/[\u0900-\u0D7F]/.test(s)) return false;
+
+      // Reject edition / navigation / login metadata strings
+      if (/(?:edition\s*(?:us|uk|in)|epaper|subscribe\s*to|sign\s*in|weather|updated\s*\d|copyright|all\s*rights\s*reserved|follow\s*us)/i.test(s)) {
+        return false;
+      }
+      return true;
+    });
 
     if (sentences.length <= count) return sentences;
 

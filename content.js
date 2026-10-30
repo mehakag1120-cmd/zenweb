@@ -270,9 +270,14 @@
       root.setAttribute('data-zenweb-theme', target);
       root.setAttribute('data-zenweb-font', target === 'beige' ? 'office-editorial' : 'circular-digital');
 
-      // Update canvas visibility (Beige has no animation)
+      // Update canvas visibility and opacity (Beige has no animation; Sorbet & Surf 50%; Cyberpunk 65%)
       if (this.slidingPixelCanvas) {
         this.slidingPixelCanvas.style.display = target === 'beige' ? 'none' : 'block';
+        if (target === 'sorbet' || target === 'surf') {
+          this.slidingPixelCanvas.style.opacity = '0.50';
+        } else if (target === 'cyberpunk') {
+          this.slidingPixelCanvas.style.opacity = '0.65';
+        }
       }
 
       // Re-initialize particles for the selected theme
@@ -429,7 +434,7 @@
           });
         }
       } else if (theme === 'sorbet') {
-        // Sorbet Theme: High-visibility strobing pixel hearts phasing in and out of view across the screen
+        // Sorbet Theme: Strobing pixel hearts phasing in and out of view across the screen (50% opacity)
         const heartCount = Math.max(45, Math.floor((width * height) / 22000));
         const sorbetColors = ['#E11D48', '#FF1493', '#BE185D', '#0284C7', '#EAB308', '#9D174D', '#F43F5E'];
 
@@ -440,13 +445,13 @@
             y: Math.random() * height,
             pixelSize,
             color: sorbetColors[Math.floor(Math.random() * sorbetColors.length)],
-            maxAlpha: 0.80 + Math.random() * 0.20,
+            maxAlpha: 0.40 + Math.random() * 0.10, // 50% max opacity
             strobeSpeed: 1.2 + Math.random() * 2.0,
             phase: Math.random() * Math.PI * 2
           });
         }
       } else if (theme === 'surf') {
-        // Surf Theme: Pixel Sharks surfing smoothly from left to right on waves!
+        // Surf Theme: Pixel Sharks surfing smoothly from left to right on waves (50% opacity)
         this.surfingSharks = [];
         const sharkCount = Math.max(16, Math.floor(width / 75));
         const sharkColors = ['#0284C7', '#0F4C81', '#0369A1', '#1D4ED8', '#0284C7', '#0EA5E9'];
@@ -463,7 +468,7 @@
             waveAmp: 10 + Math.random() * 14,
             waveFreq: 0.008 + Math.random() * 0.006,
             wavePhase: Math.random() * Math.PI * 2,
-            alpha: 0.80 + Math.random() * 0.20,
+            alpha: 0.40 + Math.random() * 0.10, // 50% max opacity
             shimmerSpeed: 1.2 + Math.random() * 2
           });
         }
@@ -714,8 +719,9 @@
           }
         } else {
           // Light Mode Collisions (Sorbet, Surf, Beige)
-          // Normalizes any low-contrast, light grey, white, or lingering neon green text
-          if (this.isLowContrastTextOnLight(comp.color)) {
+          // Aggressively normalizes any low-contrast, light grey, white, or lingering neon green text
+          const isGreenish = (comp.color && (comp.color.includes('0, 255') || comp.color.includes('0, 230') || comp.color.includes('0, 204') || comp.color.includes('green')));
+          if (this.isLowContrastTextOnLight(comp.color) || isGreenish) {
             if (el.tagName === 'A' || el.closest('a')) {
               el.style.setProperty('color', theme.linkColor, 'important');
               el.style.setProperty('-webkit-text-fill-color', theme.linkColor, 'important');
@@ -874,7 +880,8 @@
         }
         curr = curr.parentElement;
       }
-      return 'rgb(9, 10, 15)'; // Default ZenWeb cyber-dark canvas
+      const theme = this.getActiveThemeConfig();
+      return theme.bodyBg || 'rgb(9, 10, 15)';
     }
 
     isDarkBackground(colorStr) {
@@ -928,14 +935,19 @@
     isLowContrastTextOnLight(colorStr) {
       if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return false;
       const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-      if (!m) return false;
+      if (!m) {
+        if (typeof colorStr === 'string' && (colorStr.includes('00FF') || colorStr.includes('00ff') || colorStr.includes('green') || colorStr.includes('00e6') || colorStr.includes('00cc'))) {
+          return true;
+        }
+        return false;
+      }
       if (m[4] !== undefined && parseFloat(m[4]) < 0.25) return true;
       const r = parseInt(m[1], 10);
       const g = parseInt(m[2], 10);
       const b = parseInt(m[3], 10);
       const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
       // High green or neon or high luminance (>0.48) is washed out on light backgrounds
-      const isNeonGreen = g > 175 && r < 120;
+      const isNeonGreen = g > 130 && r < 160;
       return lum >= 0.48 || isNeonGreen;
     }
 
@@ -2165,6 +2177,11 @@
       this.mountSlidingPixelCanvas();
       if (this.slidingPixelCanvas) {
         this.slidingPixelCanvas.style.display = themeKey === 'beige' ? 'none' : 'block';
+        if (themeKey === 'sorbet' || themeKey === 'surf') {
+          this.slidingPixelCanvas.style.opacity = '0.50';
+        } else if (themeKey === 'cyberpunk') {
+          this.slidingPixelCanvas.style.opacity = '0.65';
+        }
       }
 
       // 2. Mount Hardware Remote Dock
@@ -2241,7 +2258,10 @@
         .avatar-upload, .js-user-profile-bio-form, [data-hotkey],
         [id^="zenweb-"], [class^="zw-"],
         [class*="edition"], [class*="language"], [class*="lang-"], [class*="top-nav"],
-        [class*="header"], [class*="menu"], [class*="masthead"], [class*="branding"]
+        [class*="header"], [class*="menu"], [class*="masthead"], [class*="branding"],
+        [class*="weather"], [class*="date"], [class*="time"], [class*="epaper"], [class*="ePaper"],
+        [class*="signin"], [class*="sign-in"], [class*="login"], [id*="header"], [id*="nav"],
+        [id*="edition"], [id*="lang"], [id*="menu"], [id*="weather"], [id*="login"]
       `).forEach(el => el.remove());
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }

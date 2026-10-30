@@ -1,457 +1,159 @@
 /**
- * ZenWeb Production CSS Engine (v2.0)
- * Bubbly, Hyper-Modern Sensory Design, Air-Tight Contrast Specificity & Frosted Glass Focus
- * Inspired by 21stdev.com and Neurodivergent Cognitive Ergonomics
+ * ZenWeb Pixel-Digital Stylesheet (v2.1)
+ * Inspired by books.baseten.com: Sliding pixel aesthetics, anti-aliased transitions,
+ * cohesive white-grey-black palette with electric green (#00FF66) and cyber pink (#FF007A) accents.
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
 /* ==========================================================================
-   1. FONTS & THEME DESIGN TOKENS
+   1. DIGITAL COLOR TOKENS & DESIGN SYSTEM
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Lexend:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=OpenDyslexic&display=swap');
-
-/* Theme 1: Calm Pastel / Lavender (Zero blue-light spike, gentle luminance) */
-:root[data-zenweb-theme="pastel"] {
-  --zw-bg: #f8f5fc !important;
-  --zw-surface: #efe8f8 !important;
-  --zw-surface-elevated: #ffffff !important;
-  --zw-text: #281e35 !important;
-  --zw-text-muted: #5e526c !important;
-  --zw-accent: #7c4dff !important;
-  --zw-accent-hover: #651fff !important;
-  --zw-accent-subtle: #ebdffc !important;
-  --zw-border: #dcd0ea !important;
-  --zw-highlight: #fffae0 !important;
-  --zw-shadow: rgba(45, 30, 65, 0.08) !important;
-  --zw-font-stack: 'Lexend', 'Atkinson Hyperlegible', sans-serif !important;
-}
-
-/* Theme 2: Deep Focus Contrast (Warm cream on deep obsidian/navy - Photophobia relief) */
-:root[data-zenweb-theme="deep-contrast"] {
-  --zw-bg: #0d1117 !important;
-  --zw-surface: #161b22 !important;
-  --zw-surface-elevated: #21262d !important;
-  --zw-text: #f0f6fc !important;
-  --zw-text-muted: #8b949e !important;
-  --zw-accent: #58a6ff !important;
-  --zw-accent-hover: #79b8ff !important;
-  --zw-accent-subtle: #1f2937 !important;
-  --zw-border: #30363d !important;
-  --zw-highlight: #23344d !important;
-  --zw-shadow: rgba(0, 0, 0, 0.6) !important;
-  --zw-font-stack: 'Lexend', 'Atkinson Hyperlegible', sans-serif !important;
-}
-
-/* Theme 3: Monochrome Warm Sepia (Amber warmth, reduces visual glare & migraine triggers) */
-:root[data-zenweb-theme="sepia"] {
-  --zw-bg: #f5eedc !important;
-  --zw-surface: #eae0c8 !important;
-  --zw-surface-elevated: #fbf7ee !important;
-  --zw-text: #3c3022 !important;
-  --zw-text-muted: #72624d !important;
-  --zw-accent: #b26a00 !important;
-  --zw-accent-hover: #d97706 !important;
-  --zw-accent-subtle: #ecd9ba !important;
-  --zw-border: #d7c9ad !important;
-  --zw-highlight: #f8e8c8 !important;
-  --zw-shadow: rgba(60, 48, 34, 0.08) !important;
-  --zw-font-stack: 'Lexend', 'Atkinson Hyperlegible', sans-serif !important;
-}
-
-/* Dedicated Typography Stacks */
-:root[data-zenweb-font="lexend"] {
-  --zw-font-stack: 'Lexend', -apple-system, sans-serif !important;
-}
-:root[data-zenweb-font="atkinson"] {
-  --zw-font-stack: 'Atkinson Hyperlegible', -apple-system, sans-serif !important;
-}
-:root[data-zenweb-font="opendyslexic"] {
-  --zw-font-stack: 'OpenDyslexic', 'Atkinson Hyperlegible', sans-serif !important;
-}
-:root[data-zenweb-font="system"] {
-  --zw-font-stack: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-}
-:root[data-zenweb-font="serif"] {
-  --zw-font-stack: Georgia, "Times New Roman", Cambria, serif !important;
+:root {
+  --zw-black: #0a0a0e;
+  --zw-gray-dark: #12131a;
+  --zw-gray-surface: #181922;
+  --zw-gray-border: #262835;
+  --zw-gray-light: #8f96a3;
+  --zw-white: #f2f4f8;
+  --zw-green: #00FF66;
+  --zw-green-glow: rgba(0, 255, 102, 0.35);
+  --zw-pink: #FF007A;
+  --zw-pink-glow: rgba(255, 0, 122, 0.35);
+  --zw-font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --zw-font-heading: 'Chivo', 'Plus Jakarta Sans', sans-serif;
+  --zw-font-mono: 'Space Mono', monospace;
+  --zw-shadow-block: 4px 4px 0px #000000;
+  --zw-shadow-pink: 4px 4px 0px var(--zw-pink);
+  --zw-shadow-green: 4px 4px 0px var(--zw-green);
 }
 
 /* ==========================================================================
-   2. BULLETPROOF CONTRAST & SPECIFICITY OVERRIDE (Fixes black text in dark themes)
+   2. RESTRUCTURED WEBPAGE THEME & TYPOGRAPHY ENHANCEMENT
    ========================================================================== */
 
-/* Universal Background enforcement */
-html[data-zenweb-theme],
-html[data-zenweb-theme] body {
-  background-color: var(--zw-bg) !important;
-  color: var(--zw-text) !important;
-  font-family: var(--zw-font-stack) !important;
+html[data-zenweb-theme="pixel-dark"],
+html[data-zenweb-theme="pixel-dark"] body {
+  background-color: var(--zw-black) !important;
+  color: var(--zw-white) !important;
+  font-family: var(--zw-font-primary) !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
 
-/* Universal Text Contrast Enforcement: Covers ALL semantic text elements */
-html[data-zenweb-theme] body,
-html[data-zenweb-theme] p,
-html[data-zenweb-theme] span:not([id^="zenweb-"], [class^="zw-"], [class*="zw-"]),
-html[data-zenweb-theme] div:not([id^="zenweb-"], [class^="zw-"], [class*="zw-"]),
-html[data-zenweb-theme] h1,
-html[data-zenweb-theme] h2,
-html[data-zenweb-theme] h3,
-html[data-zenweb-theme] h4,
-html[data-zenweb-theme] h5,
-html[data-zenweb-theme] h6,
-html[data-zenweb-theme] li,
-html[data-zenweb-theme] ul,
-html[data-zenweb-theme] ol,
-html[data-zenweb-theme] dl,
-html[data-zenweb-theme] dt,
-html[data-zenweb-theme] dd,
-html[data-zenweb-theme] article,
-html[data-zenweb-theme] section,
-html[data-zenweb-theme] main,
-html[data-zenweb-theme] blockquote,
-html[data-zenweb-theme] td,
-html[data-zenweb-theme] th,
-html[data-zenweb-theme] label,
-html[data-zenweb-theme] strong,
-html[data-zenweb-theme] b:not(.zw-bionic-lead),
-html[data-zenweb-theme] em,
-html[data-zenweb-theme] i,
-html[data-zenweb-theme] time {
-  color: var(--zw-text) !important;
-  font-family: var(--zw-font-stack) !important;
+/* Universal text size & line spacing boost for effortless reading */
+html[data-zenweb-theme="pixel-dark"] p,
+html[data-zenweb-theme="pixel-dark"] li,
+html[data-zenweb-theme="pixel-dark"] blockquote,
+html[data-zenweb-theme="pixel-dark"] dd {
+  font-size: 18.5px !important;
+  line-height: 1.82 !important;
+  letter-spacing: 0.015em !important;
+  color: var(--zw-white) !important;
+  font-family: var(--zw-font-primary) !important;
 }
 
-/* Normalization of line height and letter spacing for readability */
-html[data-zenweb-theme] p,
-html[data-zenweb-theme] li,
-html[data-zenweb-theme] dd,
-html[data-zenweb-theme] blockquote {
-  line-height: var(--zw-line-height, 1.75) !important;
-  letter-spacing: var(--zw-letter-spacing, 0.02em) !important;
+html[data-zenweb-theme="pixel-dark"] h1,
+html[data-zenweb-theme="pixel-dark"] h2,
+html[data-zenweb-theme="pixel-dark"] h3,
+html[data-zenweb-theme="pixel-dark"] h4 {
+  font-family: var(--zw-font-heading) !important;
+  color: #ffffff !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.3 !important;
 }
 
-/* High-Contrast Container Adjustments (Eliminates blinding white boxes in dark theme) */
-html[data-zenweb-theme="deep-contrast"] main,
-html[data-zenweb-theme="deep-contrast"] article,
-html[data-zenweb-theme="deep-contrast"] section,
-html[data-zenweb-theme="deep-contrast"] header,
-html[data-zenweb-theme="deep-contrast"] footer,
-html[data-zenweb-theme="deep-contrast"] nav,
-html[data-zenweb-theme="deep-contrast"] aside,
-html[data-zenweb-theme="deep-contrast"] .content,
-html[data-zenweb-theme="deep-contrast"] .article,
-html[data-zenweb-theme="deep-contrast"] .post,
-html[data-zenweb-theme="deep-contrast"] .container,
-html[data-zenweb-theme="deep-contrast"] [class*="content"],
-html[data-zenweb-theme="deep-contrast"] [class*="article"],
-html[data-zenweb-theme="deep-contrast"] [class*="wrapper"],
-html[data-zenweb-theme="deep-contrast"] [class*="card"]:not([id^="zenweb-"]) {
-  background-color: var(--zw-bg) !important;
-  border-color: var(--zw-border) !important;
+html[data-zenweb-theme="pixel-dark"] h1 {
+  border-bottom: 2px solid var(--zw-gray-border) !important;
+  padding-bottom: 12px !important;
+  margin-bottom: 24px !important;
 }
 
-/* Headings Contrast */
-html[data-zenweb-theme] h1,
-html[data-zenweb-theme] h2,
-html[data-zenweb-theme] h3,
-html[data-zenweb-theme] h4,
-html[data-zenweb-theme] h5,
-html[data-zenweb-theme] h6 {
-  color: var(--zw-text) !important;
-  letter-spacing: -0.015em !important;
-  line-height: 1.35 !important;
+html[data-zenweb-theme="pixel-dark"] a {
+  color: var(--zw-green) !important;
+  text-decoration-thickness: 2px !important;
+  text-underline-offset: 4px !important;
 }
 
-/* Hyperlinks with accessible contrast & underline offset */
-html[data-zenweb-theme] a {
-  color: var(--zw-accent) !important;
-  text-decoration-thickness: 1.5px !important;
-  text-underline-offset: 3px !important;
-  transition: color 0.15s ease !important;
+html[data-zenweb-theme="pixel-dark"] a:hover {
+  color: var(--zw-pink) !important;
 }
 
-html[data-zenweb-theme] a:hover {
-  color: var(--zw-accent-hover) !important;
-}
-
-/* Code & Pre Blocks */
-html[data-zenweb-theme] code,
-html[data-zenweb-theme] pre {
-  background-color: var(--zw-surface) !important;
-  color: var(--zw-text) !important;
-  border-radius: 6px !important;
-  border: 1px solid var(--zw-border) !important;
-}
-
-/* Optimal line length cap (75ch) */
-html[data-zenweb-max-width="true"] article,
-html[data-zenweb-max-width="true"] main p,
-html[data-zenweb-max-width="true"] .article-content p,
-html[data-zenweb-max-width="true"] .entry-content p,
-html[data-zenweb-max-width="true"] [role="main"] p {
-  max-width: 75ch !important;
+/* Restructured content containers */
+html[data-zenweb-theme="pixel-dark"] article,
+html[data-zenweb-theme="pixel-dark"] main,
+html[data-zenweb-theme="pixel-dark"] [role="main"] {
+  max-width: 82ch !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
 /* ==========================================================================
-   3. DISTRACTION SHIELD & ANIMATION SUPPRESSOR
+   3. SLIDING PIXEL BACKGROUND CANVAS
    ========================================================================== */
 
-html[data-zenweb-shield="true"] .ad,
-html[data-zenweb-shield="true"] .ads,
-html[data-zenweb-shield="true"] .advertisement,
-html[data-zenweb-shield="true"] .advert,
-html[data-zenweb-shield="true"] [id*="google_ads"],
-html[data-zenweb-shield="true"] [class*="sponsored"],
-html[data-zenweb-shield="true"] [class*="promoted"],
-html[data-zenweb-shield="true"] [class*="taboola"],
-html[data-zenweb-shield="true"] [class*="outbrain"],
-html[data-zenweb-shield="true"] [class*="newsletter-modal"],
-html[data-zenweb-shield="true"] [class*="subscribe-popup"],
-html[data-zenweb-shield="true"] [class*="cookie-banner"],
-html[data-zenweb-shield="true"] [class*="consent-banner"],
-html[data-zenweb-shield="true"] [class*="sticky-banner"],
-html[data-zenweb-shield="true"] aside:not([data-zenweb-keep]) {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-/* Anti-flashbang veil */
-#zenweb-flashbang-veil {
+#zenweb-pixel-canvas {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  z-index: 2147483640 !important;
+  z-index: -1 !important;
   pointer-events: none !important;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  background-color: var(--zw-bg, #f8f5fc) !important;
-  opacity: 1;
-}
-
-#zenweb-flashbang-veil.zw-fade-out {
-  opacity: 0 !important;
-}
-
-/* Animation suppressor */
-html[data-zenweb-suppress-anim="true"] *:not([id^="zenweb-"], [class^="zw-"], [class*="zw-"]) {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.001ms !important;
-  scroll-behavior: auto !important;
-}
-
-html[data-zenweb-suppress-anim="true"] video[autoplay]:not([data-zenweb-allowed]) {
-  filter: grayscale(80%) opacity(0.3) !important;
+  contain: strict !important;
 }
 
 /* ==========================================================================
-   4. FROSTED GLASS READING RULER (FIXED TOGGLE & BLURRED BOUNDARIES)
+   4. DATA RESTRUCTURING CARDS & SCANNABLE BULLET POINTS
    ========================================================================== */
 
-#zenweb-ruler-overlay {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  z-index: 2147483630 !important;
-  pointer-events: none !important;
-  display: none; /* Controlled cleanly by .zw-active class! */
-  contain: strict;
-  will-change: transform, opacity;
-}
-
-#zenweb-ruler-overlay.zw-active {
-  display: block !important;
-}
-
-/* Frosted glass curtains outside the focus aperture */
-.zw-ruler-curtain-top,
-.zw-ruler-curtain-bottom {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  background: rgba(13, 17, 23, 0.52) !important;
-  backdrop-filter: blur(12px) brightness(0.72) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(12px) brightness(0.72) saturate(130%) !important;
-  transition: backdrop-filter 0.25s ease, background 0.25s ease !important;
-  pointer-events: none !important;
-  will-change: height, top;
-}
-
-.zw-ruler-curtain-top {
-  top: 0 !important;
-  height: 0 !important;
-  border-bottom: 1.5px solid rgba(124, 77, 255, 0.45) !important;
-}
-
-.zw-ruler-curtain-bottom {
-  bottom: 0 !important;
-  height: 0 !important;
-  border-top: 1.5px solid rgba(124, 77, 255, 0.45) !important;
-}
-
-/* The clear focus aperture in the center (NO blur, illuminated beam) */
-.zw-ruler-aperture {
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 0 35px rgba(124, 77, 255, 0.35), inset 0 0 15px rgba(124, 77, 255, 0.12) !important;
-  border-top: 2px solid var(--zw-accent, #7c4dff) !important;
-  border-bottom: 2px solid var(--zw-accent, #7c4dff) !important;
-  border-radius: 2px !important;
-  pointer-events: none !important;
-}
-
-/* Subtle focus beam guide lines */
-.zw-ruler-aperture::before {
-  content: "" !important;
-  position: absolute !important;
-  left: 20px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  width: 12px !important;
-  height: 12px !important;
-  border-radius: 50% !important;
-  background: var(--zw-accent, #7c4dff) !important;
-  box-shadow: 0 0 12px var(--zw-accent, #7c4dff) !important;
-  opacity: 0.8 !important;
-}
-
-/* ==========================================================================
-   5. BIONIC READING ENGINE
-   ========================================================================== */
-
-b.zw-bionic-lead {
-  font-weight: 750 !important;
-  color: var(--zw-text, inherit) !important;
-  opacity: 1 !important;
-}
-
-span.zw-bionic-tail {
-  opacity: 0.88 !important;
-}
-
-/* ==========================================================================
-   6. SMART CHUNKING (DIGESTIBLE PARAGRAPH BLOCKS)
-   ========================================================================== */
-
-.zw-chunk-block {
-  display: block !important;
-  margin-bottom: 0.95rem !important;
-}
-
-.zw-chunk-divider {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  margin: 0.85rem auto !important;
-  width: 54px !important;
-  height: 3px !important;
-  border-radius: 3px !important;
-  background: linear-gradient(90deg, transparent, var(--zw-accent, #7c4dff), transparent) !important;
-  opacity: 0.65 !important;
-}
-
-/* ==========================================================================
-   7. LAST-READ ANCHOR
-   ========================================================================== */
-
-.zw-last-read-anchor {
-  position: relative !important;
-}
-
-.zw-last-read-anchor::before {
-  content: "📌 Resumed Focus Here" !important;
-  position: absolute !important;
-  left: -12px !important;
-  top: -26px !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  padding: 4px 10px !important;
-  border-radius: 20px !important;
-  background: var(--zw-accent, #7c4dff) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.4) !important;
-  animation: zw-pulse 2s infinite ease-in-out !important;
-  z-index: 10 !important;
-  pointer-events: none !important;
-}
-
-@keyframes zw-pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.85; }
-}
-
-/* ==========================================================================
-   8. AI EXECUTIVE OVERVIEW CARD (21stdev.com Bubbly Glass Style)
-   ========================================================================== */
-
-.zw-ai-summary-card {
+.zw-restructured-card {
   all: initial;
   display: block !important;
   box-sizing: border-box !important;
-  font-family: var(--zw-font-stack, 'Lexend', sans-serif) !important;
-  background: var(--zw-surface-elevated, #ffffff) !important;
-  border: 1.5px solid var(--zw-border, #dcd0ea) !important;
-  border-left: 6px solid var(--zw-accent, #7c4dff) !important;
-  border-radius: 16px !important;
-  padding: 22px 26px !important;
-  margin: 26px auto 34px auto !important;
-  max-width: 78ch !important;
-  box-shadow: 0 10px 30px var(--zw-shadow, rgba(45, 30, 65, 0.08)) !important;
-  color: var(--zw-text, #281e35) !important;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease !important;
-  position: relative !important;
-  z-index: 100 !important;
+  background: var(--zw-gray-surface, #181922) !important;
+  border: 1.5px solid var(--zw-gray-border, #262835) !important;
+  border-left: 4px solid var(--zw-green, #00FF66) !important;
+  border-radius: 6px !important;
+  padding: 22px 24px !important;
+  margin: 28px 0 !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+  font-family: var(--zw-font-primary, sans-serif) !important;
+  transition: transform 0.2s ease, border-color 0.2s ease !important;
 }
 
-.zw-ai-summary-card:hover {
-  transform: translateY(-2px) scale(1.01) !important;
-  box-shadow: 0 14px 36px var(--zw-shadow, rgba(45, 30, 65, 0.14)) !important;
+.zw-restructured-card:hover {
+  transform: translate(-1px, -1px) !important;
+  border-color: var(--zw-green, #00FF66) !important;
+  box-shadow: 6px 6px 0px #000000 !important;
 }
 
-.zw-ai-summary-header {
+.zw-card-pill-row {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
   margin-bottom: 14px !important;
-  border-bottom: 1px solid var(--zw-border, #dcd0ea) !important;
-  padding-bottom: 10px !important;
+  border-bottom: 1px solid var(--zw-gray-border, #262835) !important;
+  padding-bottom: 8px !important;
 }
 
-.zw-ai-summary-title {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  font-size: 14.5px !important;
-  font-weight: 700 !important;
-  color: var(--zw-accent, #7c4dff) !important;
-  letter-spacing: 0.03em !important;
-}
-
-.zw-ai-summary-badge {
+.zw-pixel-tag {
+  font-family: var(--zw-font-mono, monospace) !important;
   font-size: 11px !important;
-  font-weight: 600 !important;
-  padding: 3px 9px !important;
-  border-radius: 12px !important;
-  background: var(--zw-accent-subtle, #ebdffc) !important;
-  color: var(--zw-accent, #7c4dff) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--zw-green, #00FF66) !important;
 }
 
-.zw-ai-summary-list {
+.zw-card-meta {
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 10.5px !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+}
+
+.zw-bullet-list {
   list-style: none !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -460,309 +162,392 @@ span.zw-bionic-tail {
   gap: 12px !important;
 }
 
-.zw-ai-summary-item {
+.zw-bullet-item {
   display: flex !important;
   align-items: flex-start !important;
   gap: 12px !important;
-  font-size: 14.5px !important;
-  line-height: 1.6 !important;
-  color: var(--zw-text, #281e35) !important;
+  font-size: 17.5px !important;
+  line-height: 1.65 !important;
+  color: var(--zw-white, #f2f4f8) !important;
 }
 
-.zw-ai-summary-bullet {
-  flex-shrink: 0 !important;
-  width: 24px !important;
-  height: 24px !important;
-  border-radius: 50% !important;
-  background: var(--zw-accent-subtle, #ebdffc) !important;
-  color: var(--zw-accent, #7c4dff) !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-weight: 700 !important;
+.zw-bullet-marker {
+  color: var(--zw-pink, #FF007A) !important;
   font-size: 12px !important;
+  margin-top: 4px !important;
+  flex-shrink: 0 !important;
 }
 
-.zw-ai-summary-close {
-  background: transparent !important;
-  border: none !important;
-  color: var(--zw-text-muted, #777) !important;
-  font-size: 18px !important;
+.zw-bullet-text strong {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-decoration: underline !important;
+  text-decoration-color: var(--zw-pink, #FF007A) !important;
+  text-underline-offset: 3px !important;
+}
+
+/* ==========================================================================
+   5. EXECUTIVE OVERVIEW BRIEFING CARD
+   ========================================================================== */
+
+.zw-overview-window {
+  margin: 24px 0 36px 0 !important;
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 2px solid var(--zw-gray-border, #262835) !important;
+  box-shadow: 6px 6px 0px #000000 !important;
+  border-radius: 8px !important;
+}
+
+.zw-pixel-window-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 10px 16px !important;
+  background: #181924 !important;
+  border-bottom: 2px solid var(--zw-gray-border, #262835) !important;
+}
+
+.zw-overview-header-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.zw-pixel-status-green {
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  background: rgba(0, 255, 102, 0.12) !important;
+  border: 1px solid var(--zw-green, #00FF66) !important;
+  color: var(--zw-green, #00FF66) !important;
+  padding: 2px 8px !important;
+  border-radius: 3px !important;
+}
+
+.zw-pixel-close {
   cursor: pointer !important;
-  padding: 4px 8px !important;
-  border-radius: 6px !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  font-size: 16px !important;
+  font-family: sans-serif !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
   transition: all 0.15s ease !important;
 }
 
-.zw-ai-summary-close:hover {
-  background: var(--zw-surface, #f0f0f0) !important;
-  color: var(--zw-text, #222) !important;
-}
-
-/* ==========================================================================
-   9. BUBBLY SELECTION TOOLTIP & INLINE RESULTS
-   ========================================================================== */
-
-#zenweb-selection-tooltip {
-  all: initial;
-  position: absolute !important;
-  z-index: 2147483645 !important;
-  background: var(--zw-surface-elevated, #ffffff) !important;
-  border: 1px solid var(--zw-border, #dcd0ea) !important;
-  border-radius: 14px !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16) !important;
-  padding: 6px !important;
-  display: flex !important;
-  gap: 6px !important;
-  align-items: center !important;
-  font-family: var(--zw-font-stack, sans-serif) !important;
-  transform: translate(-50%, -100%) translateY(-10px) scale(0.95) !important;
-  transition: opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  opacity: 0;
-  pointer-events: none;
-}
-
-#zenweb-selection-tooltip.zw-visible {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  transform: translate(-50%, -100%) translateY(-10px) scale(1) !important;
-}
-
-.zw-tooltip-btn {
-  all: initial;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  padding: 7px 13px !important;
-  border-radius: 9px !important;
-  background: var(--zw-surface, #f4effa) !important;
-  color: var(--zw-text, #281e35) !important;
-  font-family: inherit !important;
-  font-size: 12.5px !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-.zw-tooltip-btn:hover {
-  background: var(--zw-accent, #7c4dff) !important;
+.zw-pixel-close:hover {
+  background: var(--zw-pink, #FF007A) !important;
   color: #ffffff !important;
-  transform: translateY(-1px) scale(1.04) !important;
 }
 
-/* Inline modal result */
-.zw-ai-inline-result {
-  all: initial;
-  display: block !important;
-  position: absolute !important;
-  z-index: 2147483646 !important;
-  background: var(--zw-surface-elevated, #ffffff) !important;
-  color: var(--zw-text, #281e35) !important;
-  border: 1.5px solid var(--zw-accent, #7c4dff) !important;
-  border-radius: 16px !important;
-  padding: 18px 22px !important;
-  max-width: 400px !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22) !important;
-  font-family: var(--zw-font-stack, sans-serif) !important;
-  animation: zw-bubbly-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+.zw-overview-body {
+  padding: 20px 24px !important;
 }
 
-@keyframes zw-bubbly-in {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.zw-ai-inline-result-header {
+.zw-overview-badge-row {
   display: flex !important;
-  justify-content: space-between !important;
   align-items: center !important;
-  font-size: 12.5px !important;
-  font-weight: 700 !important;
-  color: var(--zw-accent, #7c4dff) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
-  margin-bottom: 8px !important;
+  gap: 12px !important;
+  margin-bottom: 16px !important;
 }
 
-.zw-ai-inline-result-content {
-  font-size: 14px !important;
+.zw-badge-accent-pink {
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  background: var(--zw-pink, #FF007A) !important;
+  color: #ffffff !important;
+  padding: 3px 10px !important;
+  border-radius: 3px !important;
+  letter-spacing: 0.05em !important;
+}
+
+.zw-overview-bullets {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+}
+
+.zw-overview-bullet-item {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  font-size: 16.5px !important;
   line-height: 1.6 !important;
-  color: var(--zw-text, #281e35) !important;
-  margin-bottom: 12px !important;
+  color: var(--zw-white, #f2f4f8) !important;
+}
+
+.zw-bullet-num {
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--zw-green, #00FF66) !important;
+  background: rgba(0, 255, 102, 0.1) !important;
+  border: 1px solid var(--zw-green, #00FF66) !important;
+  padding: 2px 6px !important;
+  border-radius: 3px !important;
+  flex-shrink: 0 !important;
+  margin-top: 2px !important;
 }
 
 /* ==========================================================================
-   10. BUBBLY FLOATING PILL (TACTILE & DOCKABLE)
+   6. DIALOG BACKDROPS & DIGITAL WINDOWS
    ========================================================================== */
 
-#zenweb-floating-pill {
+.zw-dialog-backdrop {
   all: initial;
   position: fixed !important;
-  bottom: 24px !important;
-  left: 24px !important;
-  z-index: 2147483635 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 2147483646 !important;
+  background: rgba(10, 10, 14, 0.88) !important;
+  backdrop-filter: blur(8px) !important;
   display: flex !important;
   align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  animation: zw-fade-in 0.25s ease !important;
+}
+
+.zw-pixel-window {
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 2px solid var(--zw-gray-border, #262835) !important;
+  border-radius: 8px !important;
+  box-shadow: 8px 8px 0px #000000 !important;
+  color: var(--zw-white, #f2f4f8) !important;
+  font-family: var(--zw-font-primary, sans-serif) !important;
+  overflow: hidden !important;
+}
+
+/* Permission Request Card */
+.zw-permission-card {
+  max-width: 520px !important;
+  width: 100% !important;
+}
+
+.zw-permission-body {
+  display: flex !important;
+  gap: 20px !important;
+  padding: 24px !important;
+}
+
+.zw-agent-avatar {
+  font-size: 40px !important;
+  width: 64px !important;
+  height: 64px !important;
+  background: #1c1d29 !important;
+  border: 2px solid var(--zw-green, #00FF66) !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 4px 4px 0px #000 !important;
+}
+
+.zw-permission-content h3 {
+  font-family: var(--zw-font-heading, sans-serif) !important;
+  font-size: 19px !important;
+  color: #ffffff !important;
+  margin: 0 0 8px 0 !important;
+}
+
+.zw-permission-content p {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  margin-bottom: 14px !important;
+}
+
+.zw-permission-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 8px !important;
-  background: var(--zw-surface-elevated, #ffffff) !important;
-  border: 1.5px solid var(--zw-border, #dcd0ea) !important;
-  border-radius: 36px !important;
-  padding: 7px 14px !important;
-  box-shadow: 0 10px 30px var(--zw-shadow, rgba(45, 30, 65, 0.14)) !important;
-  font-family: var(--zw-font-stack, sans-serif) !important;
-  backdrop-filter: blur(16px) !important;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  will-change: transform, opacity;
 }
 
-#zenweb-floating-pill:hover {
-  box-shadow: 0 14px 38px var(--zw-shadow, rgba(45, 30, 65, 0.22)) !important;
-  transform: translateY(-2px) scale(1.02) !important;
+.zw-permission-list li {
+  font-size: 13px !important;
+  color: #d1d5db !important;
+  display: flex !important;
+  gap: 8px !important;
+  align-items: baseline !important;
 }
 
-#zenweb-floating-pill.zw-disabled {
-  opacity: 0.3 !important;
-  pointer-events: none !important;
-  transform: scale(0.9) !important;
+.zw-bullet-pink { color: var(--zw-pink, #FF007A) !important; font-size: 10px !important; }
+.zw-bullet-green { color: var(--zw-green, #00FF66) !important; font-size: 10px !important; }
+
+.zw-permission-actions {
+  display: flex !important;
+  gap: 12px !important;
+  padding: 16px 24px !important;
+  background: #181924 !important;
+  border-top: 1px solid var(--zw-gray-border, #262835) !important;
 }
 
-.zw-pill-btn {
+/* Digital Buttons */
+.zw-btn-pixel-primary {
+  all: initial;
+  flex: 1;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 11px 18px !important;
+  background: var(--zw-green, #00FF66) !important;
+  color: #0a0a0e !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  border: 1px solid #000000 !important;
+  box-shadow: 3px 3px 0px #000000 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.zw-btn-pixel-primary:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 4px 4px 0px var(--zw-pink, #FF007A) !important;
+}
+
+.zw-btn-pixel-secondary {
   all: initial;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 36px !important;
-  height: 36px !important;
-  border-radius: 50% !important;
-  background: var(--zw-surface, #f4effa) !important;
-  color: var(--zw-text, #281e35) !important;
-  font-size: 16px !important;
+  padding: 11px 18px !important;
+  background: #232533 !important;
+  color: var(--zw-white, #f2f4f8) !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  border: 1px solid var(--zw-gray-border, #262835) !important;
+  box-shadow: 3px 3px 0px #000000 !important;
   cursor: pointer !important;
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  position: relative !important;
+  transition: all 0.15s ease !important;
 }
 
-.zw-pill-btn:hover {
-  background: var(--zw-accent, #7c4dff) !important;
-  color: #ffffff !important;
-  transform: scale(1.15) !important;
+.zw-btn-pixel-secondary:hover {
+  background: #2b2e3e !important;
+  transform: translate(-1px, -1px) !important;
 }
 
-.zw-pill-btn.zw-active {
-  background: var(--zw-accent, #7c4dff) !important;
-  color: #ffffff !important;
-  box-shadow: 0 0 12px rgba(124, 77, 255, 0.4) !important;
+/* Water Reminder Modal */
+.zw-water-card {
+  max-width: 460px !important;
+  width: 100% !important;
 }
 
-.zw-pill-tooltip {
-  position: absolute !important;
-  bottom: 46px !important;
-  left: 50% !important;
-  transform: translateX(-50%) translateY(4px) !important;
-  background: #18202d !important;
-  color: #ffffff !important;
-  font-size: 11px !important;
-  font-weight: 600 !important;
-  padding: 4px 10px !important;
+.zw-water-body {
+  display: flex !important;
+  align-items: center !important;
+  gap: 18px !important;
+  padding: 24px !important;
+}
+
+.zw-water-icon {
+  font-size: 44px !important;
+  width: 68px !important;
+  height: 68px !important;
   border-radius: 8px !important;
-  white-space: nowrap !important;
-  pointer-events: none !important;
-  opacity: 0 !important;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  background: rgba(0, 229, 255, 0.12) !important;
+  border: 2px solid #00E5FF !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  box-shadow: 4px 4px 0px #000 !important;
 }
 
-.zw-pill-btn:hover .zw-pill-tooltip {
-  opacity: 1 !important;
-  transform: translateX(-50%) translateY(0) !important;
+.zw-water-text h3 {
+  font-family: var(--zw-font-heading, sans-serif) !important;
+  font-size: 20px !important;
+  color: #ffffff !important;
+  margin: 0 0 6px 0 !important;
 }
 
-/* ==========================================================================
-   11. BUBBLY FATIGUE PROMPT & MODALS
-   ========================================================================== */
+.zw-water-text p {
+  font-size: 13.5px !important;
+  line-height: 1.5 !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  margin: 0 !important;
+}
 
-#zenweb-fatigue-prompt {
+.zw-water-actions {
+  display: flex !important;
+  gap: 12px !important;
+  padding: 16px 24px !important;
+  background: #181924 !important;
+  border-top: 1px solid var(--zw-gray-border, #262835) !important;
+}
+
+/* Idle Prompt Toast */
+.zw-idle-toast {
   all: initial;
   position: fixed !important;
   bottom: 24px !important;
   right: 24px !important;
-  z-index: 2147483640 !important;
-  background: var(--zw-surface-elevated, #ffffff) !important;
-  color: var(--zw-text, #281e35) !important;
-  border: 1.5px solid var(--zw-accent, #7c4dff) !important;
-  border-radius: 20px !important;
-  padding: 20px 24px !important;
-  max-width: 380px !important;
-  box-shadow: 0 16px 40px rgba(45, 30, 65, 0.2) !important;
-  font-family: var(--zw-font-stack, sans-serif) !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 12px !important;
-  animation: zw-bubbly-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  z-index: 2147483645 !important;
+  max-width: 390px !important;
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 2px solid var(--zw-pink, #FF007A) !important;
+  border-radius: 8px !important;
+  box-shadow: 6px 6px 0px #000000 !important;
+  color: var(--zw-white, #f2f4f8) !important;
+  font-family: var(--zw-font-primary, sans-serif) !important;
+  animation: zw-slide-up 0.25s ease !important;
 }
 
-.zw-fatigue-title {
+.zw-idle-body {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 14px !important;
+  padding: 16px 20px !important;
+}
+
+.zw-idle-body strong {
+  font-family: var(--zw-font-heading) !important;
   font-size: 15px !important;
-  font-weight: 700 !important;
-  color: var(--zw-accent, #7c4dff) !important;
+  color: #ffffff !important;
 }
 
-.zw-fatigue-body {
-  font-size: 13.5px !important;
-  line-height: 1.5 !important;
-  color: var(--zw-text-muted, #5e526c) !important;
+.zw-idle-body p {
+  font-size: 12.5px !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  margin: 4px 0 0 0 !important;
+  line-height: 1.4 !important;
 }
 
-.zw-fatigue-actions {
+.zw-idle-actions {
   display: flex !important;
   gap: 8px !important;
-  margin-top: 4px !important;
+  padding: 12px 18px !important;
+  background: #181924 !important;
+  border-top: 1px solid var(--zw-gray-border, #262835) !important;
 }
 
-.zw-btn-primary {
+.zw-btn-pixel-ghost {
   all: initial;
   display: inline-flex !important;
   align-items: center !important;
-  justify-content: center !important;
-  padding: 9px 16px !important;
-  border-radius: 10px !important;
-  background: var(--zw-accent, #7c4dff) !important;
-  color: #ffffff !important;
-  font-family: inherit !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
-  transition: transform 0.15s ease !important;
-}
-
-.zw-btn-primary:hover {
-  transform: translateY(-1px) scale(1.03) !important;
-}
-
-.zw-btn-secondary {
-  all: initial;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 9px 14px !important;
-  border-radius: 10px !important;
-  background: var(--zw-surface, #eee) !important;
-  color: var(--zw-text, #333) !important;
-  font-family: inherit !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  padding: 8px 12px !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 11.5px !important;
   cursor: pointer !important;
 }
 
 /* ==========================================================================
-   12. MICRO-GAME & BREATHING MODALS
+   7. MINI-GAMES MODAL & CANVAS OVERLAY
    ========================================================================== */
 
-#zenweb-game-modal,
-#zenweb-breathing-modal,
-#zenweb-lockout-modal {
+.zw-game-backdrop {
   all: initial;
   position: fixed !important;
   top: 0 !important;
@@ -770,100 +555,98 @@ span.zw-bionic-tail {
   width: 100vw !important;
   height: 100vh !important;
   z-index: 2147483647 !important;
-  background: rgba(13, 17, 23, 0.94) !important;
-  backdrop-filter: blur(16px) !important;
+  background: rgba(10, 10, 14, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  font-family: var(--zw-font-stack, 'Lexend', sans-serif) !important;
-  contain: strict;
-  will-change: opacity;
-  animation: zw-fade 0.3s ease !important;
+  contain: strict !important;
+  animation: zw-fade-in 0.25s ease !important;
 }
 
-@keyframes zw-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.zw-game-container {
-  position: relative !important;
+.zw-game-window {
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 2px solid var(--zw-gray-border, #262835) !important;
+  border-radius: 8px !important;
+  box-shadow: 10px 10px 0px #000000 !important;
+  max-width: 760px !important;
+  width: 92vw !important;
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important;
-  justify-content: center !important;
-  max-width: 740px !important;
-  width: 90vw !important;
+  overflow: hidden !important;
 }
 
-.zw-game-hud {
+.zw-game-header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;
-  margin-bottom: 14px !important;
   padding: 12px 20px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.14) !important;
-  border-radius: 16px !important;
-  color: #ffffff !important;
-  backdrop-filter: blur(10px) !important;
+  background: #181924 !important;
+  border-bottom: 2px solid var(--zw-gray-border, #262835) !important;
 }
 
 .zw-game-title-group {
   display: flex !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 12px !important;
+}
+
+.zw-pixel-pill {
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  background: var(--zw-pink, #FF007A) !important;
+  color: #ffffff !important;
+  padding: 3px 8px !important;
+  border-radius: 3px !important;
 }
 
 .zw-game-title {
-  font-size: 16.5px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.02em !important;
-}
-
-.zw-game-timer-pill {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
+  font-family: var(--zw-font-mono, monospace) !important;
   font-size: 14px !important;
   font-weight: 700 !important;
-  background: rgba(124, 77, 255, 0.35) !important;
-  border: 1px solid #7c4dff !important;
-  padding: 5px 14px !important;
-  border-radius: 24px !important;
+  letter-spacing: 0.05em !important;
   color: #ffffff !important;
 }
 
-.zw-game-timer-circle {
-  width: 10px !important;
-  height: 10px !important;
+.zw-game-clock {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--zw-green, #00FF66) !important;
+  background: #0a0a0e !important;
+  border: 1px solid var(--zw-gray-border, #262835) !important;
+  padding: 4px 12px !important;
+  border-radius: 4px !important;
+}
+
+.zw-clock-dot {
+  width: 8px !important;
+  height: 8px !important;
   border-radius: 50% !important;
-  background: #00e676 !important;
-  animation: zw-timer-blink 1s infinite !important;
+  background: var(--zw-green, #00FF66) !important;
+  box-shadow: 0 0 8px var(--zw-green, #00FF66) !important;
+  animation: zw-blink 1s infinite !important;
 }
 
-@keyframes zw-timer-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.zw-game-canvas-wrapper {
-  position: relative !important;
-  border-radius: 20px !important;
-  overflow: hidden !important;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65) !important;
-  border: 2px solid rgba(255, 255, 255, 0.16) !important;
-  background: #10141d !important;
+.zw-game-canvas-box {
+  background: #0a0a0e !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-bottom: 2px solid var(--zw-gray-border, #262835) !important;
 }
 
 #zenweb-game-canvas {
   display: block !important;
-  width: 700px !important;
-  height: 440px !important;
-  max-width: 88vw !important;
-  max-height: 56vh !important;
+  width: 720px !important;
+  height: 420px !important;
+  max-width: 90vw !important;
+  max-height: 55vh !important;
   cursor: crosshair !important;
 }
 
@@ -871,141 +654,194 @@ span.zw-bionic-tail {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  width: 100% !important;
-  margin-top: 14px !important;
-  color: rgba(255, 255, 255, 0.65) !important;
+  padding: 12px 20px !important;
+  background: #181924 !important;
+}
+
+.zw-game-hint {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
   font-size: 12.5px !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  font-family: var(--zw-font-mono, monospace) !important;
 }
 
-.zw-game-close-btn {
+.zw-badge-hint {
+  background: #2b2e3e !important;
+  color: var(--zw-green, #00FF66) !important;
+  padding: 2px 6px !important;
+  font-size: 10px !important;
+  border-radius: 2px !important;
+}
+
+.zw-btn-game-quit {
   all: initial;
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  padding: 7px 16px !important;
-  border-radius: 10px !important;
-  font-family: inherit !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 8px 16px !important;
+  background: #222432 !important;
+  color: #f2f4f8 !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  border: 1px solid var(--zw-gray-border, #262835) !important;
+  box-shadow: 2px 2px 0px #000 !important;
   cursor: pointer !important;
-  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transition: all 0.15s ease !important;
 }
 
-.zw-game-close-btn:hover {
-  background: rgba(255, 82, 82, 0.3) !important;
-  border-color: #ff5252 !important;
-  transform: scale(1.04) !important;
+.zw-btn-game-quit:hover {
+  background: var(--zw-pink, #FF007A) !important;
+  color: #ffffff !important;
 }
 
-/* 30-Second Guided Box Breathing */
-.zw-breathing-circle-container {
+/* Breathing Orb */
+.zw-breath-orb-wrap {
   position: relative !important;
-  width: 270px !important;
-  height: 270px !important;
+  width: 180px !important;
+  height: 180px !important;
+  margin: 0 auto !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  margin: 32px 0 !important;
 }
 
-.zw-breathing-outer-ring {
+.zw-breath-ring {
   position: absolute !important;
-  width: 260px !important;
-  height: 260px !important;
-  border: 2px dashed rgba(124, 77, 255, 0.35) !important;
+  width: 170px !important;
+  height: 170px !important;
+  border: 2px dashed rgba(0, 255, 102, 0.3) !important;
   border-radius: 50% !important;
 }
 
-.zw-breathing-orb {
-  width: 140px !important;
-  height: 140px !important;
+.zw-breath-orb {
+  width: 90px !important;
+  height: 90px !important;
   border-radius: 50% !important;
-  background: radial-gradient(circle, #7c4dff 0%, #3f51b5 100%) !important;
-  box-shadow: 0 0 50px rgba(124, 77, 255, 0.65) !important;
+  background: radial-gradient(circle, var(--zw-green, #00FF66) 0%, #009944 100%) !important;
+  box-shadow: 0 0 35px var(--zw-green-glow, rgba(0, 255, 102, 0.4)) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  font-family: var(--zw-font-mono, monospace) !important;
   font-size: 18px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.05em !important;
-  color: #ffffff !important;
-  will-change: transform;
+  color: #0a0a0e !important;
+  animation: zw-breath-pulse 8s infinite ease-in-out !important;
 }
 
-.zw-breathing-anim-box {
-  animation: zw-box-breath 16s infinite ease-in-out !important;
-}
-
-@keyframes zw-box-breath {
-  0% { transform: scale(0.75); }
-  25% { transform: scale(1.35); }
+@keyframes zw-breath-pulse {
+  0%, 100% { transform: scale(0.85); }
   50% { transform: scale(1.35); }
-  75% { transform: scale(0.75); }
-  100% { transform: scale(0.75); }
 }
 
-.zw-breathing-phase-text {
-  font-size: 25px !important;
-  font-weight: 700 !important;
-  color: #ebdffc !important;
-  margin-bottom: 8px !important;
-}
+/* ==========================================================================
+   8. FLOATING DIGITAL DOCK WIDGET
+   ========================================================================== */
 
-.zw-breathing-subtext {
-  font-size: 15px !important;
-  color: rgba(255, 255, 255, 0.72) !important;
-  max-width: 400px !important;
-  line-height: 1.5 !important;
-}
-
-.zw-breathing-countdown {
-  font-size: 14px !important;
-  color: #00e676 !important;
-  font-weight: 600 !important;
-  margin-top: 20px !important;
-  background: rgba(0, 230, 118, 0.12) !important;
-  padding: 5px 18px !important;
-  border-radius: 16px !important;
-}
-
-/* Hyperfixation Lockout Card */
-.zw-lockout-card {
-  background: #161b22 !important;
-  border: 1.5px solid #30363d !important;
-  border-radius: 24px !important;
-  padding: 38px 34px !important;
-  max-width: 460px !important;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6) !important;
+.zw-floating-dock {
+  all: initial;
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  z-index: 2147483640 !important;
   display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 2px solid var(--zw-gray-border, #262835) !important;
+  border-radius: 8px !important;
+  padding: 6px 8px !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  transition: transform 0.2s ease !important;
+}
+
+.zw-floating-dock:hover {
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 6px 6px 0px #000000 !important;
+}
+
+.zw-dock-btn {
+  all: initial;
+  display: inline-flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  gap: 16px !important;
-  text-align: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  padding: 6px 10px !important;
+  border-radius: 4px !important;
+  background: #1a1b26 !important;
+  color: var(--zw-white, #f2f4f8) !important;
+  cursor: pointer !important;
+  border: 1px solid transparent !important;
+  transition: all 0.15s ease !important;
 }
 
-.zw-lockout-icon {
-  font-size: 44px !important;
+.zw-dock-btn:hover {
+  background: #252738 !important;
+  border-color: var(--zw-green, #00FF66) !important;
+  transform: translateY(-1px) !important;
 }
 
-.zw-lockout-title {
-  font-size: 20px !important;
+.zw-dock-btn span:first-child {
+  font-size: 16px !important;
+}
+
+.zw-dock-label {
+  font-size: 9.5px !important;
   font-weight: 700 !important;
-  color: #58a6ff !important;
+  color: var(--zw-gray-light, #8f96a3) !important;
+  letter-spacing: 0.05em !important;
 }
 
-.zw-lockout-desc {
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  color: #8b949e !important;
+.zw-dock-active {
+  border-color: var(--zw-green, #00FF66) !important;
+  background: rgba(0, 255, 102, 0.1) !important;
 }
 
-.zw-lockout-time-left {
-  font-size: 26px !important;
+.zw-dock-active .zw-dock-label {
+  color: var(--zw-green, #00FF66) !important;
+}
+
+/* Toast Pill */
+.zw-toast-pill {
+  all: initial;
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 2147483647 !important;
+  background: var(--zw-gray-dark, #12131a) !important;
+  border: 1.5px solid var(--zw-green, #00FF66) !important;
+  box-shadow: 4px 4px 0px #000000 !important;
+  border-radius: 6px !important;
+  color: #ffffff !important;
+  font-family: var(--zw-font-mono, monospace) !important;
+  font-size: 12.5px !important;
   font-weight: 700 !important;
-  color: #ffca28 !important;
-  font-variant-numeric: tabular-nums !important;
-  background: rgba(255, 202, 40, 0.12) !important;
-  padding: 8px 26px !important;
-  border-radius: 14px !important;
-  border: 1px solid rgba(255, 202, 40, 0.3) !important;
+  padding: 10px 20px !important;
+  animation: zw-slide-up 0.25s ease !important;
+}
+
+/* Animations */
+@keyframes zw-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zw-slide-up {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes zw-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.zw-fade-out {
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
 }

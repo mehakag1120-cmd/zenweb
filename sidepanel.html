@@ -3,75 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenWeb AI Co-Pilot</title>
+  <title>ZenWeb AI Reading Deck</title>
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 <body>
-  <div class="ff-sidepanel-app">
+  <div class="zw-sidepanel-app">
     <!-- Header -->
-    <header class="ff-sp-header">
-      <div class="ff-sp-title-area">
-        <div class="ff-sp-icon">✨</div>
+    <header class="zw-sp-header">
+      <div class="zw-sp-title-area">
+        <div class="zw-sp-icon">⚡</div>
         <div>
-          <h2>ZenWeb Co-Pilot</h2>
-          <span class="ff-sp-subtitle">ADHD & Sensory Reading Companion</span>
+          <h2>ZENWEB AI DECK</h2>
+          <span class="zw-sp-subtitle">[READING CO-PILOT]</span>
         </div>
       </div>
-      <button class="ff-sp-icon-btn" id="btn-refresh-context" title="Refresh Active Page Context">🔄</button>
+      <button class="zw-sp-icon-btn" id="btn-refresh-context" title="Refresh Active Tab Context">🔄</button>
     </header>
 
-    <!-- Page Context Pill -->
-    <div class="ff-sp-context-card">
-      <div class="ff-sp-context-header">
-        <span class="ff-sp-pulse-dot"></span>
-        <span class="ff-sp-context-label">Active Page Context</span>
+    <!-- Context Pill -->
+    <div class="zw-sp-context-card">
+      <div class="zw-sp-context-header">
+        <span class="zw-sp-pulse-dot"></span>
+        <span class="zw-sp-context-label">ACTIVE PAGE CONTEXT</span>
       </div>
-      <div class="ff-sp-page-title" id="sp-page-title">Detecting page...</div>
+      <div class="zw-sp-page-title" id="sp-page-title">Syncing active page...</div>
     </div>
 
-    <!-- Quick Cognitive Action Chips -->
-    <div class="ff-sp-quick-chips">
-      <button class="ff-sp-chip" data-action="summary">
-        <span>⚡</span> 3-Bullet Core
+    <!-- Quick Action Chips -->
+    <div class="zw-sp-quick-chips">
+      <button class="zw-sp-chip" data-action="summary">
+        <span>⚡</span> [3-BULLET CORE]
       </button>
-      <button class="ff-sp-chip" data-action="adhd">
-        <span>🧩</span> Explain for ADHD
+      <button class="zw-sp-chip" data-action="adhd">
+        <span>🧩</span> [SCANNABLE BULLETS]
       </button>
-      <button class="ff-sp-chip" data-action="tone">
-        <span>🕊️</span> Neutralize Tone
+      <button class="zw-sp-chip" data-action="tone">
+        <span>🕊️</span> [NEUTRALIZE TONE]
       </button>
-      <button class="ff-sp-chip" data-action="actions">
-        <span>📋</span> Action Checklist
+      <button class="zw-sp-chip" data-action="actions">
+        <span>📋</span> [ACTION ITEMS]
       </button>
     </div>
 
     <!-- Chat Message Stream -->
-    <main class="ff-sp-messages" id="sp-messages">
-      <div class="ff-sp-msg ff-sp-assistant">
-        <div class="ff-sp-msg-header">
-          <span class="ff-sp-avatar">✨</span>
-          <span class="ff-sp-sender">ZenWeb Assistant</span>
+    <main class="zw-sp-messages" id="sp-messages">
+      <div class="zw-sp-msg zw-sp-assistant">
+        <div class="zw-sp-msg-header">
+          <span class="zw-sp-avatar">🤖</span>
+          <span class="zw-sp-sender">ZENWEB AGENT</span>
         </div>
-        <div class="ff-sp-msg-body">
-          Hi there! I'm your privacy-first reading co-pilot. I can break down dense paragraphs, eliminate fluff, or answer questions about this page. How can I support your focus?
+        <div class="zw-sp-msg-body">
+          Reading deck initialized. I monitor cognitive pacing, break dense walls of text into actionable bullet points, and answer questions about this page.
         </div>
       </div>
     </main>
 
-    <!-- Chat Input Area -->
-    <footer class="ff-sp-input-area">
-      <div class="ff-sp-input-wrapper">
+    <!-- Input Footer -->
+    <footer class="zw-sp-input-area">
+      <div class="zw-sp-input-wrapper">
         <textarea
           id="sp-user-input"
-          class="ff-sp-textarea"
-          placeholder="Ask a question about this article..."
+          class="zw-sp-textarea"
+          placeholder="Ask a question about this page..."
           rows="1"
         ></textarea>
-        <button class="ff-sp-send-btn" id="sp-send-btn" title="Send Question">➔</button>
+        <button class="zw-sp-send-btn" id="sp-send-btn" title="Send Question">➔</button>
       </div>
-      <div class="ff-sp-hint">
-        <span>🔒 100% On-device privacy (Gemini Nano)</span>
-        <button id="sp-clear-btn" class="ff-sp-clear-link">Clear chat</button>
+      <div class="zw-sp-hint">
+        <span>🔒 100% On-device privacy</span>
+        <button id="sp-clear-btn" class="zw-sp-clear-link">[CLEAR CHAT]</button>
       </div>
     </footer>
   </div>

@@ -1,13 +1,14 @@
 /**
- * ZenWeb Content Orchestrator (v2.0)
- * Comprehensive DOM transformer, Shadow DOM traverser, MutationObserver engine,
- * Frosted Glass Reading Ruler, Lossless Bionic Reading, Smart Chunking, and Activity Monitor.
+ * ZenWeb Content Orchestrator (v2.1)
+ * Screen Activity Monitoring AI Agent (with explicit user permission),
+ * 15-minute randomized focus reset mini-games, 30-minute water break reminders,
+ * Webpage Data Restructuring (scannable bullet cards, circular bold fonts),
+ * and Sliding Pixel Background Canvas inspired by books.baseten.com.
  */
 
 (function () {
   'use strict';
 
-  // Prevent duplicate instances
   if (window.__ZENWEB_INITIALIZED__) return;
   window.__ZENWEB_INITIALIZED__ = true;
 
@@ -15,52 +16,49 @@
     constructor() {
       this.settings = null;
       this.observer = null;
-      this.rulerEl = null;
-      this.tooltipEl = null;
-      this.floatingPillEl = null;
-      this.fatiguePromptEl = null;
-      this.lastScrollY = window.scrollY;
+      this.slidingPixelCanvas = null;
+      this.slidingPixelCtx = null;
+      this.pixelAnimId = null;
+      this.pixels = [];
       this.lastActivityTime = Date.now();
+      this.lastScrollY = window.scrollY;
       this.scrollStuckStartTime = null;
-      this.fatigueTimerInterval = null;
-      this.bionicNodesCache = new Map(); // For lossless toggling
-      this.chunkedNodesCache = new Map();
-      this.modifiedStyleNodes = new Set();
-      this.mousePos = { x: 0, y: window.innerHeight / 2 };
+      this.activityInterval = null;
+      this.waterTimerInterval = null;
+      this.modifiedNodesCache = new Map();
+      this.restructuredCardsCache = new Map();
+      window.__ZENWEB_CONTENT_INSTANCE__ = this;
 
       this.init();
     }
 
     async init() {
-      // 1. Anti-Flashbang Veil
-      this.mountFlashbangVeil();
-
-      // 2. Load Settings from chrome.storage.sync
       this.settings = await this.loadSettings();
 
-      // 3. Mount UI Overlays (Ruler, Tooltip, Floating Pill)
-      this.mountReadingRuler();
-      this.mountSelectionTooltip();
-      this.mountFloatingPill();
+      // 1. Mount Sliding Pixel Canvas (Inspired by books.baseten.com)
+      this.mountSlidingPixelCanvas();
 
-      // 4. Apply State based on settings.enabled
+      // 2. Mount Floating Action Dock
+      this.mountFloatingDock();
+
+      // 3. Check Screen Monitoring Permission Dialog
+      this.checkScreenMonitoringPermission();
+
+      // 4. Apply State
       if (this.settings.enabled !== false) {
         this.applyActiveState();
       } else {
         this.applyDisabledState();
       }
 
-      // 5. Dynamic SPA MutationObserver
-      this.setupMutationEngine();
-
-      // 6. Activity & Fatigue Monitor
+      // 5. Setup Screen Activity Monitoring
       this.setupActivityMonitor();
 
-      // 7. Listen for Extension Runtime Messages
-      this.setupMessageListeners();
+      // 6. Setup Local Water & Focus Timers
+      this.setupTimers();
 
-      // 8. Dismiss Anti-Flashbang Veil
-      setTimeout(() => this.dismissFlashbangVeil(), 200);
+      // 7. Setup Runtime Message Listeners
+      this.setupMessageListeners();
     }
 
     /* ==========================================================================
@@ -70,9 +68,7 @@
     async loadSettings() {
       return new Promise((resolve) => {
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
-          chrome.storage.sync.get(null, (items) => {
-            resolve(items || {});
-          });
+          chrome.storage.sync.get(null, (items) => resolve(items || {}));
         } else {
           resolve({});
         }
@@ -80,608 +76,167 @@
     }
 
     /* ==========================================================================
-       FULL STATE TOGGLE (100% Lossless On / Off Behavior)
+       1. SLIDING PIXEL BACKGROUND CANVAS (books.baseten.com aesthetic)
        ========================================================================== */
 
-    applyActiveState() {
-      const root = document.documentElement;
-
-      // Theme
-      if (this.settings.theme && this.settings.theme !== 'none') {
-        root.setAttribute('data-zenweb-theme', this.settings.theme);
-      } else {
-        root.removeAttribute('data-zenweb-theme');
-      }
-
-      // Typography & Shields
-      root.setAttribute('data-zenweb-font', this.settings.fontFamily || 'lexend');
-      root.setAttribute('data-zenweb-shield', this.settings.distractionShield ? 'true' : 'false');
-      root.setAttribute('data-zenweb-suppress-anim', this.settings.animationSuppressor ? 'true' : 'false');
-      root.setAttribute('data-zenweb-max-width', this.settings.maxLineLength ? 'true' : 'false');
-      root.style.setProperty('--zw-line-height', this.settings.lineSpacing || '1.75');
-
-      // Inline styles normalization
-      this.normalizeInlineStyles(document.body);
-
-      // Shadow DOM piercer
-      this.pierceShadowRoots(document.documentElement);
-
-      // Ruler visibility
-      this.updateRulerVisibility();
-
-      // Bionic Reading
-      if (this.settings.bionicReading) {
-        this.enableBionicReading();
-      } else {
-        this.disableBionicReading();
-      }
-
-      // Smart Chunking
-      if (this.settings.smartChunking) {
-        this.applySmartChunking();
-      } else {
-        this.removeSmartChunking();
-      }
-
-      // Last-Read Anchor
-      if (this.settings.lastReadAnchor) {
-        this.initLastReadAnchor();
-      }
-
-      // AI Summary Card
-      if (this.settings.aiSummaryCard) {
-        setTimeout(() => this.injectAISummaryCard(), 600);
-      } else {
-        document.getElementById('zenweb-ai-summary-card')?.remove();
-      }
-
-      // Floating pill active state
-      if (this.floatingPillEl) {
-        this.floatingPillEl.classList.remove('zw-disabled');
-      }
-    }
-
-    applyDisabledState() {
-      const root = document.documentElement;
-
-      // 1. Remove all root theme attributes
-      root.removeAttribute('data-zenweb-theme');
-      root.removeAttribute('data-zenweb-font');
-      root.removeAttribute('data-zenweb-shield');
-      root.removeAttribute('data-zenweb-suppress-anim');
-      root.removeAttribute('data-zenweb-max-width');
-      root.style.removeProperty('--zw-line-height');
-
-      // 2. Hide and deactivate Reading Ruler completely
-      this.hideRuler();
-
-      // 3. Losslessly restore Bionic Reading text
-      this.disableBionicReading();
-
-      // 4. Losslessly restore Chunked Paragraphs
-      this.removeSmartChunking();
-
-      // 5. Restore original inline styles
-      this.restoreNormalizedStyles();
-
-      // 6. Remove injected UI cards & prompts
-      document.getElementById('zenweb-ai-summary-card')?.remove();
-      document.getElementById('zenweb-fatigue-prompt')?.remove();
-      document.querySelector('.zw-ai-inline-result')?.remove();
-
-      if (this.tooltipEl) {
-        this.tooltipEl.classList.remove('zw-visible');
-      }
-
-      // 7. Dim floating pill
-      if (this.floatingPillEl) {
-        this.floatingPillEl.classList.add('zw-disabled');
-      }
-
-      // 8. Stop ambient sound if playing
-      if (window.ZenWebAudio && window.ZenWebAudio.isPlaying) {
-        window.ZenWebAudio.stop();
-      }
-    }
-
-    /* ==========================================================================
-       ANTI-FLASHBANG VEIL
-       ========================================================================== */
-
-    mountFlashbangVeil() {
-      if (document.getElementById('zenweb-flashbang-veil')) return;
-      const veil = document.createElement('div');
-      veil.id = 'zenweb-flashbang-veil';
-      document.documentElement.appendChild(veil);
-    }
-
-    dismissFlashbangVeil() {
-      const veil = document.getElementById('zenweb-flashbang-veil');
-      if (veil) {
-        veil.classList.add('zw-fade-out');
-        setTimeout(() => veil.remove(), 400);
-      }
-    }
-
-    /* ==========================================================================
-       INLINE STYLE NORMALIZATION & LOSSLESS RESTORATION
-       ========================================================================== */
-
-    normalizeInlineStyles(container) {
-      if (!container || !this.settings.enabled) return;
-
-      const elements = container.querySelectorAll('article, p, span, div, h1, h2, h3, h4, h5, h6, li, a');
-      elements.forEach(el => {
-        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
-
-        const inlineBg = el.style.backgroundColor || el.style.background;
-        const inlineColor = el.style.color;
-
-        if (inlineColor) {
-          if (!el.dataset.zwOrigColor) {
-            el.dataset.zwOrigColor = inlineColor;
-            this.modifiedStyleNodes.add(el);
-          }
-          el.style.color = '';
-        }
-
-        if (inlineBg && !inlineBg.includes('url')) {
-          if (!el.dataset.zwOrigBg) {
-            el.dataset.zwOrigBg = inlineBg;
-            this.modifiedStyleNodes.add(el);
-          }
-          el.style.backgroundColor = '';
-          el.style.background = '';
-        }
-      });
-    }
-
-    restoreNormalizedStyles() {
-      this.modifiedStyleNodes.forEach(el => {
-        if (el && el.parentNode) {
-          if (el.dataset.zwOrigColor) {
-            el.style.color = el.dataset.zwOrigColor;
-            delete el.dataset.zwOrigColor;
-          }
-          if (el.dataset.zwOrigBg) {
-            el.style.backgroundColor = el.dataset.zwOrigBg;
-            delete el.dataset.zwOrigBg;
-          }
-        }
-      });
-      this.modifiedStyleNodes.clear();
-    }
-
-    /* ==========================================================================
-       SHADOW DOM PIERCER
-       ========================================================================== */
-
-    pierceShadowRoots(node) {
-      if (!node) return;
-
-      if (node.shadowRoot) {
-        const shadow = node.shadowRoot;
-        if (!shadow.querySelector('#zenweb-shadow-styles')) {
-          const styleEl = document.createElement('style');
-          styleEl.id = 'zenweb-shadow-styles';
-          styleEl.textContent = `
-            :host {
-              font-family: var(--zw-font-stack, 'Lexend', sans-serif) !important;
-              color: var(--zw-text, inherit) !important;
-            }
-            p, span, div, h1, h2, h3, li, a {
-              color: var(--zw-text, inherit) !important;
-              line-height: var(--zw-line-height, 1.75) !important;
-              letter-spacing: 0.02em !important;
-            }
-          `;
-          shadow.appendChild(styleEl);
-        }
-        this.pierceShadowRoots(shadow);
-      }
-
-      const children = node.children || [];
-      for (let i = 0; i < children.length; i++) {
-        this.pierceShadowRoots(children[i]);
-      }
-    }
-
-    /* ==========================================================================
-       DYNAMIC SPA MUTATION OBSERVER
-       ========================================================================== */
-
-    setupMutationEngine() {
-      let isThrottled = false;
-
-      this.observer = new MutationObserver((mutations) => {
-        if (!this.settings || !this.settings.enabled) return;
-
-        if (!isThrottled) {
-          isThrottled = true;
-          requestAnimationFrame(() => {
-            for (const mutation of mutations) {
-              for (const addedNode of mutation.addedNodes) {
-                if (addedNode.nodeType === Node.ELEMENT_NODE) {
-                  if (!addedNode.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) {
-                    this.normalizeInlineStyles(addedNode);
-                    this.pierceShadowRoots(addedNode);
-
-                    if (this.settings.animationSuppressor) {
-                      const videos = addedNode.querySelectorAll('video[autoplay]');
-                      videos.forEach(v => {
-                        try { v.pause(); v.muted = true; } catch(e){}
-                      });
-                    }
-                  }
-                }
-              }
-            }
-            isThrottled = false;
-          });
-        }
-      });
-
-      this.observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-    }
-
-    /* ==========================================================================
-       FROSTED GLASS READING RULER (FIXED TOGGLE & BLURRED BOUNDARIES)
-       ========================================================================== */
-
-    mountReadingRuler() {
-      let ruler = document.getElementById('zenweb-ruler-overlay');
-      if (!ruler) {
-        ruler = document.createElement('div');
-        ruler.id = 'zenweb-ruler-overlay';
-        ruler.innerHTML = `
-          <div class="zw-ruler-curtain-top" id="zw-ruler-curtain-top"></div>
-          <div class="zw-ruler-aperture" id="zw-ruler-aperture"></div>
-          <div class="zw-ruler-curtain-bottom" id="zw-ruler-curtain-bottom"></div>
-        `;
-        document.body.appendChild(ruler);
-      }
-      this.rulerEl = ruler;
-      this.updateRulerVisibility();
-
-      // Fluid 60-120fps tracking using requestAnimationFrame
-      let ticking = false;
-      window.addEventListener('pointermove', (e) => {
-        this.mousePos.x = e.clientX;
-        this.mousePos.y = e.clientY;
-
-        if (!ticking && this.settings.enabled && this.settings.readingRuler) {
-          requestAnimationFrame(() => {
-            this.renderRulerPosition(this.mousePos.y);
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }, { passive: true });
-    }
-
-    renderRulerPosition(cursorY) {
-      if (!this.rulerEl || !this.settings.enabled || !this.settings.readingRuler) return;
-
-      const height = this.settings.rulerHeight || 120;
-      const half = height / 2;
-      const topCurtainHeight = Math.max(0, cursorY - half);
-      const apertureTop = topCurtainHeight;
-      const bottomCurtainTop = cursorY + half;
-
-      const curtainTop = this.rulerEl.querySelector('#zw-ruler-curtain-top');
-      const aperture = this.rulerEl.querySelector('#zw-ruler-aperture');
-      const curtainBottom = this.rulerEl.querySelector('#zw-ruler-curtain-bottom');
-
-      if (curtainTop && aperture && curtainBottom) {
-        curtainTop.style.height = `${topCurtainHeight}px`;
-        aperture.style.top = `${apertureTop}px`;
-        aperture.style.height = `${height}px`;
-        curtainBottom.style.top = `${bottomCurtainTop}px`;
-        curtainBottom.style.height = `calc(100vh - ${bottomCurtainTop}px)`;
-      }
-    }
-
-    updateRulerVisibility() {
-      if (!this.rulerEl) return;
-      if (this.settings.enabled && this.settings.readingRuler) {
-        this.rulerEl.classList.add('zw-active');
-        this.renderRulerPosition(this.mousePos.y);
-      } else {
-        this.hideRuler();
-      }
-    }
-
-    hideRuler() {
-      if (this.rulerEl) {
-        this.rulerEl.classList.remove('zw-active');
-      }
-    }
-
-    /* ==========================================================================
-       LOSSLESS BIONIC READING CONVERTER
-       ========================================================================== */
-
-    enableBionicReading() {
-      const paragraphs = document.querySelectorAll('article p, main p, .entry-content p, p');
-      paragraphs.forEach(p => {
-        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code, table, form')) return;
-        if (this.bionicNodesCache.has(p)) return;
-
-        this.bionicNodesCache.set(p, p.innerHTML);
-        p.innerHTML = this.convertTextToBionicHTML(p.innerHTML);
-      });
-    }
-
-    disableBionicReading() {
-      this.bionicNodesCache.forEach((originalHTML, el) => {
-        if (el && el.parentNode) {
-          el.innerHTML = originalHTML;
-        }
-      });
-      this.bionicNodesCache.clear();
-    }
-
-    convertTextToBionicHTML(html) {
-      const parts = html.split(/(<[^>]+>)/g);
-      return parts.map(part => {
-        if (part.startsWith('<') && part.endsWith('>')) return part;
-        return part.replace(/(\b[a-zA-Z0-9']+\b)/g, (word) => {
-          if (word.length <= 1) return word;
-          const leadLen = Math.ceil(word.length * 0.45);
-          const lead = word.slice(0, leadLen);
-          const tail = word.slice(leadLen);
-          return `<b class="zw-bionic-lead">${lead}</b><span class="zw-bionic-tail">${tail}</span>`;
-        });
-      }).join('');
-    }
-
-    /* ==========================================================================
-       LOSSLESS SMART CHUNKING
-       ========================================================================== */
-
-    applySmartChunking() {
-      const paragraphs = document.querySelectorAll('article p, main p, .entry-content p');
-      paragraphs.forEach(p => {
-        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code')) return;
-        if (this.chunkedNodesCache.has(p)) return;
-
-        const text = p.innerText || '';
-        const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)/g);
-        if (sentences && sentences.length > 5) {
-          this.chunkedNodesCache.set(p, p.innerHTML);
-
-          let newHTML = '';
-          for (let i = 0; i < sentences.length; i += 3) {
-            const chunk = sentences.slice(i, i + 3).join('');
-            newHTML += `<span class="zw-chunk-block">${chunk}</span>`;
-            if (i + 3 < sentences.length) {
-              newHTML += `<div class="zw-chunk-divider"></div>`;
-            }
-          }
-          p.innerHTML = newHTML;
-        }
-      });
-    }
-
-    removeSmartChunking() {
-      this.chunkedNodesCache.forEach((orig, el) => {
-        if (el && el.parentNode) el.innerHTML = orig;
-      });
-      this.chunkedNodesCache.clear();
-    }
-
-    /* ==========================================================================
-       LAST-READ ANCHOR
-       ========================================================================== */
-
-    initLastReadAnchor() {
-      const pageKey = 'zenweb_anchor_' + location.href.split('#')[0];
-      const savedY = parseInt(sessionStorage.getItem(pageKey) || '0', 10);
-
-      if (savedY > 300) {
-        setTimeout(() => {
-          window.scrollTo({ top: savedY, behavior: 'smooth' });
-          this.highlightVisibleParagraph();
-        }, 350);
-      }
-
-      let scrollTimer = null;
-      window.addEventListener('scroll', () => {
-        if (scrollTimer) clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-          sessionStorage.setItem(pageKey, window.scrollY.toString());
-        }, 500);
-      }, { passive: true });
-    }
-
-    highlightVisibleParagraph() {
-      const centerY = window.innerHeight * 0.4;
-      const elements = document.elementsFromPoint(window.innerWidth / 2, centerY);
-      const para = elements.find(el => el.tagName === 'P' || el.tagName === 'ARTICLE');
-
-      if (para && !para.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) {
-        para.classList.add('zw-last-read-anchor');
-        setTimeout(() => {
-          para.classList.remove('zw-last-read-anchor');
-        }, 4500);
-      }
-    }
-
-    /* ==========================================================================
-       AI 3-BULLET EXECUTIVE SUMMARY CARD
-       ========================================================================== */
-
-    async injectAISummaryCard() {
-      if (document.getElementById('zenweb-ai-summary-card')) return;
-
-      const mainEl = document.querySelector('article, [role="main"], main') || document.body;
-      const pageText = this.extractCleanText(mainEl);
-
-      if (pageText.split(/\s+/).length < 220) return;
-
-      const card = document.createElement('div');
-      card.id = 'zenweb-ai-summary-card';
-      card.className = 'zw-ai-summary-card';
-      card.innerHTML = `
-        <div class="zw-ai-summary-header">
-          <div class="zw-ai-summary-title">
-            <span>⚡</span>
-            <span>ZenWeb 3-Bullet Executive Overview</span>
-            <span class="zw-ai-summary-badge">ADHD Scannable</span>
-          </div>
-          <button class="zw-ai-summary-close" id="zw-summary-close-btn" title="Dismiss">✕</button>
-        </div>
-        <div id="zw-summary-loading" style="font-size: 14px; color: var(--zw-text-muted); display: flex; align-items: center; gap: 8px;">
-          <span>🧠 Synthesizing key takeaways...</span>
-        </div>
-        <ul class="zw-ai-summary-list" id="zw-summary-list" style="display: none;"></ul>
-      `;
-
-      if (mainEl.firstChild) {
-        mainEl.insertBefore(card, mainEl.firstChild);
-      } else {
-        mainEl.appendChild(card);
-      }
-
-      card.querySelector('#zw-summary-close-btn').addEventListener('click', () => {
-        card.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' }).onfinish = () => card.remove();
-      });
-
-      if (window.ZenWebAI) {
-        const bullets = await window.ZenWebAI.generate3BulletSummary(pageText);
-        const list = card.querySelector('#zw-summary-list');
-        const loading = card.querySelector('#zw-summary-loading');
-
-        if (list && loading) {
-          loading.style.display = 'none';
-          list.style.display = 'flex';
-          list.innerHTML = bullets.map((b, i) => `
-            <li class="zw-ai-summary-item">
-              <span class="zw-ai-summary-bullet">${i + 1}</span>
-              <span>${b}</span>
-            </li>
-          `).join('');
-        }
-      }
-    }
-
-    /* ==========================================================================
-       PLAIN-ENGLISH & TONE NEUTRALIZER FLOATING TOOLTIP
-       ========================================================================== */
-
-    mountSelectionTooltip() {
-      if (document.getElementById('zenweb-selection-tooltip')) return;
-
-      const tooltip = document.createElement('div');
-      tooltip.id = 'zenweb-selection-tooltip';
-      tooltip.innerHTML = `
-        <button class="zw-tooltip-btn" id="zw-btn-simplify">
-          <span>💡</span><span>Simplify</span>
-        </button>
-        <button class="zw-tooltip-btn" id="zw-btn-neutralize">
-          <span>🕊️</span><span>Calm Tone</span>
-        </button>
-        <button class="zw-tooltip-btn" id="zw-btn-speak">
-          <span>🔊</span><span>Listen</span>
-        </button>
-      `;
-      document.body.appendChild(tooltip);
-      this.tooltipEl = tooltip;
-
-      document.addEventListener('selectionchange', () => {
-        if (!this.settings || !this.settings.enabled) {
-          this.tooltipEl.classList.remove('zw-visible');
-          return;
-        }
-
-        const sel = window.getSelection();
-        const text = sel ? sel.toString().trim() : '';
-
-        if (!text || text.length < 5 || sel.isCollapsed) {
-          this.tooltipEl.classList.remove('zw-visible');
-          return;
-        }
-
-        const range = sel.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-          this.tooltipEl.style.left = `${rect.left + rect.width / 2 + window.scrollX}px`;
-          this.tooltipEl.style.top = `${rect.top + window.scrollY}px`;
-          this.tooltipEl.classList.add('zw-visible');
-        }
-      });
-
-      tooltip.querySelector('#zw-btn-simplify').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const text = window.getSelection()?.toString().trim();
-        if (!text) return;
-        const result = await window.ZenWebAI.simplifyText(text);
-        this.renderInlineResult("Plain-English Rewrite", result);
-        this.tooltipEl.classList.remove('zw-visible');
-      });
-
-      tooltip.querySelector('#zw-btn-neutralize').addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const text = window.getSelection()?.toString().trim();
-        if (!text) return;
-        const result = await window.ZenWebAI.neutralizeTone(text);
-        this.renderInlineResult("Emotionally Neutralized Tone", result);
-        this.tooltipEl.classList.remove('zw-visible');
-      });
-
-      tooltip.querySelector('#zw-btn-speak').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const text = window.getSelection()?.toString().trim();
-        if (!text) return;
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance(text);
-          utter.rate = 1.0;
-          window.speechSynthesis.speak(utter);
-        }
-        this.tooltipEl.classList.remove('zw-visible');
-      });
-    }
-
-    renderInlineResult(title, text) {
-      const existing = document.querySelector('.zw-ai-inline-result');
-      if (existing) existing.remove();
-
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) return;
-      const rect = sel.getRangeAt(0).getBoundingClientRect();
-
-      const resultBox = document.createElement('div');
-      resultBox.className = 'zw-ai-inline-result';
-      resultBox.style.left = `${rect.left + window.scrollX}px`;
-      resultBox.style.top = `${rect.bottom + window.scrollY + 8}px`;
-
-      resultBox.innerHTML = `
-        <div class="zw-ai-inline-result-header">
-          <span>${title}</span>
-          <button style="all:initial; cursor:pointer; font-size:16px; color:inherit;" id="zw-close-inline-res">✕</button>
-        </div>
-        <div class="zw-ai-inline-result-content">${text}</div>
-        <div style="font-size: 11px; color: var(--zw-text-muted);">ZenWeb Privacy-First AI</div>
-      `;
-
-      document.body.appendChild(resultBox);
-      resultBox.querySelector('#zw-close-inline-res').addEventListener('click', () => resultBox.remove());
-
-      const onOutClick = (e) => {
-        if (!resultBox.contains(e.target)) {
-          resultBox.remove();
-          document.removeEventListener('pointerdown', onOutClick);
-        }
+    mountSlidingPixelCanvas() {
+      if (document.getElementById('zenweb-pixel-canvas')) return;
+
+      const canvas = document.createElement('canvas');
+      canvas.id = 'zenweb-pixel-canvas';
+      canvas.className = 'zw-pixel-background';
+      document.body.appendChild(canvas);
+
+      this.slidingPixelCanvas = canvas;
+      this.slidingPixelCtx = canvas.getContext('2d');
+
+      const resize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
       };
-      setTimeout(() => document.addEventListener('pointerdown', onOutClick), 100);
+      window.addEventListener('resize', resize);
+      resize();
+
+      // Generate initial sliding pixel nodes
+      this.pixels = [];
+      const count = 35;
+      for (let i = 0; i < count; i++) {
+        this.pixels.push({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          w: Math.random() > 0.6 ? 6 : 4,
+          h: Math.random() > 0.6 ? 6 : 4,
+          vx: 8 + Math.random() * 18, // Smooth horizontal slide
+          vy: (Math.random() - 0.5) * 6,
+          color: Math.random() > 0.3 ? '#00FF66' : '#FF007A',
+          alpha: 0.15 + Math.random() * 0.35
+        });
+      }
+
+      this.startPixelAnimation();
+    }
+
+    startPixelAnimation() {
+      if (this.pixelAnimId) cancelAnimationFrame(this.pixelAnimId);
+
+      let lastTime = performance.now();
+      const loop = (timestamp) => {
+        const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+        lastTime = timestamp;
+
+        if (this.settings?.enabled && this.settings?.slidingPixels !== false) {
+          this.renderSlidingPixels(dt);
+        } else if (this.slidingPixelCtx) {
+          this.slidingPixelCtx.clearRect(0, 0, this.slidingPixelCanvas.width, this.slidingPixelCanvas.height);
+        }
+
+        this.pixelAnimId = requestAnimationFrame(loop);
+      };
+
+      this.pixelAnimId = requestAnimationFrame(loop);
+    }
+
+    renderSlidingPixels(dt) {
+      if (!this.slidingPixelCtx || !this.slidingPixelCanvas) return;
+      const ctx = this.slidingPixelCtx;
+      const w = this.slidingPixelCanvas.width;
+      const h = this.slidingPixelCanvas.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Subtle matrix dot grid
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+      const gridSize = 40;
+      for (let x = 0; x < w; x += gridSize) {
+        for (let y = 0; y < h; y += gridSize) {
+          ctx.fillRect(x, y, 1.5, 1.5);
+        }
+      }
+
+      // Sliding pixels with anti-aliased trails
+      this.pixels.forEach(p => {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+
+        if (p.x > w + 20) p.x = -20;
+        if (p.y > h + 20) p.y = -20;
+        if (p.y < -20) p.y = h + 20;
+
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fillRect(p.x, p.y, p.w, p.h);
+
+        // Motion trail dot
+        ctx.globalAlpha = p.alpha * 0.4;
+        ctx.fillRect(p.x - p.w * 1.5, p.y, p.w, p.h);
+      });
+
+      ctx.globalAlpha = 1;
     }
 
     /* ==========================================================================
-       ACTIVITY & FATIGUE DWELL MONITOR
+       2. SCREEN MONITORING PERMISSION REQUEST (EXPLICIT USER CONSENT)
+       ========================================================================== */
+
+    checkScreenMonitoringPermission() {
+      if (this.settings.screenMonitoringPermission === true) return;
+      if (document.getElementById('zenweb-permission-dialog')) return;
+
+      const dialog = document.createElement('div');
+      dialog.id = 'zenweb-permission-dialog';
+      dialog.className = 'zw-dialog-backdrop';
+      dialog.innerHTML = `
+        <div class="zw-pixel-window zw-permission-card">
+          <div class="zw-pixel-window-header">
+            <span class="zw-pixel-tag">[SYSTEM PROTOCOL // PERMISSION]</span>
+            <span class="zw-pixel-status-green">AWAITING_CONSENT</span>
+          </div>
+          <div class="zw-permission-body">
+            <div class="zw-agent-avatar">🤖</div>
+            <div class="zw-permission-content">
+              <h3>Enable AI Screen Activity Monitor?</h3>
+              <p>
+                To protect your focus and prevent executive freeze, ZenWeb's AI Agent monitors your reading pace and idle dwell time on this tab.
+              </p>
+              <ul class="zw-permission-list">
+                <li><span class="zw-bullet-pink">■</span> <strong>100% On-Device & Private:</strong> Zero screen recording or data transmission.</li>
+                <li><span class="zw-bullet-green">■</span> <strong>Idle Stall Detection:</strong> Offers gentle resets when reading momentum stops.</li>
+                <li><span class="zw-bullet-green">■</span> <strong>Automated Rhythm:</strong> 15-min focus breaks & 30-min water alerts.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="zw-permission-actions">
+            <button class="zw-btn-pixel-primary" id="zw-grant-permission-btn">
+              [✓ ALLOW SCREEN MONITORING]
+            </button>
+            <button class="zw-btn-pixel-secondary" id="zw-deny-permission-btn">
+              [✕ DECLINE / PAUSE]
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(dialog);
+
+      dialog.querySelector('#zw-grant-permission-btn').addEventListener('click', () => {
+        this.settings.screenMonitoringPermission = true;
+        chrome.storage.sync.set({ screenMonitoringPermission: true });
+        dialog.remove();
+        this.showToast("✓ AI Screen Activity Monitor Enabled!");
+        this.updateDockState();
+      });
+
+      dialog.querySelector('#zw-deny-permission-btn').addEventListener('click', () => {
+        this.settings.screenMonitoringPermission = false;
+        chrome.storage.sync.set({ screenMonitoringPermission: false });
+        dialog.remove();
+        this.showToast("Screen monitor paused. You can enable it anytime in the popup.");
+        this.updateDockState();
+      });
+    }
+
+    /* ==========================================================================
+       3. SCREEN ACTIVITY & COGNITIVE IDLE MONITOR
        ========================================================================== */
 
     setupActivityMonitor() {
@@ -689,26 +244,30 @@
         this.lastActivityTime = Date.now();
       };
 
-      ['pointermove', 'keydown', 'click'].forEach(evt => {
+      ['pointermove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evt => {
         window.addEventListener(evt, resetActivity, { passive: true });
       });
 
-      this.fatigueTimerInterval = setInterval(() => {
-        if (!this.settings || !this.settings.enabled || !this.settings.fatigueDetection) return;
+      // Periodically check if user has stalled on screen
+      if (this.activityInterval) clearInterval(this.activityInterval);
+      this.activityInterval = setInterval(() => {
+        if (!this.settings?.enabled) return;
+        if (this.settings.screenMonitoringPermission !== true) return;
+        if (this.settings.screenActivityMonitoring === false) return;
 
         const currentY = window.scrollY;
         const delta = Math.abs(currentY - this.lastScrollY);
+        const idleThresholdMs = (this.settings.idleThresholdMinutes || 3) * 60 * 1000;
 
+        // If stationary on screen
         if (delta < 50) {
           if (!this.scrollStuckStartTime) {
             this.scrollStuckStartTime = Date.now();
           } else {
-            const stuckDurationMs = Date.now() - this.scrollStuckStartTime;
-            const thresholdMs = (this.settings.fatigueThresholdMinutes || 4) * 60 * 1000;
-
-            if (stuckDurationMs >= thresholdMs) {
-              this.showFatiguePrompt();
-              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10m
+            const dwellDuration = Date.now() - this.scrollStuckStartTime;
+            if (dwellDuration >= idleThresholdMs) {
+              this.showIdleAlert();
+              this.scrollStuckStartTime = Date.now() + 600000; // Snooze 10 mins
             }
           }
         } else {
@@ -718,126 +277,358 @@
       }, 10000);
     }
 
-    showFatiguePrompt() {
-      if (document.getElementById('zenweb-fatigue-prompt')) return;
+    showIdleAlert() {
+      if (document.getElementById('zenweb-idle-prompt')) return;
 
       const prompt = document.createElement('div');
-      prompt.id = 'zenweb-fatigue-prompt';
+      prompt.id = 'zenweb-idle-prompt';
+      prompt.className = 'zw-pixel-window zw-idle-toast';
       prompt.innerHTML = `
-        <div class="zw-fatigue-title">
-          <span>🧠</span>
-          <span>Gentle Focus Check-In</span>
+        <div class="zw-pixel-window-header">
+          <span class="zw-pixel-tag">[AI AGENT // IDLE DETECTED]</span>
+          <span class="zw-pixel-close" id="zw-idle-close">✕</span>
         </div>
-        <div class="zw-fatigue-body">
-          You've been hovering on this paragraph for a few minutes. Cognitive fatigue or executive freeze happens! Would you like a 90-second sensory reset?
+        <div class="zw-idle-body">
+          <div style="font-size: 28px;">🧠</div>
+          <div>
+            <strong>Cognitive Pause Detected</strong>
+            <p>You've been lingering on this section for several minutes. Ready for a quick focus reset break?</p>
+          </div>
         </div>
-        <div class="zw-fatigue-actions">
-          <button class="zw-btn-primary" id="zw-fatigue-play-btn">90s Reset</button>
-          <button class="zw-btn-secondary" id="zw-fatigue-breathe-btn">Box Breath</button>
-          <button class="zw-btn-secondary" id="zw-fatigue-dismiss-btn">Still Reading</button>
+        <div class="zw-idle-actions">
+          <button class="zw-btn-pixel-primary" id="zw-idle-game-btn">[🎮 90s FOCUS RESET]</button>
+          <button class="zw-btn-pixel-secondary" id="zw-idle-water-btn">[💧 DRINK WATER]</button>
+          <button class="zw-btn-pixel-ghost" id="zw-idle-keep-reading">[RESUME]</button>
         </div>
       `;
 
       document.body.appendChild(prompt);
 
-      prompt.querySelector('#zw-fatigue-play-btn').addEventListener('click', () => {
+      prompt.querySelector('#zw-idle-close').addEventListener('click', () => prompt.remove());
+      prompt.querySelector('#zw-idle-keep-reading').addEventListener('click', () => prompt.remove());
+
+      prompt.querySelector('#zw-idle-game-btn').addEventListener('click', () => {
         prompt.remove();
-        if (window.ZenWebGames) window.ZenWebGames.launchGame('fluid', 90);
+        if (window.ZenWebGames) window.ZenWebGames.launchGame('random', 90);
       });
 
-      prompt.querySelector('#zw-fatigue-breathe-btn').addEventListener('click', () => {
+      prompt.querySelector('#zw-idle-water-btn').addEventListener('click', () => {
         prompt.remove();
-        if (window.ZenWebGames) window.ZenWebGames.startBreathingTransition();
-      });
-
-      prompt.querySelector('#zw-fatigue-dismiss-btn').addEventListener('click', () => {
-        prompt.remove();
+        this.triggerWaterBreakReminder();
       });
     }
 
     /* ==========================================================================
-       BUBBLY FLOATING QUICK-ACCESS PILL
+       4. 30-MINUTE WATER BREAK REMINDER
        ========================================================================== */
 
-    mountFloatingPill() {
-      if (document.getElementById('zenweb-floating-pill')) return;
+    triggerWaterBreakReminder() {
+      if (document.getElementById('zenweb-water-modal')) return;
 
-      const pill = document.createElement('div');
-      pill.id = 'zenweb-floating-pill';
-      pill.innerHTML = `
-        <button class="zw-pill-btn" id="zw-pill-audio" title="Toggle Ambient Audio">
-          <span>🎧</span>
-          <span class="zw-pill-tooltip">Focus Noise</span>
-        </button>
-        <button class="zw-pill-btn" id="zw-pill-ruler" title="Toggle Frosted Ruler">
-          <span>📏</span>
-          <span class="zw-pill-tooltip">Frosted Ruler</span>
-        </button>
-        <button class="zw-pill-btn" id="zw-pill-bionic" title="Toggle Bionic Reading">
-          <span>📖</span>
-          <span class="zw-pill-tooltip">Bionic Text</span>
-        </button>
-        <button class="zw-pill-btn" id="zw-pill-game" title="Take 90s Focus Break">
+      const modal = document.createElement('div');
+      modal.id = 'zenweb-water-modal';
+      modal.className = 'zw-dialog-backdrop';
+      modal.innerHTML = `
+        <div class="zw-pixel-window zw-water-card">
+          <div class="zw-pixel-window-header">
+            <span class="zw-pixel-tag">[HYDRATION PROTOCOL // 30-MIN]</span>
+            <span class="zw-pixel-status-green">ALERT_ACTIVE</span>
+          </div>
+          <div class="zw-water-body">
+            <div class="zw-water-icon">💧</div>
+            <div class="zw-water-text">
+              <h3>Hydration Check-In</h3>
+              <p>
+                You've been focused for 30 minutes! Drinking water boosts oxygen flow to the prefrontal cortex and resets mental clarity.
+              </p>
+            </div>
+          </div>
+          <div class="zw-water-actions">
+            <button class="zw-btn-pixel-primary" id="zw-logged-water-btn">
+              [✓ I DRANK WATER]
+            </button>
+            <button class="zw-btn-pixel-secondary" id="zw-snooze-water-btn">
+              [SNOOZE 5 MIN]
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      modal.querySelector('#zw-logged-water-btn').addEventListener('click', () => {
+        chrome.runtime?.sendMessage({ type: 'LOG_WATER_BREAK' }, (res) => {
+          this.showToast(`💧 Awesome! Total water breaks logged today: ${res?.count || 1}`);
+        });
+        if (window.ZenWebAudio) window.ZenWebAudio.playZenChime();
+        modal.remove();
+      });
+
+      modal.querySelector('#zw-snooze-water-btn').addEventListener('click', () => {
+        modal.remove();
+        this.showToast("Water reminder snoozed for 5 minutes.");
+      });
+    }
+
+    setupTimers() {
+      // Local fallback in case background alarm is delayed
+      if (this.waterTimerInterval) clearInterval(this.waterTimerInterval);
+      this.waterTimerInterval = setInterval(() => {
+        if (!this.settings?.enabled) return;
+        const now = Date.now();
+        const lastWater = this.settings.lastWaterBreakTimestamp || now;
+        const intervalMs = (this.settings.waterReminderIntervalMinutes || 30) * 60 * 1000;
+
+        if (now - lastWater >= intervalMs) {
+          this.settings.lastWaterBreakTimestamp = now;
+          chrome.storage.sync.set({ lastWaterBreakTimestamp: now });
+          this.triggerWaterBreakReminder();
+        }
+      }, 30000);
+    }
+
+    /* ==========================================================================
+       5. WEBPAGE DATA RESTRUCTURING (BULLET CARDS & CIRCULAR BOLD FONTS)
+       ========================================================================== */
+
+    applyDataRestructuring() {
+      const root = document.documentElement;
+      root.setAttribute('data-zenweb-theme', 'pixel-dark');
+      root.setAttribute('data-zenweb-font', 'circular-digital');
+      root.setAttribute('data-zenweb-restructured', 'true');
+
+      // Top Executive Briefing Card
+      this.injectExecutiveOverview();
+
+      // Restructure dense paragraphs into scannable cards with bullet points
+      const paragraphs = document.querySelectorAll('article p, main p, .content p, [role="main"] p');
+      paragraphs.forEach((p, idx) => {
+        if (p.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], pre, code, nav, footer')) return;
+        if (this.restructuredCardsCache.has(p)) return;
+
+        const text = p.innerText?.trim() || '';
+        // Only restructure paragraphs with substance (>200 chars or >3 sentences)
+        const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)/g);
+        if (sentences && sentences.length >= 3 && text.length > 180) {
+          this.restructuredCardsCache.set(p, p.innerHTML);
+
+          let bulletHTML = '';
+          sentences.forEach(s => {
+            const cleanSentence = s.trim();
+            if (cleanSentence.length > 15) {
+              // Highlight initial words
+              const parts = cleanSentence.split(' ');
+              const lead = parts.slice(0, 3).join(' ');
+              const tail = parts.slice(3).join(' ');
+              bulletHTML += `
+                <li class="zw-bullet-item">
+                  <span class="zw-bullet-marker">■</span>
+                  <span class="zw-bullet-text"><strong>${lead}</strong> ${tail}</span>
+                </li>
+              `;
+            }
+          });
+
+          p.innerHTML = `
+            <div class="zw-restructured-card">
+              <div class="zw-card-pill-row">
+                <span class="zw-pixel-tag">[BLOCK // 0${(idx % 9) + 1}]</span>
+                <span class="zw-card-meta">${sentences.length} SCANNABLE POINTS</span>
+              </div>
+              <ul class="zw-bullet-list">
+                ${bulletHTML}
+              </ul>
+            </div>
+          `;
+        }
+      });
+    }
+
+    removeDataRestructuring() {
+      const root = document.documentElement;
+      root.removeAttribute('data-zenweb-theme');
+      root.removeAttribute('data-zenweb-font');
+      root.removeAttribute('data-zenweb-restructured');
+
+      document.getElementById('zenweb-executive-card')?.remove();
+
+      this.restructuredCardsCache.forEach((origHTML, el) => {
+        if (el && el.parentNode) {
+          el.innerHTML = origHTML;
+        }
+      });
+      this.restructuredCardsCache.clear();
+    }
+
+    injectExecutiveOverview() {
+      if (document.getElementById('zenweb-executive-card')) return;
+
+      const mainEl = document.querySelector('article, main, [role="main"]') || document.body;
+      const cleanText = this.extractCleanText(mainEl);
+      if (cleanText.split(/\s+/).length < 200) return;
+
+      const card = document.createElement('div');
+      card.id = 'zenweb-executive-card';
+      card.className = 'zw-pixel-window zw-overview-window';
+      card.innerHTML = `
+        <div class="zw-pixel-window-header">
+          <div class="zw-overview-header-left">
+            <span class="zw-pixel-tag">[AI BRIEFING // EXECUTIVE OVERVIEW]</span>
+            <span class="zw-pixel-status-green">RESTRUCTURED</span>
+          </div>
+          <span class="zw-pixel-close" id="zw-overview-close">✕</span>
+        </div>
+        <div class="zw-overview-body">
+          <div class="zw-overview-badge-row">
+            <span class="zw-badge-accent-pink">CORE TAKEAWAYS</span>
+            <span style="font-size:11px; color:#8f96a3;">High-visibility scannable mode</span>
+          </div>
+          <ul class="zw-overview-bullets" id="zw-overview-list">
+            <li class="zw-overview-bullet-loading">Synthesizing key digital takeaways...</li>
+          </ul>
+        </div>
+      `;
+
+      if (mainEl.firstChild) {
+        mainEl.insertBefore(card, mainEl.firstChild);
+      } else {
+        mainEl.appendChild(card);
+      }
+
+      card.querySelector('#zw-overview-close').addEventListener('click', () => card.remove());
+
+      if (window.ZenWebAI) {
+        window.ZenWebAI.generate3BulletSummary(cleanText).then(bullets => {
+          const list = card.querySelector('#zw-overview-list');
+          if (list) {
+            list.innerHTML = bullets.map((b, i) => `
+              <li class="zw-overview-bullet-item">
+                <span class="zw-bullet-num">0${i + 1}</span>
+                <span>${b}</span>
+              </li>
+            `).join('');
+          }
+        });
+      }
+    }
+
+    /* ==========================================================================
+       6. FLOATING DIGITAL DOCK WIDGET
+       ========================================================================== */
+
+    mountFloatingDock() {
+      if (document.getElementById('zenweb-dock')) return;
+
+      const dock = document.createElement('div');
+      dock.id = 'zenweb-dock';
+      dock.className = 'zw-floating-dock';
+      dock.innerHTML = `
+        <button class="zw-dock-btn" id="zw-dock-game" title="Take 90s Focus Reset Game">
           <span>🎮</span>
-          <span class="zw-pill-tooltip">90s Reset</span>
+          <span class="zw-dock-label">RESET</span>
         </button>
-        <button class="zw-pill-btn" id="zw-pill-sidepanel" title="AI Co-Pilot Panel">
-          <span>✨</span>
-          <span class="zw-pill-tooltip">AI Co-Pilot</span>
+        <button class="zw-dock-btn" id="zw-dock-water" title="Hydration Check-in">
+          <span>💧</span>
+          <span class="zw-dock-label">WATER</span>
+        </button>
+        <button class="zw-dock-btn" id="zw-dock-restructure" title="Toggle Bullet Restructuring">
+          <span>⚡</span>
+          <span class="zw-dock-label">CARDS</span>
+        </button>
+        <button class="zw-dock-btn" id="zw-dock-agent" title="AI Screen Activity Monitor">
+          <span>🤖</span>
+          <span class="zw-dock-label" id="zw-dock-agent-label">AGENT</span>
         </button>
       `;
 
-      document.body.appendChild(pill);
-      this.floatingPillEl = pill;
+      document.body.appendChild(dock);
 
-      // Audio toggle
-      const audioBtn = pill.querySelector('#zw-pill-audio');
-      audioBtn.addEventListener('click', () => {
-        if (!window.ZenWebAudio) return;
-        if (window.ZenWebAudio.isPlaying) {
-          window.ZenWebAudio.stop();
-          audioBtn.classList.remove('zw-active');
+      dock.querySelector('#zw-dock-game').addEventListener('click', () => {
+        if (window.ZenWebGames) window.ZenWebGames.launchGame('random', 90);
+      });
+
+      dock.querySelector('#zw-dock-water').addEventListener('click', () => {
+        this.triggerWaterBreakReminder();
+      });
+
+      dock.querySelector('#zw-dock-restructure').addEventListener('click', () => {
+        this.settings.dataRestructuring = !this.settings.dataRestructuring;
+        chrome.storage.sync.set({ dataRestructuring: this.settings.dataRestructuring });
+        if (this.settings.dataRestructuring) {
+          this.applyDataRestructuring();
+          this.showToast("✓ Webpage data restructured into scannable bullet cards!");
         } else {
-          window.ZenWebAudio.start(this.settings.soundEngine?.type || 'brown');
-          audioBtn.classList.add('zw-active');
+          this.removeDataRestructuring();
+          this.showToast("Original webpage text restored.");
         }
       });
 
-      // Ruler toggle
-      const rulerBtn = pill.querySelector('#zw-pill-ruler');
-      rulerBtn.addEventListener('click', () => {
-        this.settings.readingRuler = !this.settings.readingRuler;
-        rulerBtn.classList.toggle('zw-active', this.settings.readingRuler);
-        this.updateRulerVisibility();
-        chrome.storage?.sync?.set({ readingRuler: this.settings.readingRuler });
-      });
-
-      // Bionic toggle
-      const bionicBtn = pill.querySelector('#zw-pill-bionic');
-      bionicBtn.addEventListener('click', () => {
-        this.settings.bionicReading = !this.settings.bionicReading;
-        bionicBtn.classList.toggle('zw-active', this.settings.bionicReading);
-        if (this.settings.bionicReading) {
-          this.enableBionicReading();
+      dock.querySelector('#zw-dock-agent').addEventListener('click', () => {
+        if (this.settings.screenMonitoringPermission !== true) {
+          this.checkScreenMonitoringPermission();
         } else {
-          this.disableBionicReading();
+          this.settings.screenActivityMonitoring = !this.settings.screenActivityMonitoring;
+          chrome.storage.sync.set({ screenActivityMonitoring: this.settings.screenActivityMonitoring });
+          this.updateDockState();
+          this.showToast(this.settings.screenActivityMonitoring
+            ? "AI Screen Activity Monitor: ACTIVE"
+            : "AI Screen Activity Monitor: PAUSED");
         }
-        chrome.storage?.sync?.set({ bionicReading: this.settings.bionicReading });
       });
 
-      // Game launcher
-      pill.querySelector('#zw-pill-game').addEventListener('click', () => {
-        if (window.ZenWebGames) window.ZenWebGames.launchGame('fluid', 90);
-      });
+      this.updateDockState();
+    }
 
-      // Side panel
-      pill.querySelector('#zw-pill-sidepanel').addEventListener('click', () => {
-        chrome.runtime?.sendMessage({ type: 'OPEN_SIDE_PANEL' });
-      });
+    updateDockState() {
+      const dock = document.getElementById('zenweb-dock');
+      if (!dock) return;
+
+      const agentBtn = dock.querySelector('#zw-dock-agent');
+      const agentLabel = dock.querySelector('#zw-dock-agent-label');
+
+      if (this.settings.screenMonitoringPermission && this.settings.screenActivityMonitoring !== false) {
+        agentBtn?.classList.add('zw-dock-active');
+        if (agentLabel) agentLabel.textContent = 'ACTIVE';
+      } else {
+        agentBtn?.classList.remove('zw-dock-active');
+        if (agentLabel) agentLabel.textContent = 'PAUSED';
+      }
     }
 
     /* ==========================================================================
-       UTILITIES & TEXT EXTRACTION
+       7. STATE APPLICATION & REVERSION
+       ========================================================================== */
+
+    applyActiveState() {
+      if (this.settings.dataRestructuring !== false) {
+        this.applyDataRestructuring();
+      }
+
+      if (this.slidingPixelCanvas) {
+        this.slidingPixelCanvas.style.display = 'block';
+      }
+
+      const dock = document.getElementById('zenweb-dock');
+      if (dock) dock.style.display = 'flex';
+    }
+
+    applyDisabledState() {
+      this.removeDataRestructuring();
+
+      if (this.slidingPixelCanvas) {
+        this.slidingPixelCanvas.style.display = 'none';
+      }
+
+      const dock = document.getElementById('zenweb-dock');
+      if (dock) dock.style.display = 'none';
+
+      document.getElementById('zenweb-idle-prompt')?.remove();
+      document.getElementById('zenweb-water-modal')?.remove();
+      document.getElementById('zenweb-game-modal')?.remove();
+    }
+
+    /* ==========================================================================
+       UTILITIES & MESSAGING
        ========================================================================== */
 
     extractCleanText(container = document.body) {
@@ -846,44 +637,63 @@
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }
 
-    /* ==========================================================================
-       RUNTIME MESSAGING DISPATCHER
-       ========================================================================== */
+    showToast(msg) {
+      const existing = document.getElementById('zenweb-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'zenweb-toast';
+      toast.className = 'zw-toast-pill';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('zw-fade-out');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
 
     setupMessageListeners() {
       chrome.runtime?.onMessage.addListener((msg, sender, sendResponse) => {
         switch (msg.type) {
           case 'UPDATE_SETTINGS':
             this.settings = { ...this.settings, ...msg.settings };
-
-            // Full State Dispatch
             if (this.settings.enabled === false) {
               this.applyDisabledState();
             } else {
               this.applyActiveState();
             }
-
+            this.updateDockState();
             sendResponse({ success: true });
             break;
 
-          case 'LAUNCH_MICRO_BREAK':
+          case 'TRIGGER_MINIGAME_BREAK':
             if (window.ZenWebGames) {
-              window.ZenWebGames.launchGame(msg.gameType || 'fluid', msg.duration || 90);
+              window.ZenWebGames.launchGame(msg.game || 'random', msg.duration || 90);
             }
             sendResponse({ success: true });
             break;
 
-          case 'TRIGGER_SELECTION_ACTION':
-            if (msg.action === 'simplify') {
-              window.ZenWebAI.simplifyText(msg.selectionText).then(res => {
-                this.renderInlineResult("Plain-English Rewrite", res);
-              });
-            } else if (msg.action === 'neutralize') {
-              window.ZenWebAI.neutralizeTone(msg.selectionText).then(res => {
-                this.renderInlineResult("Emotionally Neutralized Statement", res);
-              });
-            }
+          case 'TRIGGER_WATER_REMINDER':
+            this.triggerWaterBreakReminder();
             sendResponse({ success: true });
+            break;
+
+          case 'REQUEST_PERMISSION_DIALOG':
+            this.settings.screenMonitoringPermission = false;
+            this.checkScreenMonitoringPermission();
+            sendResponse({ success: true });
+            break;
+
+          case 'TOGGLE_RESTRUCTURE':
+            this.settings.dataRestructuring = !this.settings.dataRestructuring;
+            chrome.storage.sync.set({ dataRestructuring: this.settings.dataRestructuring });
+            if (this.settings.dataRestructuring) {
+              this.applyDataRestructuring();
+            } else {
+              this.removeDataRestructuring();
+            }
+            sendResponse({ success: true, active: this.settings.dataRestructuring });
             break;
 
           case 'EXTRACT_PAGE_CONTENT':
@@ -893,27 +703,11 @@
               url: location.href
             });
             break;
-
-          case 'PLAY_AMBIENT_AUDIO':
-            if (window.ZenWebAudio) {
-              window.ZenWebAudio.start(msg.audioType);
-              if (msg.volume !== undefined) window.ZenWebAudio.setVolume(msg.volume);
-            }
-            sendResponse({ success: true });
-            break;
-
-          case 'STOP_AMBIENT_AUDIO':
-            if (window.ZenWebAudio) {
-              window.ZenWebAudio.stop();
-            }
-            sendResponse({ success: true });
-            break;
         }
       });
     }
   }
 
-  // Self-mount on DOM Ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => new ZenWebContent());
   } else {

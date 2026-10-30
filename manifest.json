@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "ZenWeb - ADHD & Sensory Cognitive Copilot",
-  "version": "1.0.0",
-  "description": "Production-grade neurodivergent cognitive design extension transforming websites into calm, accessible, dopamine-balanced environments.",
+  "name": "ZenWeb - Pixel Sensory AI Copilot",
+  "version": "2.1.0",
+  "description": "Transforms ordinary webpages into an animated digital masterpiece with screen activity monitoring, 15-min focus reset mini-games, and 30-min water break alerts.",
   "permissions": [
     "storage",
     "activeTab",
     "scripting",
     "sidePanel",
-    "idle"
+    "idle",
+    "alarms"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -24,7 +25,7 @@
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     },
-    "default_title": "ZenWeb Control Center"
+    "default_title": "ZenWeb Control Deck"
   },
   "side_panel": {
     "default_path": "sidepanel.html"

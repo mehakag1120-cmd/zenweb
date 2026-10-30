@@ -3,255 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenWeb Sensory & Contrast Verification Suite</title>
+  <title>ZenWeb - Pixel Sensory AI Verification Deck</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    /* Baseline unstyled simulated webpage */
+    /* Baseline test environment */
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #ffffff;
-      color: #111111;
-      line-height: 1.5;
+      padding: 0;
+      background: #0a0a0e;
+      color: #f2f4f8;
+      font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
     .demo-nav {
-      background: #121620;
-      color: #fff;
-      padding: 14px 28px;
+      background: #12131a;
+      border-bottom: 2px solid #262835;
+      padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .demo-container {
-      display: flex;
-      max-width: 1200px;
-      margin: 24px auto;
-      gap: 28px;
-      padding: 0 20px;
-    }
-
-    .demo-main {
-      flex: 3;
-    }
-
-    .demo-sidebar {
-      flex: 1;
+      max-width: 1140px;
+      margin: 32px auto;
+      padding: 0 24px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 32px;
     }
 
-    /* Annoying ads to test distraction shield */
-    .ad, .advertisement, .sticky-banner {
-      background: #fff9c4;
-      border: 2px dashed #fbc02d;
-      padding: 18px;
-      text-align: center;
-      font-weight: bold;
-      color: #e65100;
+    /* Verification Console Window */
+    .demo-console {
+      background: #12131a;
+      border: 2px solid #262835;
       border-radius: 8px;
+      padding: 24px;
+      box-shadow: 6px 6px 0px #000;
     }
 
-    .flashing-box {
-      background: #ff1744;
-      color: white;
-      padding: 14px;
-      text-align: center;
-      font-weight: bold;
-      border-radius: 8px;
-      animation: flash-anim 0.8s infinite alternate;
-    }
-
-    @keyframes flash-anim {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.03); opacity: 0.6; }
-    }
-
-    article p {
-      font-size: 16.5px;
-      margin-bottom: 22px;
-      line-height: 1.6;
-    }
-
-    .demo-test-card {
-      background: #ede7f6;
-      border: 1.5px solid #7c4dff;
-      border-radius: 16px;
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      box-shadow: 0 4px 16px rgba(124, 77, 255, 0.12);
-    }
-
-    .demo-test-card h3 {
-      margin: 0 0 8px 0;
-      color: #4a148c;
-      font-size: 18px;
-    }
-
-    .demo-btn-group {
+    .demo-console-head {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #262835;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+
+    .demo-btn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
       margin-top: 14px;
     }
 
     .demo-btn {
-      background: #7c4dff;
-      color: white;
-      border: none;
-      padding: 9px 16px;
-      border-radius: 10px;
-      cursor: pointer;
+      all: initial;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      background: #181924;
+      border: 1.5px solid #262835;
+      color: #ffffff;
+      font-family: 'Space Mono', monospace;
+      font-size: 11.5px;
       font-weight: 700;
-      font-size: 13px;
-      transition: all 0.2s ease;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #000;
+      transition: all 0.15s ease;
+      text-align: center;
     }
 
     .demo-btn:hover {
-      background: #651fff;
-      transform: translateY(-1px);
+      border-color: #00FF66;
+      color: #00FF66;
+      transform: translate(-1px, -1px);
     }
 
-    .demo-btn-secondary {
-      background: #ffffff;
-      color: #333333;
-      border: 1px solid #cccccc;
+    .demo-btn-pink:hover {
+      border-color: #FF007A;
+      color: #FF007A;
     }
 
-    .demo-btn-secondary:hover {
-      background: #f5f5f5;
+    .demo-article {
+      background: #12131a;
+      border: 2px solid #262835;
+      border-radius: 8px;
+      padding: 36px 40px;
+      box-shadow: 6px 6px 0px #000;
     }
 
-    .demo-contrast-box {
+    .demo-article h1 {
+      font-family: 'Chivo', sans-serif;
+      font-size: 32px;
+      color: #ffffff;
+      margin-top: 0;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .demo-meta {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: #8f96a3;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .demo-ad-box {
+      background: rgba(255, 0, 122, 0.08);
+      border: 1.5px dashed #FF007A;
+      color: #FF007A;
       padding: 16px;
-      margin: 18px 0;
-      border-radius: 10px;
-      border: 1px solid #ddd;
+      text-align: center;
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      margin: 24px 0;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
+  <!-- Header -->
   <header class="demo-nav">
-    <div style="font-weight: 800; font-size: 19px;">TechScience Global Journal</div>
-    <div style="font-size: 13px; opacity: 0.8;">Simulated Live Web Environment</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span style="font-size:22px; color:#00FF66;">⚡</span>
+      <strong style="font-family:'Chivo', sans-serif; font-size:18px; letter-spacing:0.04em;">ZENWEB // INFERENCE & RESEARCH JOURNAL</strong>
+    </div>
+    <div style="font-family:'Space Mono', monospace; font-size:11px; color:#00FF66;">
+      [SYSTEM: VERIFICATION ENVIRONMENT]
+    </div>
   </header>
 
-  <!-- Sticky noisy banner to test Distraction Shield -->
-  <div class="sticky-banner">
-    🚨 FLASH SALE! 90% OFF ON NOISY SUBSCRIPTIONS! CLICK HERE BEFORE TIME EXPIRES! 🚨
-  </div>
-
   <div class="demo-container">
-    <main class="demo-main">
 
-      <!-- Interactive Verification Suite -->
-      <section class="demo-test-card">
-        <h3>🧪 ZenWeb Interactive Verification Suite</h3>
-        <p style="margin: 0; font-size: 13.5px; color: #444;">
-          Test real-time controls, contrast overrides, frosted glass reading ruler, and lossless on/off restoration:
-        </p>
-
-        <div class="demo-btn-group">
-          <!-- Theme triggers -->
-          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'deep-contrast')">🌌 Deep Focus Contrast</button>
-          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'pastel')">🌸 Calm Pastel</button>
-          <button class="demo-btn" onclick="document.documentElement.setAttribute('data-zenweb-theme', 'sepia')">📜 Warm Sepia</button>
-          <button class="demo-btn demo-btn-secondary" onclick="document.documentElement.removeAttribute('data-zenweb-theme')">Default Colors</button>
-
-          <!-- Ruler trigger -->
-          <button class="demo-btn" onclick="toggleRuler()" style="background: #29b6f6;">📏 Toggle Frosted Ruler</button>
-
-          <!-- Audio triggers -->
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('brown')">🎧 Brown Noise</button>
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.start('rain')">🌧️ Rain</button>
-          <button class="demo-btn" onclick="window.ZenWebAudio && window.ZenWebAudio.stop()" style="background:#d32f2f;">⏹️ Stop Audio</button>
-
-          <!-- Micro-breaks -->
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('fluid', 90)" style="background:#00c853;">🎮 90s Zen Fluid</button>
-          <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.startBreathingTransition()" style="background:#00897b;">🧘 30s Box Breath</button>
+    <!-- Interactive Console -->
+    <section class="demo-console">
+      <div class="demo-console-head">
+        <div>
+          <span class="zw-pixel-tag">[TEST SUITE // CONTROLS]</span>
+          <h2 style="font-family:'Chivo', sans-serif; font-size:18px; margin:4px 0 0 0; color:#fff;">
+            ZenWeb v2.1 Interactive Feature Deck
+          </h2>
         </div>
-      </section>
-
-      <article>
-        <!-- Clickbait headline to test Tone Neutralizer -->
-        <h1 id="article-headline" style="font-size: 32px; color: #b71c1c; font-weight: 800;">
-          CATASTROPHIC DISASTER SHOCKS ENTIRE TECH INDUSTRY: DOOMSDAY SCENARIO IMMINENT AS CHAOS ERUPTS!
-        </h1>
-
-        <p style="font-size: 14px; color: #666;">
-          Published by Dr. Elena Vance | 7-minute read | Cognitive Neuroscience Division
-        </p>
-
-        <!-- Simulated flashing banner -->
-        <div class="flashing-box">
-          ⚠️ URGENT: MIND-BLOWING REVELATION INSIDE! (Flashbang Suppressor will freeze this)
-        </div>
-
-        <!-- Hardcoded black inline style text to verify Deep Contrast text color override! -->
-        <div class="demo-contrast-box" style="color: #000000; background-color: #ffffff;">
-          <strong style="color: #050505;">Hardcoded Black Text Verification Container:</strong>
-          <p style="color: rgb(10, 10, 10); margin-top: 6px;">
-            This paragraph has explicit inline style <code>color: rgb(10,10,10)</code>. In previous versions, switching to dark theme left this text black against a dark background! In ZenWeb v2.0, high-specificity rules and inline cleaners ensure this text turns into brilliant, legible warm cream text (<code>#f0f6fc</code>)!
-          </p>
-        </div>
-
-        <!-- Long academic wall of text for Smart Chunking & Bionic Reading -->
-        <p>
-          The fundamental paradigm shift in contemporary web interfaces has precipitated an urgent re-evaluation of cognitive architecture in neurodivergent populations. In light of the fact that commercial websites aggressively inundate digital users with sensory dissonance, individuals with Attention-Deficit/Hyperactivity Disorder (ADHD) and Autism Spectrum Conditions (ASC) experience heightened vulnerability to executive dysfunction freeze, working memory exhaustion, and sensory overstimulation. Empirical findings consistently demonstrate that uncontrolled typographical line lengths, asynchronous visual animations, and aggressive contrast boundaries systematically diminish cognitive comprehension.
-        </p>
-
-        <p>
-          In order to ameliorate these attentional impediments, technological interventions must prioritize ambient sensory grounding rather than relying solely on blunt ad blocking. Prior to the utilization of hardware-accelerated rendering pipelines, web applications routinely failed to accommodate the neurodivergent scanning patterns characterized by rapid, intermittent saccadic fixations. Nevertheless, by employing algorithmic lead-weight typography—commonly known as bionic reading—the neural pathways responsible for linguistic decipherment receive distinct visual anchors that truncate ocular dwell latency while preserving deep semantic retention.
-        </p>
-
-        <p>
-          Furthermore, auditory cognitive anchoring represents an underutilized modality for sustaining prolonged executive focus. Traditional acoustic masking mechanisms routinely rely upon white noise algorithms that feature an elevated spectral energy distribution within the higher frequency registers. Such high-frequency acoustic profiles regularly precipitate sensory agitation and auditory fatigue in autistic individuals possessing acoustic hypersensitivity. Conversely, stochastic brownian integration produces a 6-decibel per octave spectral attenuation curve that mimics natural subterranean resonance. This low-frequency dominance effectively suppresses erratic ambient phonemes without instigating cognitive arousal.
-        </p>
-
-        <p>
-          Moreover, the phenomenon of ADHD hyperfixation warrants rigorous architectural safeguards during micro-break interventions. When an executive freeze occurs, standard gamified interventions frequently trigger unregulated dopamine seeking behaviors, thereby trapping the user in a perpetual diversionary cycle. To circumvent this vulnerability, controlled micro-gaming environments must impose immutable chronological thresholds, followed by physiological vagal nerve resetting protocols such as four-by-four box respiration, culminating in strict cooling latencies.
-        </p>
-
-        <!-- Another ad banner to test Distraction Shield -->
-        <div class="ad">
-          SPONSORED ADVERTISEMENT: BUY OUR HIGH-OCTANE ENERGY DRINK NOW!
-        </div>
-
-        <p>
-          In conclusion, the convergence of privacy-first on-device artificial intelligence, hardware-accelerated compositor thread manipulation, and neurodivergent-centered sensory ergonomics establishes an entirely unprecedented benchmark for digital accessibility. Websites cease to be chaotic battlegrounds for finite dopamine reserves; instead, they are transformed into tranquil, predictable, and cognitively regenerative environments.
-        </p>
-      </article>
-    </main>
-
-    <!-- Sidebar with ads and autoplay recommendations -->
-    <aside class="demo-sidebar">
-      <div class="ad">
-        PROMOTED: You Won't Believe What Happened Next! (Ad Block Test)
+        <span class="zw-pixel-status-green">ONLINE</span>
       </div>
 
-      <div style="background: #fff3e0; border: 1px solid #ffe0b2; padding: 14px; border-radius: 10px;">
-        <h4 style="margin: 0 0 8px 0; color: #e65100;">Autoplay Video Container</h4>
-        <p style="font-size: 13px; margin: 0 0 10px 0;">This noisy container is suppressed when ZenWeb's Distraction Shield is enabled.</p>
-        <video autoplay muted loop style="width: 100%; border-radius: 6px; background: #000;">
-          <source src="data:video/mp4;base64," type="video/mp4">
-        </video>
+      <p style="font-size:13.5px; color:#8f96a3; margin:0 0 12px 0;">
+        Trigger each core subsystem directly or use the ZenWeb extension icon & bottom dock:
+      </p>
+
+      <div class="demo-btn-grid">
+        <!-- Mini-Games -->
+        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('dino', 90)">
+          <span>🦖</span> [PLAY DINO JUMP]
+        </button>
+        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('tetris', 90)">
+          <span>🧱</span> [PLAY TETRIS MATRIX]
+        </button>
+        <button class="demo-btn" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('whack', 90)">
+          <span>🎯</span> [WHACK-A-DINO]
+        </button>
+        <button class="demo-btn demo-btn-pink" onclick="window.ZenWebGames && window.ZenWebGames.launchGame('random', 90)">
+          <span>🎲</span> [15-MIN RANDOM RESET]
+        </button>
+
+        <!-- Hydration & Monitoring -->
+        <button class="demo-btn demo-btn-pink" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.triggerWaterBreakReminder()">
+          <span>💧</span> [30-MIN WATER ALERT]
+        </button>
+        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.checkScreenMonitoringPermission()">
+          <span>🤖</span> [AGENT PERMISSION]
+        </button>
+
+        <!-- Data Restructuring -->
+        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.applyDataRestructuring()">
+          <span>⚡</span> [RESTRUCTURE DATA]
+        </button>
+        <button class="demo-btn" onclick="window.ZenWebContentInstance && window.ZenWebContentInstance.removeDataRestructuring()" style="color:#8f96a3;">
+          <span>✕</span> [RESTORE ORIGINAL]
+        </button>
+      </div>
+    </section>
+
+    <!-- Simulated Article to demonstrate Data Restructuring -->
+    <article class="demo-article">
+      <div class="demo-meta">
+        <span>AUTHOR: PHILIP KIELY</span>
+        <span>•</span>
+        <span>TOPIC: PRODUCTION INFERENCE ARCHITECTURE</span>
+        <span>•</span>
+        <span>READ TIME: 8 MIN</span>
       </div>
 
-      <div class="advertisement">
-        SUBSCRIBE TO OUR 200 EMAILS PER DAY NEWSLETTER!
+      <h1>System Optimization and Latency Bounds in Distributed AI Inference Engines</h1>
+
+      <div class="demo-ad-box">
+        🚨 NOISY COMMERCIAL BANNER: SPONSORED PROMOTION DETECTED (SUPPRESSED BY DISTRACTION SHIELD)
       </div>
-    </aside>
+
+      <!-- Long dense paragraph to demonstrate conversion into scannable bullet cards -->
+      <p>
+        The performance characteristics of transformer-based inference workloads diverge substantially from traditional state-free web applications. Because modern large language models require gigabytes of high-bandwidth memory simply to preserve key-value caches across multi-turn generation steps, memory bandwidth saturation represents the primary operational bottleneck rather than raw compute FLOPS. When request concurrency scales unpredictably in enterprise environments, standard serving runtimes experience catastrophic queue latency escalation and memory fragmentation.
+      </p>
+
+      <p>
+        To circumvent these physical hardware constraints, contemporary production frameworks implement continuous batching mechanisms combined with page-allocated key-value cache partitioning. By decoupling token generation cycles from monolithic static batch boundaries, inference servers maximize tensor core compute occupancy while sustaining predictable time-to-first-token response latencies. Empirical measurements across production clusters demonstrate that continuous token scheduling improves overall system throughput by 300 to 450 percent while dramatically reducing GPU idle duty cycles.
+      </p>
+
+      <p>
+        Furthermore, cognitive endurance in technical research demands structured informational hierarchy and rhythmic physiological pacing. Prolonged immersion in monolithic documentation precipitates attentional degradation, micro-saccadic ocular strain, and executive function stalls. By restructuring dense prose into scannable bullet cards with highlighted operative terms, digital environments align with neurodivergent scanning patterns, truncating cognitive latency while cementing conceptual recall.
+      </p>
+
+      <div class="demo-ad-box">
+        ⚠️ NEWSLETTER POPUP SIMULATION: SUBSCRIBE NOW (WILL BE CONCEALED)
+      </div>
+
+      <p>
+        Equally vital is the enforcement of scheduled cognitive interruptions. Neural pathways dedicated to analytical problem solving undergo rapid fatigue when denied brief, dopamine-balanced resets. Integrating 15-minute micro-breaks with kinetic pixel games—such as dino jumping or tetromino spatial alignment—resets prefrontal cortex saturation, while 30-minute hydration protocols maintain optimal cerebral oxygenation.
+      </p>
+    </article>
+
   </div>
 
+  <!-- Expose instance for demo script hooks -->
+  <script src="audio-engine.js"></script>
+  <script src="ai-engine.js"></script>
+  <script src="game-engine.js"></script>
+  <script src="content.js"></script>
   <script>
-    function toggleRuler() {
-      const ruler = document.getElementById('zenweb-ruler-overlay');
-      if (ruler) {
-        ruler.classList.toggle('zw-active');
-      }
-    }
+    // Hook for direct demo buttons
+    window.addEventListener('DOMContentLoaded', () => {
+      // Find the initialized content instance
+      setTimeout(() => {
+        if (window.__ZENWEB_CONTENT_INSTANCE__) {
+          window.ZenWebContentInstance = window.__ZENWEB_CONTENT_INSTANCE__;
+        }
+      }, 400);
+    });
   </script>
 </body>
 </html>

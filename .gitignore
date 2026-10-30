@@ -8,6 +8,17 @@ ehthumbs.db
 Thumbs.db
 [Dd]esktop.ini
 
+# Python Virtual Environments & Environments
+venv/
+.venv/
+env/
+.env
+.env.*
+!.env.example
+ENV/
+env.bak/
+venv.bak/
+
 # Node.js & Dependencies
 node_modules/
 npm-debug.log*
@@ -37,13 +48,9 @@ out/
 *.crx
 *.pem
 
-# Environment & Secrets
-.env
-.env.local
-.env.*.local
-
 # Temporary / Scratch Files
 tmp/
 temp/
 *.tmp
+scrape_*.js
 rename.js

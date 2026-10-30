@@ -3,421 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenWeb Sensory Copilot</title>
+  <title>ZenWeb Pixel Deck</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <div class="zw-popup-app">
+  <div class="zw-deck-app">
     <!-- Header / Brand -->
-    <header class="zw-header">
-      <div class="zw-brand">
-        <div class="zw-brand-icon-wrap">
-          <span class="zw-brand-icon">✨</span>
-        </div>
-        <div class="zw-brand-text">
-          <h1>ZenWeb</h1>
-          <span class="zw-brand-sub">Neurodivergent Sensory Copilot</span>
+    <header class="zw-deck-header">
+      <div class="zw-deck-brand">
+        <div class="zw-deck-icon">⚡</div>
+        <div>
+          <h1>ZENWEB</h1>
+          <span class="zw-deck-sub">PIXEL SENSORY AI DECK</span>
         </div>
       </div>
-      <div class="zw-header-actions">
-        <button class="zw-icon-btn" id="btn-header-sidepanel" title="Open AI Co-Pilot Panel">🤖</button>
+      <div class="zw-master-toggle-wrap">
+        <span class="zw-badge-status" id="master-status-badge">ONLINE</span>
+        <label class="zw-pixel-switch" title="Toggle ZenWeb Master State">
+          <input type="checkbox" id="master-toggle" checked>
+          <span class="zw-pixel-slider"></span>
+        </label>
       </div>
     </header>
 
-    <!-- Master Switch Hero Card (Clear On/Off Indicator) -->
-    <section class="zw-master-card" id="zw-master-card">
-      <div class="zw-master-info">
-        <div class="zw-status-indicator">
-          <span class="zw-status-dot" id="master-status-dot"></span>
-          <span class="zw-status-text" id="master-status-text">ZenWeb is Active</span>
+    <main class="zw-deck-body" id="zw-deck-controls">
+      <!-- 1. DATA RESTRUCTURING ENGINE -->
+      <section class="zw-deck-section">
+        <div class="zw-section-title-row">
+          <span class="zw-sec-tag">[01 // RESTRUCTURE]</span>
+          <span class="zw-badge-accent-pink">ENGAGEMENT</span>
         </div>
-        <p class="zw-master-desc" id="master-status-sub">Transforming site into a calm, accessible space</p>
-      </div>
-      <label class="zw-bubbly-switch" title="Toggle ZenWeb On/Off">
-        <input type="checkbox" id="master-toggle" checked>
-        <span class="zw-bubbly-slider"></span>
-      </label>
-    </section>
-
-    <!-- Navigation Tabs (21stdev.com Bubbly Pills) -->
-    <nav class="zw-tabs" role="tablist">
-      <button class="zw-tab active" data-tab="theme" role="tab">🎨 Sensory</button>
-      <button class="zw-tab" data-tab="reading" role="tab">📖 Focus</button>
-      <button class="zw-tab" data-tab="audio" role="tab">🎧 Audio</button>
-      <button class="zw-tab" data-tab="break" role="tab">🎮 Reset</button>
-      <button class="zw-tab" data-tab="ai" role="tab">⚡ AI</button>
-    </nav>
-
-    <!-- Main Container -->
-    <main class="zw-tab-viewport" id="zw-main-controls">
-
-      <!-- TAB 1: SENSORY & THEMES -->
-      <div class="zw-tab-content active" id="tab-theme">
-        <div class="zw-section-header">
-          <span class="zw-section-title">Color Palette & Contrast</span>
-          <span class="zw-badge zw-badge-accent">Eye Strain Relief</span>
+        <div class="zw-card-row">
+          <div class="zw-card-meta">
+            <strong>Restructure Page into Bullet Cards</strong>
+            <p>Larger circular font, scannable cards & bold key points</p>
+          </div>
+          <label class="zw-pixel-switch-sm">
+            <input type="checkbox" id="restructure-toggle" checked>
+            <span class="zw-pixel-slider-sm"></span>
+          </label>
         </div>
-
-        <div class="zw-theme-grid">
-          <button class="zw-theme-card active" data-theme="pastel">
-            <div class="zw-theme-swatch zw-swatch-pastel">
-              <span class="zw-swatch-check">✓</span>
-            </div>
-            <strong>Calm Pastel</strong>
-            <small>Lavender & Soft Tones</small>
-          </button>
-
-          <button class="zw-theme-card" data-theme="deep-contrast">
-            <div class="zw-theme-swatch zw-swatch-contrast">
-              <span class="zw-swatch-check">✓</span>
-            </div>
-            <strong>Deep Focus</strong>
-            <small>Obsidian & Cream Text</small>
-          </button>
-
-          <button class="zw-theme-card" data-theme="sepia">
-            <div class="zw-theme-swatch zw-swatch-sepia">
-              <span class="zw-swatch-check">✓</span>
-            </div>
-            <strong>Monochrome</strong>
-            <small>Warm Amber Sepia</small>
-          </button>
-
-          <button class="zw-theme-card" data-theme="none">
-            <div class="zw-theme-swatch zw-swatch-default">
-              <span class="zw-swatch-check">✓</span>
-            </div>
-            <strong>Default</strong>
-            <small>Original Colors</small>
-          </button>
+        <div class="zw-card-row">
+          <div class="zw-card-meta">
+            <strong>Sliding Pixel Background</strong>
+            <p>Baseten-inspired anti-aliased ambient particle canvas</p>
+          </div>
+          <label class="zw-pixel-switch-sm">
+            <input type="checkbox" id="sliding-pixels-toggle" checked>
+            <span class="zw-pixel-slider-sm"></span>
+          </label>
         </div>
+      </section>
 
-        <div class="zw-section-header" style="margin-top: 18px;">
-          <span class="zw-section-title">Dyslexia & Legibility Typography</span>
+      <!-- 2. SCREEN ACTIVITY MONITORING AI AGENT -->
+      <section class="zw-deck-section">
+        <div class="zw-section-title-row">
+          <span class="zw-sec-tag">[02 // SCREEN AI AGENT]</span>
+          <span class="zw-badge-accent-green" id="agent-perm-badge">ACTIVE</span>
         </div>
+        <div class="zw-agent-status-box">
+          <div class="zw-agent-icon">🤖</div>
+          <div class="zw-agent-details">
+            <strong id="agent-status-text">Screen Monitor Active</strong>
+            <p id="agent-status-desc">Observes reading pace & cognitive stalls to trigger timely resets</p>
+          </div>
+        </div>
+        <div class="zw-agent-actions">
+          <button class="zw-btn-deck" id="btn-request-perm">[MANAGE PERMISSION]</button>
+        </div>
+      </section>
 
-        <div class="zw-select-box">
-          <label for="font-select">Font Family</label>
-          <select id="font-select" class="zw-select">
-            <option value="lexend">Lexend (Cognitive Speed & Spacing)</option>
-            <option value="atkinson">Atkinson Hyperlegible (Scannability)</option>
-            <option value="opendyslexic">OpenDyslexic (Weighted Bottoms)</option>
-            <option value="system">Plus Jakarta Sans (Modern Clean)</option>
-            <option value="serif">Classic Editorial Serif</option>
+      <!-- 3. 15-MINUTE FOCUS RESET MINI-GAMES -->
+      <section class="zw-deck-section">
+        <div class="zw-section-title-row">
+          <span class="zw-sec-tag">[03 // 15-MIN RESET MINI-GAMES]</span>
+          <span class="zw-badge-timer" id="next-reset-countdown">15:00</span>
+        </div>
+        <div class="zw-game-picker-row">
+          <label for="game-selector">Active Game:</label>
+          <select id="game-selector" class="zw-deck-select">
+            <option value="random">Randomize (Dino / Tetris / Whack)</option>
+            <option value="dino">Dino Jump (Kinetic Focus)</option>
+            <option value="tetris">Tetris Matrix (Spatial Reset)</option>
+            <option value="whack">Whack-A-Dino (Reaction Burst)</option>
           </select>
         </div>
-
-        <!-- Sensory Toggles -->
-        <div class="zw-card-list">
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">Distraction Shield</span>
-                <span class="zw-pill-badge" id="badge-shield">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Auto-hides noisy banners, sticky ads, and sidebars</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="shield-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">Animation & Flash Suppressor</span>
-                <span class="zw-pill-badge" id="badge-anim">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Freezes motion keyframes, GIFs, and autoplay videos</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="anim-suppress-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">75ch Line Length Cap</span>
-                <span class="zw-pill-badge" id="badge-max-width">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Prevents horizontal ocular fatigue on wide screens</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="max-width-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: READING & FOCUS ACCOMMODATIONS -->
-      <div class="zw-tab-content" id="tab-reading">
-        <div class="zw-card-list">
-
-          <!-- Frosted Glass Reading Ruler -->
-          <div class="zw-toggle-card zw-highlight-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">📏 Frosted Glass Ruler</span>
-                <span class="zw-pill-badge" id="badge-ruler">OFF</span>
-              </div>
-              <p class="zw-toggle-desc">Frosted glass blurs surrounding lines to lock focus onto your current line</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="ruler-toggle">
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <!-- Ruler Height Slider -->
-          <div class="zw-slider-card" id="ruler-slider-container">
-            <div class="zw-slider-head">
-              <span>Focus Aperture Height</span>
-              <span class="zw-slider-bubble" id="ruler-height-val">120px</span>
-            </div>
-            <input type="range" id="ruler-height-slider" min="60" max="240" step="10" value="120" class="zw-range">
-            <div class="zw-slider-sub">Adjust height of the crystal-clear reading lane</div>
-          </div>
-
-          <!-- Bionic Reading -->
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">📖 Bionic Reading Converter</span>
-                <span class="zw-pill-badge" id="badge-bionic">OFF</span>
-              </div>
-              <p class="zw-toggle-desc">Algorithmically bolds word leads to guide ocular fixations</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="bionic-toggle">
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <!-- Smart Chunking -->
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">🧩 Smart Paragraph Chunking</span>
-                <span class="zw-pill-badge" id="badge-chunking">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Divides walls of text into 3-sentence scannable units</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="chunking-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <!-- Last-Read Anchor -->
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">📌 Last-Read Anchor</span>
-                <span class="zw-pill-badge" id="badge-anchor">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Remembers your exact reading spot across reloads & tabs</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="anchor-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: AUDIO FOCUS ENGINE -->
-      <div class="zw-tab-content" id="tab-audio">
-        <div class="zw-audio-hero">
-          <div class="zw-audio-meta">
-            <div class="zw-audio-icon-wrap" id="audio-icon-wrap">🎧</div>
-            <div>
-              <strong>Synthesized Soundscapes</strong>
-              <div style="font-size: 11.5px; color: var(--zw-muted);">Web Audio API (Zero downloads)</div>
-            </div>
-          </div>
-          <button class="zw-bubbly-btn zw-btn-play" id="btn-audio-toggle">Play</button>
-        </div>
-
-        <div class="zw-section-header" style="margin-top: 16px;">
-          <span class="zw-section-title">Acoustic Profiles</span>
-        </div>
-
-        <div class="zw-sound-grid">
-          <button class="zw-sound-card active" data-sound="brown">
-            <span class="zw-sound-icon">🤎</span>
-            <strong>Brown Noise</strong>
-            <small>Low-frequency rumble</small>
-          </button>
-          <button class="zw-sound-card" data-sound="rain">
-            <span class="zw-sound-icon">🌧️</span>
-            <strong>Calm Rain</strong>
-            <small>Pink noise & droplets</small>
-          </button>
-          <button class="zw-sound-card" data-sound="binaural">
-            <span class="zw-sound-icon">🧘</span>
-            <strong>Binaural 432Hz</strong>
-            <small>6Hz Theta flow wave</small>
-          </button>
-        </div>
-
-        <div class="zw-slider-card" style="margin-top: 16px;">
-          <div class="zw-slider-head">
-            <span>Ambient Volume</span>
-            <span class="zw-slider-bubble" id="audio-vol-val">25%</span>
-          </div>
-          <input type="range" id="audio-volume-slider" min="0" max="100" value="25" class="zw-range">
-        </div>
-      </div>
-
-      <!-- TAB 4: CONTROLLED MICRO-BREAKS -->
-      <div class="zw-tab-content" id="tab-break">
-        <div class="zw-guard-banner">
-          <div class="zw-guard-head">
-            <span class="zw-guard-title">🛡️ Hyperfixation Guard</span>
-            <span class="zw-guard-pill" id="guard-status-badge">Ready (90s)</span>
-          </div>
-          <p class="zw-guard-desc">
-            Hard 90s timer locks input and transitions into 30s box breathing followed by a 15-minute cooling lock.
-          </p>
-        </div>
-
-        <div class="zw-section-header" style="margin-top: 14px;">
-          <span class="zw-section-title">Micro-Game Engine</span>
-        </div>
-
-        <div class="zw-game-grid">
-          <button class="zw-game-card active" data-game="fluid">
-            <span class="zw-game-icon">🌊</span>
-            <div class="zw-game-info">
-              <strong>Zen Fluid Flow</strong>
-              <small>Calming gravity particles</small>
-            </div>
-          </button>
-          <button class="zw-game-card" data-game="pulse">
-            <span class="zw-game-icon">💫</span>
-            <div class="zw-game-info">
-              <strong>Rhythm Pulse</strong>
-              <small>Vagal nerve resonant wave</small>
-            </div>
-          </button>
-          <button class="zw-game-card" data-game="stack">
-            <span class="zw-game-icon">🧱</span>
-            <div class="zw-game-info">
-              <strong>Zen Stacker</strong>
-              <small>Minimal kinetic balance</small>
-            </div>
-          </button>
-          <button class="zw-game-card" data-game="pattern">
-            <span class="zw-game-icon">🔮</span>
-            <div class="zw-game-info">
-              <strong>Pattern Flow</strong>
-              <small>Soft tonal memory pads</small>
-            </div>
-          </button>
-          <button class="zw-game-card" data-game="runner">
-            <span class="zw-game-icon">🕊️</span>
-            <div class="zw-game-info">
-              <strong>Micro Glide</strong>
-              <small>Minimalist sine-wave flight</small>
-            </div>
-          </button>
-        </div>
-
-        <div class="zw-break-actions">
-          <button class="zw-btn-launch" id="btn-launch-break">Launch 90s Reset</button>
-          <button class="zw-btn-breathe" id="btn-launch-breathe">🧘 30s Breath</button>
-        </div>
-
-        <div style="text-align: center; margin-top: 12px;">
-          <button id="btn-reset-lockout" class="zw-link-btn">Reset 15-min lockout (Dev Test)</button>
-        </div>
-      </div>
-
-      <!-- TAB 5: ON-DEVICE AI CO-PILOT -->
-      <div class="zw-tab-content" id="tab-ai">
-        <div class="zw-ai-banner">
-          <span style="font-size: 24px;">🧠</span>
-          <div>
-            <strong>Chrome Built-in AI / Gemini Nano</strong>
-            <p style="margin: 0; font-size: 11.5px; color: var(--zw-muted);">100% private on-device intelligence</p>
-          </div>
-        </div>
-
-        <div class="zw-card-list" style="margin-top: 14px;">
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">3-Bullet Overview Card</span>
-                <span class="zw-pill-badge" id="badge-ai-summary">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Automatically mounts key takeaways on long articles</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="ai-summary-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">Plain-English Tooltip</span>
-                <span class="zw-pill-badge" id="badge-ai-simplify">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Rewrites highlighted jargon into conversational sentences</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="ai-simplify-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">Tone Neutralizer</span>
-                <span class="zw-pill-badge" id="badge-ai-tone">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Softens clickbait and panic-inducing sensationalism</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="ai-tone-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-
-          <div class="zw-toggle-card">
-            <div class="zw-toggle-meta">
-              <div class="zw-toggle-header-row">
-                <span class="zw-toggle-name">Fatigue Freeze Detection</span>
-                <span class="zw-pill-badge" id="badge-fatigue">ON</span>
-              </div>
-              <p class="zw-toggle-desc">Gentle prompt when stationary on one section > 4 mins</p>
-            </div>
-            <label class="zw-mini-switch">
-              <input type="checkbox" id="fatigue-toggle" checked>
-              <span class="zw-mini-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <button class="zw-btn-sidepanel" id="btn-open-sidepanel">
-          <span>✨</span>
-          <span>Open AI Chat Side Panel</span>
+        <button class="zw-btn-deck-primary" id="btn-play-game-now">
+          [▶ LAUNCH 90s RESET MINI-GAME]
         </button>
-      </div>
+      </section>
 
+      <!-- 4. 30-MINUTE WATER BREAK REMINDER -->
+      <section class="zw-deck-section">
+        <div class="zw-section-title-row">
+          <span class="zw-sec-tag">[04 // 30-MIN HYDRATION]</span>
+          <span class="zw-badge-timer" id="next-water-countdown">30:00</span>
+        </div>
+        <div class="zw-water-stat-row">
+          <div class="zw-water-pill">
+            <span>💧</span>
+            <span id="water-stat-count">0 Breaks Today</span>
+          </div>
+          <button class="zw-btn-deck-secondary" id="btn-log-water-now">
+            [+ LOG WATER BREAK]
+          </button>
+        </div>
+      </section>
     </main>
 
     <!-- Footer -->
-    <footer class="zw-footer">
-      <span>ZenWeb v2.0</span>
-      <span>•</span>
-      <span>Neurodivergent Cognitive Design</span>
+    <footer class="zw-deck-footer">
+      <span>ZENWEB v2.1 // PIXEL-BRUTALIST ARCHITECTURE</span>
     </footer>
   </div>
 

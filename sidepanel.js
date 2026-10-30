@@ -1,5 +1,5 @@
 /**
- * ZenWeb Side Panel Controller
+ * ZenWeb Side Panel Controller (v2.1)
  * Facilitates context-aware reading Q&A, executive function assistance,
  * and conversational breakdown of active tab content.
  */
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sendBtn = document.getElementById('sp-send-btn');
   const clearBtn = document.getElementById('sp-clear-btn');
   const refreshBtn = document.getElementById('btn-refresh-context');
-  const chips = document.querySelectorAll('.ff-sp-chip');
+  const chips = document.querySelectorAll('.zw-sp-chip');
 
   let activePageContext = {
     title: '',
@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     content: ''
   };
 
-  // Fetch active tab content
   async function refreshPageContext() {
     pageTitleEl.textContent = 'Syncing active page...';
     chrome.runtime.sendMessage({ type: 'GET_TAB_CONTENT' }, (response) => {
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         pageTitleEl.textContent = response.title;
         pageTitleEl.title = response.title;
       } else {
-        pageTitleEl.textContent = 'Ready (Generic Context)';
+        pageTitleEl.textContent = 'Ready (Digital Context)';
       }
     });
   }
@@ -36,13 +35,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await refreshPageContext();
   refreshBtn.addEventListener('click', refreshPageContext);
 
-  // Auto-resize textarea
   inputEl.addEventListener('input', () => {
     inputEl.style.height = 'auto';
     inputEl.style.height = `${Math.min(inputEl.scrollHeight, 100)}px`;
   });
 
-  // Send message handler
   async function handleSend() {
     const text = inputEl.value.trim();
     if (!text) return;
@@ -59,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       appendMessage('assistant', response);
     } catch (err) {
       removeLoadingIndicator(loadingId);
-      appendMessage('assistant', "Sorry, I had trouble analyzing that section. You can try highlighting the paragraph directly!");
+      appendMessage('assistant', "I had trouble parsing that section. Try highlighting the paragraph directly!");
     }
   }
 
@@ -71,12 +68,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Quick Action Chips
   chips.forEach(chip => {
     chip.addEventListener('click', async () => {
       const action = chip.dataset.action;
       if (!activePageContext.content) {
-        appendMessage('assistant', "Please navigate to an article or refresh page context first!");
+        appendMessage('assistant', "Navigate to an article or refresh page context first!");
         return;
       }
 
@@ -85,38 +81,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       switch (action) {
         case 'summary':
-          promptDesc = "Give me an executive 3-bullet overview of this page.";
+          promptDesc = "Synthesize an executive 3-bullet overview of this page.";
           appendMessage('user', promptDesc);
           loadingId = appendLoadingIndicator();
           const bullets = await window.ZenWebAI.generate3BulletSummary(activePageContext.content);
           removeLoadingIndicator(loadingId);
-          appendMessage('assistant', `**Key Executive Points:**\n\n${bullets.map(b => `• ${b}`).join('\n')}`);
+          appendMessage('assistant', `**Core Executive Takeaways:**\n\n${bullets.map(b => `• ${b}`).join('\n')}`);
           break;
 
         case 'adhd':
-          promptDesc = "Explain this page in an ADHD-friendly, high-scannability format.";
+          promptDesc = "Format this page into scannable digital bullet points.";
           appendMessage('user', promptDesc);
           loadingId = appendLoadingIndicator();
-          const adhdPrompt = "Break down the core message into simple, direct bullet points with zero corporate jargon. Highlight key takeaways.";
+          const adhdPrompt = "Break down the core message into simple, direct bullet points with highlighted key terms. Keep it punchy.";
           const adhdResp = await window.ZenWebAI.answerPageQuestion(adhdPrompt, activePageContext.content);
           removeLoadingIndicator(loadingId);
           appendMessage('assistant', adhdResp);
           break;
 
         case 'tone':
-          promptDesc = "Detect any sensationalist or anxiety-inducing tone in this article.";
+          promptDesc = "Identify any clickbait or sensationalist framing.";
           appendMessage('user', promptDesc);
           loadingId = appendLoadingIndicator();
           const neutralized = await window.ZenWebAI.neutralizeTone(activePageContext.content.slice(0, 1500));
           removeLoadingIndicator(loadingId);
-          appendMessage('assistant', `**Calm, Objective Perspective:**\n\n${neutralized.slice(0, 500)}...`);
+          appendMessage('assistant', `**Objective, Calm Perspective:**\n\n${neutralized.slice(0, 500)}...`);
           break;
 
         case 'actions':
-          promptDesc = "Extract actionable steps and practical takeaways from this page.";
+          promptDesc = "Extract practical action items from this reading.";
           appendMessage('user', promptDesc);
           loadingId = appendLoadingIndicator();
-          const actionResp = await window.ZenWebAI.answerPageQuestion("What are the actionable steps, key lessons, or concrete takeaways?", activePageContext.content);
+          const actionResp = await window.ZenWebAI.answerPageQuestion("What are the key actionable takeaways or lessons?", activePageContext.content);
           removeLoadingIndicator(loadingId);
           appendMessage('assistant', actionResp);
           break;
@@ -124,34 +120,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Clear Chat
   clearBtn.addEventListener('click', () => {
     messagesEl.innerHTML = `
-      <div class="ff-sp-msg ff-sp-assistant">
-        <div class="ff-sp-msg-header">
-          <span class="ff-sp-avatar">✨</span>
-          <span class="ff-sp-sender">ZenWeb Assistant</span>
+      <div class="zw-sp-msg zw-sp-assistant">
+        <div class="zw-sp-msg-header">
+          <span class="zw-sp-avatar">🤖</span>
+          <span class="zw-sp-sender">ZENWEB AGENT</span>
         </div>
-        <div class="ff-sp-msg-body">
-          Chat cleared. Ask me anything about this page or use the quick chips above!
+        <div class="zw-sp-msg-body">
+          Deck history cleared. Ask questions about the current page or select a quick action above.
         </div>
       </div>
     `;
   });
 
-  // UI Helpers
   function appendMessage(sender, text) {
     const msg = document.createElement('div');
-    msg.className = `ff-sp-msg ff-sp-${sender}`;
+    msg.className = `zw-sp-msg zw-sp-${sender}`;
 
     const formattedBody = formatMarkdown(text);
 
     msg.innerHTML = `
-      <div class="ff-sp-msg-header">
-        <span class="ff-sp-avatar">${sender === 'assistant' ? '✨' : '👤'}</span>
-        <span class="ff-sp-sender">${sender === 'assistant' ? 'ZenWeb Assistant' : 'You'}</span>
+      <div class="zw-sp-msg-header">
+        <span class="zw-sp-avatar">${sender === 'assistant' ? '🤖' : '👤'}</span>
+        <span class="zw-sp-sender">${sender === 'assistant' ? 'ZENWEB AGENT' : 'YOU'}</span>
       </div>
-      <div class="ff-sp-msg-body">${formattedBody}</div>
+      <div class="zw-sp-msg-body">${formattedBody}</div>
     `;
 
     messagesEl.appendChild(msg);
@@ -162,13 +156,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const id = 'loading-' + Date.now();
     const msg = document.createElement('div');
     msg.id = id;
-    msg.className = 'ff-sp-msg ff-sp-assistant';
+    msg.className = 'zw-sp-msg zw-sp-assistant';
     msg.innerHTML = `
-      <div class="ff-sp-msg-header">
-        <span class="ff-sp-avatar">✨</span>
-        <span class="ff-sp-sender">ZenWeb Assistant</span>
+      <div class="zw-sp-msg-header">
+        <span class="zw-sp-avatar">🤖</span>
+        <span class="zw-sp-sender">ZENWEB AGENT</span>
       </div>
-      <div class="ff-sp-msg-body" style="color: var(--sp-muted);">Thinking & reading context...</div>
+      <div class="zw-sp-msg-body" style="color: var(--text-muted); font-family: var(--font-mono);">Processing digital context...</div>
     `;
     messagesEl.appendChild(msg);
     messagesEl.scrollTop = messagesEl.scrollHeight;

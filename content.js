@@ -29,6 +29,8 @@
       this.activityInterval = null;
       this.waterTimerInterval = null;
       this.restructuredCardsMap = new Map(); // originalElement -> cardElement
+      this.aiHiddenNodes = new Set(); // nodes hidden by AI bento restructuring
+      this.bentoMatrixEl = null;
       this.normalizedStyleElements = new Set(); // elements modified by contrast normalizer
       this.domMutationObserver = null;
       this.isRestructured = false;
@@ -694,6 +696,25 @@
       return bullets.length > 0 ? bullets : [text.trim()];
     }
 
+    /* ==========================================================================
+       6. WEBPAGE DATA RESTRUCTURING & AI BENTO COGNITIVE RE-LAYOUT ENGINE
+       ========================================================================== */
+
+    detectPageArchetype() {
+      // 1. Developer Profile / Showcase (GitHub, GitLab, Portfolio)
+      if (document.querySelector('.vcard-names, [itemtype*="Person"], .user-profile-bio, .js-profile-editable-area') ||
+          (window.location.hostname.includes('github.com') && document.querySelector('.js-pinned-items-reorder-list, .pinned-item-list-item'))) {
+        return 'developer-profile';
+      }
+      // 2. Editorial / Long-form News / Blog (Times of India, Medium, Wikipedia, Substack)
+      if (document.querySelector('article, [itemprop="articleBody"], .story-section, .article-body, .artText') ||
+          document.querySelectorAll('article p, main p, div[class*="content"] p').length >= 3) {
+        return 'editorial-article';
+      }
+      // 3. General Web Dashboard / Portal
+      return 'general-dashboard';
+    }
+
     applyDataRestructuring() {
       if (this.isRestructured) return;
       this.isRestructured = true;
@@ -703,10 +724,289 @@
       root.setAttribute('data-zenweb-font', 'circular-digital');
       root.setAttribute('data-zenweb-restructured', 'true');
 
-      // Inject Executive Briefing Card at the top of main content
+      const archetype = this.detectPageArchetype();
+      if (archetype === 'developer-profile') {
+        this.applyDeveloperProfileBentoRestructuring();
+      } else {
+        this.applyStandardCognitiveRestructuring(archetype);
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       A. Developer Profile Bento Transformation (Max Observability & Polish)
+       -------------------------------------------------------------------------- */
+    applyDeveloperProfileBentoRestructuring() {
+      // 1. Locate Native Containers
+      const sidebar = document.querySelector('.Layout-sidebar, [itemtype*="Person"], .user-profile-sticky-bar');
+      const pinnedList = document.querySelector('ol.js-pinned-items-reorder-list, .pinned-items-list, div[data-pinned-items-reorder-container], .js-pinned-items-reorder-list');
+      const mainTarget = document.querySelector('.Layout-main, main, [role="main"]') || document.body;
+
+      // Cleanly hide native cramped sidebar and duplicate pinned container
+      if (sidebar) {
+        this.aiHiddenNodes.add(sidebar);
+        sidebar.style.display = 'none';
+      }
+      if (pinnedList) {
+        this.aiHiddenNodes.add(pinnedList);
+        pinnedList.style.display = 'none';
+      }
+
+      // Also hide duplicate "Popular repositories" header if present to avoid repetition
+      const popularHeader = document.querySelector('h2.f4.mb-2, [class*="popular-repositories"]');
+      if (popularHeader) {
+        this.aiHiddenNodes.add(popularHeader);
+        popularHeader.style.display = 'none';
+      }
+
+      // 2. Extract Profile Attributes
+      const avatarImg = document.querySelector('.avatar-user, [itemprop="image"], img.avatar, [class*="avatar"] img');
+      const avatarSrc = avatarImg ? avatarImg.src : '';
+
+      const nameEl = document.querySelector('.vcard-fullname, [itemprop="name"], h1.vcard-names span, h1.vcard-names, [class*="profile-name"]');
+      const name = nameEl ? nameEl.innerText.trim() : '';
+
+      const handleEl = document.querySelector('.vcard-username, [itemprop="additionalName"], [class*="username"]');
+      const handle = handleEl ? handleEl.innerText.trim() : (window.location.pathname.replace(/^\//, '').split('/')[0] || 'Developer');
+
+      const pronounEl = document.querySelector('[itemprop="pronouns"], [class*="pronoun"]');
+      const pronouns = pronounEl ? pronounEl.innerText.trim() : '';
+
+      const bioEl = document.querySelector('.user-profile-bio, .p-note, [class*="user-bio"]');
+      const bio = bioEl ? bioEl.innerText.trim() : '';
+
+      const editBtn = document.querySelector('.js-profile-editable-edit-button, button[class*="edit-button"], [data-tab-item="overview"] ~ * button');
+      const editBtnText = editBtn ? editBtn.innerText.trim() : 'Edit Profile';
+
+      // 3. Extract Pinned Repositories / Showcase Items
+      const repoItems = Array.from(document.querySelectorAll('ol.js-pinned-items-reorder-list li, .pinned-item-list-item, [data-repo]'));
+      const projects = [];
+
+      repoItems.forEach(item => {
+        const titleEl = item.querySelector('.repo, span[title], a[href*="/"]');
+        const title = titleEl ? titleEl.innerText.trim() : '';
+        const linkEl = item.querySelector('a[href*="/"]');
+        const href = linkEl ? linkEl.href : '#';
+        const descEl = item.querySelector('.pinned-item-desc, p, [class*="desc"]');
+        const description = descEl ? descEl.innerText.trim() : 'Public engineering repository.';
+        const langEl = item.querySelector('[itemprop="programmingLanguage"], .repo-language-color + span, [class*="language"]');
+        const language = langEl ? langEl.innerText.trim() : '';
+        const langDot = item.querySelector('.repo-language-color');
+        const langColor = langDot?.style?.backgroundColor || (language === 'TypeScript' ? '#3178c6' : (language === 'JavaScript' ? '#f1e05a' : '#00FF66'));
+        const starEl = item.querySelector('a[href*="/stargazers"]');
+        const stars = starEl ? starEl.innerText.trim() : '';
+
+        if (title) {
+          projects.push({ name: title, href, description, language, langColor, stars });
+        }
+      });
+
+      // 4. Build Master Bento Matrix
+      const matrix = document.createElement('div');
+      matrix.id = 'zenweb-bento-matrix';
+      matrix.className = 'zw-bento-matrix';
+
+      // Header Telemetry Banner
+      const bannerHTML = `
+        <div class="zw-ai-architect-banner">
+          <div class="zw-ai-architect-header">
+            <div class="zw-ai-architect-left">
+              <div class="zw-ai-pulse-dot"></div>
+              <span class="zw-pixel-pill-green">● AI AGENT ACTIVE</span>
+              <span class="zw-pixel-tag">[COGNITIVE RE-LAYOUT: BENTO OBSERVABILITY MATRIX]</span>
+            </div>
+            <div class="zw-ai-architect-right">
+              <span class="zw-ai-archetype-pill">DEVELOPER SHOWCASE</span>
+              <button class="zw-btn-pixel-revert" id="zw-bento-revert-btn" title="Revert to original native layout">[RESTORE NATIVE]</button>
+            </div>
+          </div>
+          <div class="zw-ai-reasoning-box">
+            <div class="zw-ai-reasoning-text">
+              <strong>AI AGENT THOUGHT:</strong> Restructured page architecture into a balanced Bento Grid: unified profile identity hero, ${projects.length || 4} pinned project containers with live language telemetry, and decoupled layout noise.
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Intelligent Executive Briefing (Profile specific)
+      const briefingTakeaways = window.ZenWebAI?.generateProfileBriefing({
+        name, handle, pronouns, bio, projects
+      }) || [
+        `Profile Identity: ${name || handle} — Public Developer Portfolio & Engineering Showcase.`,
+        `Bio & Focus: "${bio || 'Active developer'}" — Software architecture & web systems.`,
+        `Featured Repositories: ${projects.length} open-source projects highlighted in high observability cards.`,
+        `Bento Matrix Telemetry: Balanced 2-column grid applied with live language beacons.`,
+        `Sensory Regulation: Calming sliding pixel ambient canvas active.`
+      ];
+
+      const briefingHTML = `
+        <div class="zw-pixel-window zw-overview-window" style="margin: 0 !important;">
+          <div class="zw-pixel-window-header">
+            <div class="zw-header-left">
+              <span class="zw-pixel-pill-pink">AI BRIEFING</span>
+              <span class="zw-pixel-tag">EXECUTIVE CORE</span>
+            </div>
+          </div>
+          <div class="zw-overview-body">
+            <div class="zw-overview-badge-row">
+              <span class="zw-badge-accent-pink">CORE TAKEAWAYS</span>
+              <span style="font-size:11px; color:#9499aa;">Developer Profile Overview (5 key takeaways)</span>
+            </div>
+            <ul class="zw-overview-bullets">
+              ${briefingTakeaways.map((b, i) => `
+                <li class="zw-overview-bullet-item">
+                  <span class="zw-bullet-num">0${i + 1}</span>
+                  <span>${this.escapeHTML(b)}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+
+      // Hero Identity Tile
+      const pronounBadge = pronouns ? `<span class="zw-hero-pronoun">${this.escapeHTML(pronouns)}</span>` : '';
+      const bioHTML = bio ? `<div class="zw-hero-bio">“${this.escapeHTML(bio)}”</div>` : '';
+      const avatarHTML = avatarSrc ? `<div class="zw-hero-avatar-frame"><img src="${this.escapeHTML(avatarSrc)}" alt="${this.escapeHTML(name || handle)}"/></div>` : '';
+
+      const heroHTML = `
+        <div class="zw-bento-hero-tile">
+          <div class="zw-hero-left">
+            ${avatarHTML}
+            <div class="zw-hero-meta">
+              <div class="zw-hero-title-row">
+                <span class="zw-hero-name">${this.escapeHTML(name || handle)}</span>
+                <span class="zw-hero-handle">@${this.escapeHTML(handle)}</span>
+                ${pronounBadge}
+              </div>
+              ${bioHTML}
+            </div>
+          </div>
+          <div class="zw-hero-actions">
+            <button class="zw-btn-hero-action" id="zw-bento-action-btn">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>[${this.escapeHTML(editBtnText.toUpperCase())}]</span>
+            </button>
+            <span class="zw-pixel-pill-cyan">[${projects.length || '4'} REPOSITORIES]</span>
+            <span class="zw-pixel-pill-green">[ONLINE]</span>
+          </div>
+        </div>
+      `;
+
+      // Project Showcase Bento Grid
+      let projectCardsHTML = '';
+      projects.forEach((proj, idx) => {
+        const isPink = idx % 2 === 1;
+        const blockNum = idx < 9 ? `0${idx + 1}` : `${idx + 1}`;
+        projectCardsHTML += `
+          <div class="zw-bento-card ${isPink ? 'zw-bento-card-pink' : ''}">
+            <div>
+              <div class="zw-bento-card-head">
+                <span class="zw-pixel-tag">[PROJECT // ${blockNum}]</span>
+                <span class="zw-pixel-pill-cyan">PUBLIC REPO</span>
+              </div>
+              <a class="zw-bento-card-title" href="${this.escapeHTML(proj.href)}" target="_blank" rel="noopener">
+                ${this.escapeHTML(proj.name)}
+              </a>
+              <div class="zw-bento-card-desc">
+                ${this.escapeHTML(proj.description)}
+              </div>
+            </div>
+            <div class="zw-bento-card-footer">
+              <div class="zw-lang-indicator">
+                <span class="zw-lang-dot" style="background-color: ${proj.langColor}; color: ${proj.langColor};"></span>
+                <span>${this.escapeHTML(proj.language || 'Code')}</span>
+              </div>
+              ${proj.stars ? `<span style="color:#00FF66;">★ ${this.escapeHTML(proj.stars)}</span>` : '<span style="color:#9499aa;">[STABLE]</span>'}
+            </div>
+          </div>
+        `;
+      });
+
+      const gridHTML = `
+        <div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+            <span class="zw-pixel-tag">[FEATURED REPOSITORY MATRIX]</span>
+            <span style="font-family:var(--zw-font-mono, monospace); font-size:11px; color:#9499aa;">BALANCED 2-COLUMN OBSERVABILITY</span>
+          </div>
+          <div class="zw-bento-grid">
+            ${projectCardsHTML}
+          </div>
+        </div>
+      `;
+
+      matrix.innerHTML = bannerHTML + briefingHTML + heroHTML + gridHTML;
+
+      // 5. Mount Bento Matrix
+      if (mainTarget.firstChild) {
+        mainTarget.insertBefore(matrix, mainTarget.firstChild);
+      } else {
+        mainTarget.appendChild(matrix);
+      }
+      this.bentoMatrixEl = matrix;
+
+      // 6. Interactive Event Listeners
+      matrix.querySelector('#zw-bento-revert-btn')?.addEventListener('click', () => {
+        this.removeDataRestructuring();
+        this.showToast("Native layout restored.");
+      });
+
+      matrix.querySelector('#zw-bento-action-btn')?.addEventListener('click', () => {
+        if (editBtn) {
+          editBtn.click();
+        } else {
+          this.showToast("Developer profile action triggered.");
+        }
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       B. Editorial & General Cognitive Restructuring
+       -------------------------------------------------------------------------- */
+    applyStandardCognitiveRestructuring(archetype = 'editorial-article') {
+      // 1. Inject Executive Briefing Card at the top of main content
       this.injectExecutiveOverview();
 
-      // Find substantial paragraph elements and news story summaries across broad selectors
+      // 2. Inject AI Architect Banner for editorial awareness
+      const mainEl = document.querySelector('article, main, [role="main"], #content, .post, .article, .story-section') || document.body;
+      if (!document.getElementById('zenweb-ai-architect-banner')) {
+        const banner = document.createElement('div');
+        banner.id = 'zenweb-ai-architect-banner';
+        banner.className = 'zw-ai-architect-banner';
+        const archetypeLabel = archetype === 'editorial-article' ? 'EDITORIAL ARTICLE' : 'GENERAL DASHBOARD';
+        banner.innerHTML = `
+          <div class="zw-ai-architect-header">
+            <div class="zw-ai-architect-left">
+              <div class="zw-ai-pulse-dot"></div>
+              <span class="zw-pixel-pill-green">● AI AGENT ACTIVE</span>
+              <span class="zw-pixel-tag">[COGNITIVE RE-LAYOUT: SCANNABLE DECK]</span>
+            </div>
+            <div class="zw-ai-architect-right">
+              <span class="zw-ai-archetype-pill">${archetypeLabel}</span>
+              <button class="zw-btn-pixel-revert" id="zw-editorial-revert-btn" title="Revert to native text">[RESTORE NATIVE]</button>
+            </div>
+          </div>
+          <div class="zw-ai-reasoning-box">
+            <div class="zw-ai-reasoning-text">
+              <strong>AI AGENT THOUGHT:</strong> Restructured dense prose into high-contrast scannable bullet blocks, silenced intrusive ads, and synthesized 5 key executive takeaways.
+            </div>
+          </div>
+        `;
+
+        if (mainEl.firstChild) {
+          mainEl.insertBefore(banner, mainEl.firstChild);
+        } else {
+          mainEl.appendChild(banner);
+        }
+
+        banner.querySelector('#zw-editorial-revert-btn')?.addEventListener('click', () => {
+          this.removeDataRestructuring();
+          this.showToast("Native text restored.");
+        });
+      }
+
+      // 3. Find substantial paragraph elements and restructure into granular cards
       const selector = `
         article p, main p, [role="main"] p, .post p, .article-body p, 
         section p, .entry-content p, #content p, .markdown-body p, 
@@ -722,7 +1022,6 @@
         if (this.restructuredCardsMap.has(p)) return;
 
         const text = p.innerText?.trim() || '';
-        // Restructure any paragraph with at least 50 characters of real reading text
         if (text.length >= 50) {
           const bulletList = this.splitIntoGranularBullets(text);
           if (bulletList.length === 0) return;
@@ -775,9 +1074,23 @@
       const root = document.documentElement;
       root.removeAttribute('data-zenweb-restructured');
 
+      // 1. Remove Bento Matrix & AI Banners
+      if (this.bentoMatrixEl) {
+        this.bentoMatrixEl.remove();
+        this.bentoMatrixEl = null;
+      }
+      document.getElementById('zenweb-ai-architect-banner')?.remove();
       document.getElementById('zenweb-executive-card')?.remove();
 
-      // Restore all original paragraph elements
+      // 2. Unhide all native elements preserved in aiHiddenNodes
+      this.aiHiddenNodes.forEach(node => {
+        if (node && node.isConnected) {
+          node.style.display = '';
+        }
+      });
+      this.aiHiddenNodes.clear();
+
+      // 3. Restore all original paragraph elements
       this.restructuredCardsMap.forEach((card, originalP) => {
         if (card && card.parentNode) {
           card.remove();
@@ -787,6 +1100,8 @@
         }
       });
       this.restructuredCardsMap.clear();
+
+      this.updateDockState();
     }
 
     injectExecutiveOverview() {
@@ -794,7 +1109,7 @@
 
       const mainEl = document.querySelector('article, main, [role="main"], #content, .post, .article, .story-section') || document.body;
       const cleanText = this.extractCleanText(mainEl);
-      if (cleanText.split(/\s+/).length < 100) return;
+      if (cleanText.split(/\s+/).length < 80) return;
 
       const card = document.createElement('div');
       card.id = 'zenweb-executive-card';
@@ -899,9 +1214,35 @@
           </svg>
           <span class="zw-dock-label" id="zw-dock-agent-label">AGENT</span>
         </button>
+
+        <!-- 5. Minimize / Expand Toggle -->
+        <button class="zw-dock-btn-min" id="zw-dock-minimize" title="Minimize Dock">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none">
+            <path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </button>
       `;
 
       document.documentElement.appendChild(dock);
+
+      const minBtn = dock.querySelector('#zw-dock-minimize');
+      minBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dock.classList.toggle('zw-dock-collapsed');
+        const isCollapsed = dock.classList.contains('zw-dock-collapsed');
+        minBtn.title = isCollapsed ? "Expand Dock" : "Minimize Dock";
+        minBtn.innerHTML = isCollapsed
+          ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M12 5v14M5 12h14" stroke="#00FF66" stroke-width="2.5" stroke-linecap="round"/></svg>'
+          : '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/></svg>';
+      });
+
+      dock.querySelector('.zw-dock-brand-badge').addEventListener('click', () => {
+        if (dock.classList.contains('zw-dock-collapsed')) {
+          dock.classList.remove('zw-dock-collapsed');
+          minBtn.title = "Minimize Dock";
+          minBtn.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/></svg>';
+        }
+      });
 
       dock.querySelector('#zw-dock-game').addEventListener('click', () => {
         if (window.ZenWebGames) window.ZenWebGames.launchGame('random', 90);
@@ -1043,7 +1384,14 @@
 
     extractCleanText(container = document.body) {
       const clone = container.cloneNode(true);
-      clone.querySelectorAll('script, style, noscript, nav, footer, aside, [id^="zenweb-"], [class^="zw-"]').forEach(el => el.remove());
+      clone.querySelectorAll(`
+        script, style, noscript, nav, footer, aside,
+        button, input, textarea, select, form,
+        [role="button"], [role="dialog"], [role="tooltip"], [role="navigation"],
+        [aria-hidden="true"], .sr-only, .visually-hidden, svg,
+        .avatar-upload, .js-user-profile-bio-form, [data-hotkey],
+        [id^="zenweb-"], [class^="zw-"]
+      `).forEach(el => el.remove());
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }
 

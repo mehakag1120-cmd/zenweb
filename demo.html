@@ -233,6 +233,13 @@
           <span>[RESTRUCTURE DATA]</span>
         </button>
 
+        <button class="demo-btn demo-btn-pink" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.applyDeveloperProfileBentoRestructuring()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#FF007A" stroke-width="1.8"/>
+          </svg>
+          <span>[AI BENTO RE-LAYOUT]</span>
+        </button>
+
         <button class="demo-btn" onclick="(window.ZenWebContentInstance || window.__ZENWEB_CONTENT_INSTANCE__)?.removeDataRestructuring()" style="color:#9499aa;">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#9499aa" stroke-width="2">
             <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
@@ -241,6 +248,37 @@
         </button>
       </div>
     </section>
+
+    <!-- Mock Profile Data Source for Verification Testing -->
+    <div id="demo-mock-profile" style="display:none;">
+      <div class="vcard-names">
+        <span class="vcard-fullname">meg</span>
+        <span class="vcard-username">mehakag1120-cmd</span>
+      </div>
+      <span itemprop="pronouns">she/her</span>
+      <div class="user-profile-bio">gg frickin' ez</div>
+      <button class="js-profile-editable-edit-button">Edit profile</button>
+      <ol class="js-pinned-items-reorder-list">
+        <li class="pinned-item-list-item">
+          <span class="repo">zenweb</span>
+          <p class="pinned-item-desc">Web extension for people with ADHD, focus booster for boring sites - with games, summarization and more!!</p>
+          <span itemprop="programmingLanguage">JavaScript</span>
+          <span class="repo-language-color" style="background-color: #f1e05a"></span>
+        </li>
+        <li class="pinned-item-list-item">
+          <span class="repo">osakekudasai</span>
+          <p class="pinned-item-desc">Extension for live transcription of Japanese audio, with interactible words in subtitles - colour coded by JLPT level || Japanese Learning tool</p>
+          <span itemprop="programmingLanguage">JavaScript</span>
+          <span class="repo-language-color" style="background-color: #f1e05a"></span>
+        </li>
+        <li class="pinned-item-list-item">
+          <span class="repo">lizzy-s-archive</span>
+          <p class="pinned-item-desc">a site where all of lana's unreleased music can be accessed</p>
+          <span itemprop="programmingLanguage">TypeScript</span>
+          <span class="repo-language-color" style="background-color: #3178c6"></span>
+        </li>
+      </ol>
+    </div>
 
     <!-- Simulated Article to demonstrate Data Restructuring -->
     <article class="demo-article">

@@ -651,6 +651,49 @@
        6. WEBPAGE DATA RESTRUCTURING (BULLET CARDS & CIRCULAR BOLD FONTS)
        ========================================================================== */
 
+    /**
+     * Splits paragraph text into granular, scannable bullet points
+     * Breaks along sentence boundaries (.?!), semicolons (;), dashes (—), and coordinating conjunctions
+     * @param {string} text
+     * @returns {Array<string>}
+     */
+    splitIntoGranularBullets(text) {
+      if (!text) return [];
+
+      // Split on sentence terminals (.?!), semicolons (;), or long dashes (—, --)
+      const primarySegments = text
+        .split(/(?:[.?!]+[\s\n\r]+|[;][\s\n\r]+|(?:\s*[\u2014\u2013]|\s*--\s*))/g)
+        .map(s => s.trim())
+        .filter(s => s.length > 0);
+
+      const bullets = [];
+
+      primarySegments.forEach(seg => {
+        // Clean leading bullet marks or numbers
+        const clean = seg.replace(/^[•\-*#\d.]+\s*/, '').trim();
+        if (clean.length < 12) return;
+
+        // If a segment is long (> 18 words), split on conversational transition phrases
+        const words = clean.split(/\s+/);
+        if (words.length > 18) {
+          const subChunks = clean.split(/,\s+(?:however|furthermore|moreover|meanwhile|specifically|in addition|consequently|therefore|which|whereas|while|especially)\b/i);
+          if (subChunks.length > 1) {
+            subChunks.forEach(chunk => {
+              const subClean = chunk.trim();
+              if (subClean.length >= 14) {
+                bullets.push(subClean);
+              }
+            });
+            return;
+          }
+        }
+
+        bullets.push(clean);
+      });
+
+      return bullets.length > 0 ? bullets : [text.trim()];
+    }
+
     applyDataRestructuring() {
       if (this.isRestructured) return;
       this.isRestructured = true;
@@ -679,19 +722,20 @@
         if (this.restructuredCardsMap.has(p)) return;
 
         const text = p.innerText?.trim() || '';
-        // Restructure any paragraph with at least 65 characters of real reading text
-        if (text.length >= 65) {
-          const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)/g) || [text];
+        // Restructure any paragraph with at least 50 characters of real reading text
+        if (text.length >= 50) {
+          const bulletList = this.splitIntoGranularBullets(text);
+          if (bulletList.length === 0) return;
 
           const card = document.createElement('div');
           card.className = 'zw-restructured-card';
 
           let bulletHTML = '';
-          sentences.forEach(s => {
+          bulletList.forEach(s => {
             const cleanSentence = s.trim();
-            if (cleanSentence.length > 10) {
+            if (cleanSentence.length > 5) {
               const parts = cleanSentence.split(' ');
-              const leadCount = Math.min(3, Math.max(1, Math.floor(parts.length * 0.25)));
+              const leadCount = Math.min(4, Math.max(1, Math.floor(parts.length * 0.28)));
               const lead = parts.slice(0, leadCount).join(' ');
               const tail = parts.slice(leadCount).join(' ');
 
@@ -710,7 +754,7 @@
           card.innerHTML = `
             <div class="zw-card-pill-row">
               <span class="zw-pixel-tag">[BLOCK // ${blockNum}]</span>
-              <span class="zw-card-meta">${sentences.length} KEY POINTS</span>
+              <span class="zw-card-meta">${bulletList.length} KEY POINTS</span>
             </div>
             <ul class="zw-bullet-list">
               ${bulletHTML}
@@ -766,7 +810,7 @@
         <div class="zw-overview-body">
           <div class="zw-overview-badge-row">
             <span class="zw-badge-accent-pink">CORE TAKEAWAYS</span>
-            <span style="font-size:11px; color:#9499aa;">High-visibility scannable mode</span>
+            <span style="font-size:11px; color:#9499aa;">High-visibility scannable mode (5 key takeaways)</span>
           </div>
           <ul class="zw-overview-bullets" id="zw-overview-list">
             <li class="zw-overview-bullet-loading">Synthesizing key digital takeaways...</li>
@@ -783,7 +827,7 @@
       card.querySelector('#zw-overview-close').addEventListener('click', () => card.remove());
 
       if (window.ZenWebAI) {
-        window.ZenWebAI.generate3BulletSummary(cleanText).then(bullets => {
+        window.ZenWebAI.generate3BulletSummary(cleanText, 5).then(bullets => {
           const list = card.querySelector('#zw-overview-list');
           if (list) {
             list.innerHTML = bullets.map((b, i) => `

@@ -30,17 +30,20 @@ class ZenWebAIEngine {
   }
 
   /**
-   * Generates a 3-bullet core summary card from article text
+   * Generates a high-impact key takeaway summary card from article text (5 bullets by default)
    * @param {string} fullText
-   * @returns {Promise<Array<string>>} 3 key bullet points
+   * @param {number} bulletCount Number of key takeaways to extract (default: 5)
+   * @returns {Promise<Array<string>>} Key bullet points
    */
-  async generate3BulletSummary(fullText) {
+  async generate3BulletSummary(fullText, bulletCount = 5) {
     if (!fullText || fullText.trim().length < 100) {
       return [
         "Concise page content detected.",
         "Key details are immediately visible on screen.",
-        "No long-form text requires compression."
-      ];
+        "No long-form text requires compression.",
+        "Read comfortably with high contrast typography.",
+        "Scheduled focus breaks remain active."
+      ].slice(0, bulletCount);
     }
 
     const cleanText = fullText.slice(0, 4000); // Safe token bounds for local prompt
@@ -54,7 +57,7 @@ class ZenWebAIEngine {
             this.summarizerSession = await window.ai.summarizer.create({
               type: 'key-points',
               format: 'plain-text',
-              length: 'short'
+              length: 'medium'
             });
           }
           const rawSummary = await this.summarizerSession.summarize(cleanText);
@@ -62,7 +65,7 @@ class ZenWebAIEngine {
             .split('\n')
             .map(line => line.replace(/^[-*•\d.]\s*/, '').trim())
             .filter(line => line.length > 5)
-            .slice(0, 3);
+            .slice(0, bulletCount);
 
           if (bullets.length >= 2) return bullets;
         }
@@ -78,15 +81,15 @@ class ZenWebAIEngine {
         if (canPrompt.available !== 'no') {
           if (!this.languageModelSession) {
             this.languageModelSession = await window.ai.languageModel.create({
-              systemPrompt: "You are an executive function assistant for ADHD readers. Extract exactly 3 clear, distinct, high-impact bullet points summarizing the text. Output each bullet on a new line starting with '•'."
+              systemPrompt: `You are an executive function assistant for ADHD readers. Extract exactly ${bulletCount} clear, distinct, high-impact bullet points summarizing the text. Output each bullet on a new line starting with '•'.`
             });
           }
-          const response = await this.languageModelSession.prompt(`Summarize this article:\n\n${cleanText}`);
+          const response = await this.languageModelSession.prompt(`Summarize this article in ${bulletCount} key bullet points:\n\n${cleanText}`);
           const bullets = response
             .split('\n')
             .map(line => line.replace(/^[•\d.*-]\s*/, '').trim())
             .filter(line => line.length > 5)
-            .slice(0, 3);
+            .slice(0, bulletCount);
 
           if (bullets.length >= 2) return bullets;
         }
@@ -96,7 +99,7 @@ class ZenWebAIEngine {
     }
 
     // 3. Robust Local NLP Heuristic Summarizer (TF-IDF & Graph Sentence Scoring)
-    return this.heuristicKeyPointExtraction(cleanText, 3);
+    return this.heuristicKeyPointExtraction(cleanText, bulletCount);
   }
 
   /**

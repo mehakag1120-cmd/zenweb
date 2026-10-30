@@ -319,36 +319,101 @@
     }
 
     /* ==========================================================================
-       2. CONTRAST NORMALIZER ENGINE (DOM LEVEL HIGH-SPECIFICITY INVERSION)
+       2. CONTRAST NORMALIZER & WHITE-ON-WHITE GUARDIAN ENGINE
+       Neutralizes blinding white containers, inverts dark-on-dark text,
+       darkens login and form inputs, and completely eliminates white-on-white text.
        ========================================================================== */
 
     applyContrastNormalization() {
-      // Traverse visible content elements and neutralize dark-on-dark or white boxes
+      // 1. Universal Form Controls & Inputs Guardian (Eliminates white-on-white login fields)
+      const formControls = document.querySelectorAll(`
+        input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([class^="zw-"]),
+        textarea:not([class^="zw-"]),
+        select:not([class^="zw-"]),
+        [contenteditable="true"]:not([class^="zw-"])
+      `);
+
+      formControls.forEach(el => {
+        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
+        if (!el.hasAttribute('data-zw-orig-style')) {
+          el.setAttribute('data-zw-orig-style', el.getAttribute('style') || '');
+        }
+        el.style.setProperty('background-color', '#131420', 'important');
+        el.style.setProperty('background-image', 'none', 'important');
+        el.style.setProperty('color', '#ffffff', 'important');
+        el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+        el.style.setProperty('border', '1.5px solid #272a3d', 'important');
+        el.style.setProperty('caret-color', '#00FF66', 'important');
+        this.normalizedStyleElements.add(el);
+      });
+
+      // 2. Buttons & Submit Controls Guardian
+      const buttons = document.querySelectorAll(`
+        button:not([class^="zw-"]),
+        input[type="submit"]:not([class^="zw-"]),
+        input[type="button"]:not([class^="zw-"]),
+        [role="button"]:not([class^="zw-"])
+      `);
+
+      buttons.forEach(el => {
+        if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
+        const comp = window.getComputedStyle(el);
+        if (this.isBrightBackground(comp.backgroundColor)) {
+          if (!el.hasAttribute('data-zw-orig-style')) {
+            el.setAttribute('data-zw-orig-style', el.getAttribute('style') || '');
+          }
+          el.style.setProperty('background-color', '#161826', 'important');
+          el.style.setProperty('color', '#00FF66', 'important');
+          el.style.setProperty('-webkit-text-fill-color', '#00FF66', 'important');
+          el.style.setProperty('border', '1.5px solid #00FF66', 'important');
+          this.normalizedStyleElements.add(el);
+        }
+      });
+
+      // 3. Traverse all visible text & container elements across the page
       const elements = document.querySelectorAll(`
         h1, h2, h3, h4, h5, h6, p, a, span, div, li, blockquote, dd, dt,
-        [class*="title"], [class*="heading"], [class*="headline"], [class*="story"], [class*="card"]
+        header, footer, nav, aside, section, article, form, fieldset, figure,
+        [class*="title"], [class*="heading"], [class*="headline"], [class*="story"], [class*="card"],
+        [class*="content"], [class*="container"], [class*="box"], [class*="wrapper"], [class*="text"]
       `);
 
       elements.forEach(el => {
         // Skip ZenWeb internal UI elements and GitHub contribution calendar elements
         if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"], .ContributionCalendar, .js-calendar-graph, .js-yearly-contributions, [data-level]')) return;
 
+        // Skip elements already handled in formControls
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) return;
+
         const inlineStyle = el.getAttribute('style');
         if (inlineStyle && !el.hasAttribute('data-zw-orig-style')) {
           el.setAttribute('data-zw-orig-style', inlineStyle);
         }
 
-        // Check computed colors
         const comp = window.getComputedStyle(el);
 
-        // If background is blinding white, convert to transparent or dark card surface
-        if (comp.backgroundColor && this.isBrightColor(comp.backgroundColor)) {
+        // Check if background is bright white or light grey (e.g. Times of India white box, ad boxes)
+        if (comp.backgroundColor && this.isBrightBackground(comp.backgroundColor)) {
           el.style.setProperty('background-color', 'transparent', 'important');
+          el.style.setProperty('background-image', 'none', 'important');
           this.normalizedStyleElements.add(el);
         }
 
-        // If text color is dark on dark, force to bright white or green
-        if (comp.color && this.isDarkColor(comp.color)) {
+        // Get effective background color that sits directly behind this element
+        const effectiveBg = this.getEffectiveBackgroundColor(el);
+        const isDarkBg = this.isDarkBackground(effectiveBg);
+        const isBrightBg = this.isBrightBackground(effectiveBg);
+
+        // Collision Check A: White-on-White text
+        if (isBrightBg && this.isBrightText(comp.color)) {
+          el.style.setProperty('background-color', '#12131c', 'important');
+          el.style.setProperty('color', '#ffffff', 'important');
+          el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
+          this.normalizedStyleElements.add(el);
+        }
+
+        // Collision Check B: Dark-on-Dark text (e.g. Times of India headline)
+        else if (isDarkBg && this.isLowContrastTextOnDark(comp.color)) {
           if (el.tagName === 'A' || el.closest('a')) {
             el.style.setProperty('color', '#00FF66', 'important');
             el.style.setProperty('-webkit-text-fill-color', '#00FF66', 'important');
@@ -446,41 +511,97 @@
       this.normalizedStyleElements.forEach(el => {
         if (el && el.isConnected) {
           if (el.hasAttribute('data-zw-orig-style')) {
-            el.setAttribute('style', el.getAttribute('data-zw-orig-style'));
+            const orig = el.getAttribute('data-zw-orig-style');
+            if (orig) {
+              el.setAttribute('style', orig);
+            } else {
+              el.removeAttribute('style');
+            }
             el.removeAttribute('data-zw-orig-style');
           } else {
             el.style.removeProperty('background-color');
+            el.style.removeProperty('background-image');
             el.style.removeProperty('color');
             el.style.removeProperty('-webkit-text-fill-color');
             el.style.removeProperty('fill');
             el.style.removeProperty('border');
             el.style.removeProperty('border-radius');
+            el.style.removeProperty('caret-color');
           }
         }
       });
       this.normalizedStyleElements.clear();
     }
 
-    isDarkColor(colorStr) {
-      // Parses rgb(r, g, b) or rgba and determines luminance
-      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      if (!m) return false;
+    getEffectiveBackgroundColor(el) {
+      let curr = el;
+      while (curr && curr !== document && curr !== document.documentElement) {
+        const bg = window.getComputedStyle(curr).backgroundColor;
+        if (bg && bg !== 'transparent' && bg !== 'rgba(0, 0, 0, 0)') {
+          const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+          if (m && (m[4] === undefined || parseFloat(m[4]) >= 0.15)) {
+            return bg;
+          }
+        }
+        curr = curr.parentElement;
+      }
+      return 'rgb(9, 10, 15)'; // Default ZenWeb cyber-dark canvas
+    }
+
+    isDarkBackground(colorStr) {
+      if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return true;
+      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return true;
+      if (m[4] !== undefined && parseFloat(m[4]) < 0.15) return true;
       const r = parseInt(m[1], 10);
       const g = parseInt(m[2], 10);
       const b = parseInt(m[3], 10);
-      // Relative luminance calculation
       const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      return lum < 0.38; // Under 38% brightness is dark-on-dark
+      return lum < 0.40;
+    }
+
+    isBrightBackground(colorStr) {
+      if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return false;
+      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return false;
+      if (m[4] !== undefined && parseFloat(m[4]) < 0.15) return false;
+      const r = parseInt(m[1], 10);
+      const g = parseInt(m[2], 10);
+      const b = parseInt(m[3], 10);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return lum >= 0.55;
+    }
+
+    isLowContrastTextOnDark(colorStr) {
+      if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return true;
+      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return false;
+      if (m[4] !== undefined && parseFloat(m[4]) < 0.15) return true;
+      const r = parseInt(m[1], 10);
+      const g = parseInt(m[2], 10);
+      const b = parseInt(m[3], 10);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return lum < 0.68; // Anything below 68% luminance has poor contrast on dark canvas
+    }
+
+    isBrightText(colorStr) {
+      if (!colorStr || colorStr === 'transparent' || colorStr === 'rgba(0, 0, 0, 0)') return false;
+      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+      if (!m) return false;
+      if (m[4] !== undefined && parseFloat(m[4]) < 0.15) return false;
+      const r = parseInt(m[1], 10);
+      const g = parseInt(m[2], 10);
+      const b = parseInt(m[3], 10);
+      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return lum >= 0.68;
+    }
+
+    isDarkColor(colorStr) {
+      return this.isLowContrastTextOnDark(colorStr);
     }
 
     isBrightColor(colorStr) {
-      const m = colorStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-      if (!m) return false;
-      const r = parseInt(m[1], 10);
-      const g = parseInt(m[2], 10);
-      const b = parseInt(m[3], 10);
-      const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-      return lum > 0.70; // Above 70% brightness is a blinding white box
+      return this.isBrightBackground(colorStr);
     }
 
     /* ==========================================================================

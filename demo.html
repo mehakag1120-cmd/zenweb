@@ -431,6 +431,34 @@
       </div>
     </section>
 
+    <!-- Simulated Authentication & Portal Form (Anti White-on-White Test) -->
+    <section class="demo-console" style="margin-top: 16px;">
+      <div class="demo-console-head">
+        <div>
+          <span class="zw-pixel-tag">[AUTHENTICATION // HIGH CONTRAST VERIFICATION]</span>
+          <h2 style="font-family:'Chivo', sans-serif; font-size:18px; margin:4px 0 0 0; color:#fff;">
+            Sign in with your Internet Login ID
+          </h2>
+        </div>
+        <span class="zw-pixel-pill-green">HIGH-CONTRAST INPUTS</span>
+      </div>
+
+      <form onsubmit="return false;" style="display:flex; flex-direction:column; gap:14px; margin-top:12px; max-width:440px;">
+        <div>
+          <label style="display:block; margin-bottom:6px; font-size:13px; font-family:'Space Mono', monospace; color:#9499aa;">LOGIN IDENTIFIER // EMAIL</label>
+          <input type="text" class="input-text text-input" value="neev.25001168@kiet.edu" style="width:100%; box-sizing:border-box;">
+        </div>
+        <div>
+          <label style="display:block; margin-bottom:6px; font-size:13px; font-family:'Space Mono', monospace; color:#9499aa;">PASSWORD // SECRET KEY</label>
+          <input type="password" class="input-text text-input" value="supersecretpass" style="width:100%; box-sizing:border-box;">
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button type="submit" style="padding:10px 20px; font-size:14px;">Sign In</button>
+          <a href="#" style="font-size:13px; align-self:center; font-family:'Space Mono', monospace;">Access the User Portal &rarr;</a>
+        </div>
+      </form>
+    </section>
+
   </div>
 
   <!-- Scripts -->

@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const waterStatCount = document.getElementById('water-stat-count');
   const btnLogWaterNow = document.getElementById('btn-log-water-now');
 
+  const activeThemeBadge = document.getElementById('active-theme-badge');
+  const themeCards = document.querySelectorAll('.zw-theme-card');
+
   let currentSettings = {};
 
   // 1. Load Settings
@@ -34,6 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const isEnabled = settings.enabled !== false;
     updateMasterUI(isEnabled);
+
+    // Theme Architecture
+    updateThemeUI(settings.theme || 'cyberpunk');
 
     // Restructuring
     restructureToggle.checked = settings.dataRestructuring !== false;
@@ -58,6 +64,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     masterStatusBadge.className = isEnabled ? 'zw-badge-status' : 'zw-badge-status offline';
     deckControls.style.opacity = isEnabled ? '1' : '0.45';
     deckControls.style.pointerEvents = isEnabled ? 'auto' : 'none';
+  }
+
+  function updateThemeUI(themeName) {
+    let t = (themeName || 'cyberpunk').toLowerCase();
+    if (t === 'pixel-dark') t = 'cyberpunk';
+    if (!['cyberpunk', 'sorbet', 'surf', 'beige'].includes(t)) t = 'cyberpunk';
+
+    if (activeThemeBadge) {
+      activeThemeBadge.textContent = t.toUpperCase();
+    }
+    themeCards.forEach(card => {
+      if (card.dataset.theme === t) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
   }
 
   function updateAgentUI(hasPerm, isMonitoring) {
@@ -125,6 +148,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Event Listeners
+  themeCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const selected = card.dataset.theme;
+      updateThemeUI(selected);
+      updateAndDispatch({ theme: selected });
+    });
+  });
+
   masterToggle.addEventListener('change', () => {
     updateMasterUI(masterToggle.checked);
     updateAndDispatch({ enabled: masterToggle.checked });

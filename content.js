@@ -15,6 +15,90 @@
   }
   window.__ZENWEB_INITIALIZED__ = true;
 
+  /* ==========================================================================
+     THEME REGISTRY & ARCHITECTURAL PALETTES
+     Four Distinct Aesthetics:
+     1. Cyberpunk (Neon Dark): Books.baseten sliding pixels, neon green & pink
+     2. Sorbet (Strawberry Ice Cream): Baby pink, baby blue, sunshine yellow, dark pink sorbet, strobing pixel hearts
+     3. Surf (Sea Surf): Baby blue, azure blue, sand, chocolate brown, surfing pixel hearts
+     4. Beige (Office Zen): Refined warm beige & brown, office-appropriate typography, no animation
+     ========================================================================== */
+
+  const ZENWEB_THEMES = {
+    cyberpunk: {
+      id: 'cyberpunk',
+      name: 'Cyberpunk',
+      mode: 'dark',
+      bodyBg: '#090a0f',
+      textColor: '#f4f6fb',
+      titleColor: '#ffffff',
+      linkColor: '#00FF66',
+      inputBg: '#131420',
+      inputColor: '#ffffff',
+      inputBorder: '#272a3d',
+      caretColor: '#00FF66',
+      buttonBg: '#161826',
+      buttonColor: '#00FF66',
+      buttonBorder: '#00FF66',
+      font: 'Plus Jakarta Sans',
+      fontHeading: 'Chivo'
+    },
+    sorbet: {
+      id: 'sorbet',
+      name: 'Sorbet',
+      mode: 'light',
+      bodyBg: '#FFF0F5',
+      textColor: '#4A0E2E',
+      titleColor: '#9D174D',
+      linkColor: '#BE185D',
+      inputBg: '#FFFFFF',
+      inputColor: '#4A0E2E',
+      inputBorder: '#FBCFE8',
+      caretColor: '#FF2E93',
+      buttonBg: '#FFF0F5',
+      buttonColor: '#BE185D',
+      buttonBorder: '#F472B6',
+      font: 'Fredoka',
+      fontHeading: 'Fredoka'
+    },
+    surf: {
+      id: 'surf',
+      name: 'Surf',
+      mode: 'light',
+      bodyBg: '#E0F2FE',
+      textColor: '#3E2723',
+      titleColor: '#2B1704',
+      linkColor: '#0284C7',
+      inputBg: '#FFFFFF',
+      inputColor: '#3E2723',
+      inputBorder: '#7DD3FC',
+      caretColor: '#0284C7',
+      buttonBg: '#0284C7',
+      buttonColor: '#FFFFFF',
+      buttonBorder: '#0369A1',
+      font: 'Comfortaa',
+      fontHeading: 'Comfortaa'
+    },
+    beige: {
+      id: 'beige',
+      name: 'Beige',
+      mode: 'light',
+      bodyBg: '#F7F4EE',
+      textColor: '#2C221E',
+      titleColor: '#1C1512',
+      linkColor: '#8C6D53',
+      inputBg: '#FFFFFF',
+      inputColor: '#2C221E',
+      inputBorder: '#D6CEBF',
+      caretColor: '#8C6D53',
+      buttonBg: '#EFECE4',
+      buttonColor: '#2C221E',
+      buttonBorder: '#8C6D53',
+      font: 'Newsreader',
+      fontHeading: 'Newsreader'
+    }
+  };
+
   class ZenWebContent {
     constructor() {
       this.settings = null;
@@ -23,6 +107,8 @@
       this.pixelAnimId = null;
       this.pixels = [];
       this.gridCrosshairs = [];
+      this.strobingHearts = [];
+      this.surfingHearts = [];
       this.lastActivityTime = Date.now();
       this.lastScrollY = window.scrollY;
       this.scrollStuckStartTime = null;
@@ -91,6 +177,10 @@
             }
             this.settings = { ...this.settings, ...updated };
 
+            if (changes.theme && changes.theme.newValue) {
+              this.setTheme(changes.theme.newValue);
+            }
+
             if (this.settings.enabled === false) {
               this.applyDisabledState();
             } else {
@@ -155,68 +245,184 @@
       this.startPixelAnimation();
     }
 
-    initPixelParticles(width, height) {
-      this.pixels = [];
-      this.gridCrosshairs = [];
-      const gridSize = 50;
+    getActiveThemeKey() {
+      let t = (this.settings?.theme || 'cyberpunk').toLowerCase();
+      if (t === 'pixel-dark') t = 'cyberpunk';
+      if (!['cyberpunk', 'sorbet', 'surf', 'beige'].includes(t)) t = 'cyberpunk';
+      return t;
+    }
 
-      // Generate fixed coordinate crosshairs (+)
-      for (let x = 25; x < width; x += gridSize * 2) {
-        for (let y = 25; y < height; y += gridSize * 2) {
-          if (Math.random() > 0.45) {
-            const isPink = Math.random() > 0.8;
-            this.gridCrosshairs.push({
-              x,
-              y,
-              color: isPink ? '#FF007A' : '#00FF66',
-              alpha: 0.16 + Math.random() * 0.22,
-              pulseSpeed: 1 + Math.random() * 2,
-              phase: Math.random() * Math.PI * 2
-            });
+    getActiveThemeConfig() {
+      const key = this.getActiveThemeKey();
+      return ZENWEB_THEMES[key] || ZENWEB_THEMES.cyberpunk;
+    }
+
+    setTheme(themeName) {
+      let target = (themeName || 'cyberpunk').toLowerCase();
+      if (target === 'pixel-dark') target = 'cyberpunk';
+      if (!['cyberpunk', 'sorbet', 'surf', 'beige'].includes(target)) target = 'cyberpunk';
+
+      this.settings = { ...(this.settings || {}), theme: target };
+      const root = document.documentElement;
+      root.setAttribute('data-zenweb-theme', target);
+      root.setAttribute('data-zenweb-font', target === 'beige' ? 'office-editorial' : 'circular-digital');
+
+      // Update canvas visibility (Beige has no animation)
+      if (this.slidingPixelCanvas) {
+        this.slidingPixelCanvas.style.display = target === 'beige' ? 'none' : 'block';
+      }
+
+      // Re-initialize particles for the selected theme
+      this.initPixelParticles(window.innerWidth, window.innerHeight);
+
+      // Re-apply theme-specific contrast normalization and github grid
+      this.applyContrastNormalization();
+
+      // Update Dock label if mounted
+      const themeLabel = document.getElementById('zw-dock-theme-label');
+      if (themeLabel) {
+        themeLabel.textContent = target.toUpperCase();
+      }
+
+      // Persist to sync storage
+      chrome.storage?.sync?.set({ theme: target });
+    }
+
+    /* 8-bit Pixel Heart Renderer */
+    drawPixelHeart(ctx, cx, cy, pixelSize, color, alpha) {
+      if (alpha <= 0.01) return;
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.globalAlpha = Math.min(1, Math.max(0, alpha));
+      // 7 columns x 6 rows pixel heart map
+      const matrix = [
+        [0, 1, 1, 0, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 1, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0]
+      ];
+      const startX = Math.round(cx - (3.5 * pixelSize));
+      const startY = Math.round(cy - (3 * pixelSize));
+
+      for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 7; c++) {
+          if (matrix[r][c]) {
+            ctx.fillRect(startX + c * pixelSize, startY + r * pixelSize, pixelSize, pixelSize);
           }
         }
       }
+      ctx.restore();
+    }
 
-      // Generate prominent, chunky sliding pixel packets (Baseten aesthetic)
-      const particleCount = Math.max(22, Math.floor(width / 52));
-      const colors = ['#00FF66', '#FF007A', '#F4F6FB', '#00FF66', '#38BDF8'];
+    initPixelParticles(width, height) {
+      this.pixels = [];
+      this.gridCrosshairs = [];
+      this.strobingHearts = [];
+      this.surfingHearts = [];
 
-      for (let i = 0; i < particleCount; i++) {
-        // Diverse, clearly visible chunky sizes:
-        // - Wide multi-byte data packets: 26-38px x 10-14px
-        // - Medium chunky blocks: 16-24px x 8-11px
-        // - Chunky square blocks: 12-16px x 12-16px
-        const roll = Math.random();
-        let w = 18;
-        let h = 9;
-        let styleType = 'medium';
+      const theme = this.getActiveThemeKey();
 
-        if (roll < 0.38) {
-          w = 26 + Math.floor(Math.random() * 12); // 26-38px wide
-          h = 10 + Math.floor(Math.random() * 4);  // 10-14px tall
-          styleType = 'wide';
-        } else if (roll < 0.72) {
-          w = 16 + Math.floor(Math.random() * 8);  // 16-24px wide
-          h = 8 + Math.floor(Math.random() * 3);   // 8-11px tall
-          styleType = 'medium';
-        } else {
-          const sz = 12 + Math.floor(Math.random() * 4); // 12-16px square
-          w = sz;
-          h = sz;
-          styleType = 'square';
+      if (theme === 'cyberpunk') {
+        const gridSize = 50;
+
+        // Generate fixed coordinate crosshairs (+)
+        for (let x = 25; x < width; x += gridSize * 2) {
+          for (let y = 25; y < height; y += gridSize * 2) {
+            if (Math.random() > 0.45) {
+              const isPink = Math.random() > 0.8;
+              this.gridCrosshairs.push({
+                x,
+                y,
+                color: isPink ? '#FF007A' : '#00FF66',
+                alpha: 0.16 + Math.random() * 0.22,
+                pulseSpeed: 1 + Math.random() * 2,
+                phase: Math.random() * Math.PI * 2
+              });
+            }
+          }
         }
 
-        this.pixels.push({
-          x: Math.random() * width,
-          y: Math.floor((Math.random() * height) / gridSize) * gridSize + 25 - (h / 2),
-          w,
-          h,
-          styleType,
-          vx: 30 + Math.random() * 45,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          alpha: 0.38 + Math.random() * 0.45,
-          trailSteps: 4 + Math.floor(Math.random() * 3) // 4 to 6 chunky trailing segments
-        });
+        // Chunky sliding pixel packets (Baseten aesthetic)
+        const particleCount = Math.max(22, Math.floor(width / 52));
+        const colors = ['#00FF66', '#FF007A', '#F4F6FB', '#00FF66', '#38BDF8'];
+
+        for (let i = 0; i < particleCount; i++) {
+          const roll = Math.random();
+          let w = 18;
+          let h = 9;
+          let styleType = 'medium';
+
+          if (roll < 0.38) {
+            w = 26 + Math.floor(Math.random() * 12);
+            h = 10 + Math.floor(Math.random() * 4);
+            styleType = 'wide';
+          } else if (roll < 0.72) {
+            w = 16 + Math.floor(Math.random() * 8);
+            h = 8 + Math.floor(Math.random() * 3);
+            styleType = 'medium';
+          } else {
+            const sz = 12 + Math.floor(Math.random() * 4);
+            w = sz;
+            h = sz;
+            styleType = 'square';
+          }
+
+          this.pixels.push({
+            x: Math.random() * width,
+            y: Math.floor((Math.random() * height) / gridSize) * gridSize + 25 - (h / 2),
+            w,
+            h,
+            styleType,
+            vx: 30 + Math.random() * 45,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            alpha: 0.38 + Math.random() * 0.45,
+            trailSteps: 4 + Math.floor(Math.random() * 3)
+          });
+        }
+      } else if (theme === 'sorbet') {
+        // Sorbet Theme: Strobing pixel hearts phasing in and out of view all over the screen
+        // Colors: baby pink, baby blue, sunshine yellow, and dark pink sorbet
+        const heartCount = Math.max(35, Math.floor((width * height) / 28000));
+        const sorbetColors = ['#F472B6', '#F9A8D4', '#38BDF8', '#7DD3FC', '#FDE047', '#FEF08A', '#BE185D'];
+
+        for (let i = 0; i < heartCount; i++) {
+          const pixelSize = 2 + Math.floor(Math.random() * 2.5); // 2 to 4px per pixel (14 to 28px heart)
+          this.strobingHearts.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            pixelSize,
+            color: sorbetColors[Math.floor(Math.random() * sorbetColors.length)],
+            maxAlpha: 0.35 + Math.random() * 0.5,
+            strobeSpeed: 0.8 + Math.random() * 2.2,
+            phase: Math.random() * Math.PI * 2
+          });
+        }
+      } else if (theme === 'surf') {
+        // Surf Theme: Tiny pixel hearts strobing and shining, surfing smoothly from left to right
+        // Colors: baby blue, azure blue, sand, and seafoam white
+        const surfCount = Math.max(30, Math.floor(width / 40));
+        const surfColors = ['#0284C7', '#38BDF8', '#BAE6FD', '#F5E6CA', '#FFFFFF', '#0EA5E9'];
+
+        for (let i = 0; i < surfCount; i++) {
+          const pixelSize = 1.6 + Math.random() * 0.8; // Tiny pixel hearts (11px to 17px)
+          this.surfingHearts.push({
+            x: Math.random() * width,
+            baseY: Math.random() * height,
+            y: 0,
+            pixelSize,
+            color: surfColors[Math.floor(Math.random() * surfColors.length)],
+            vx: 45 + Math.random() * 45, // Surfing horizontal velocity
+            waveAmp: 8 + Math.random() * 12, // Undulating wave amplitude
+            waveFreq: 0.012 + Math.random() * 0.008,
+            wavePhase: Math.random() * Math.PI * 2,
+            alpha: 0.45 + Math.random() * 0.45,
+            shimmerSpeed: 1 + Math.random() * 2
+          });
+        }
+      } else if (theme === 'beige') {
+        // Beige: No animated elements - keeping it clean, still, and office-appropriate
       }
     }
 
@@ -248,72 +454,101 @@
 
       ctx.clearRect(0, 0, w, h);
 
-      const gridSize = 50;
+      const theme = this.getActiveThemeKey();
 
-      // 1. Draw Crisp Technical Grid Dots
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.055)';
-      for (let x = 25; x < w; x += gridSize) {
-        for (let y = 25; y < h; y += gridSize) {
-          ctx.fillRect(x - 1, y - 1, 2.5, 2.5);
-        }
-      }
+      if (theme === 'cyberpunk') {
+        const gridSize = 50;
 
-      // 2. Draw Prominent Pulsing Coordinate Crosshairs (+)
-      this.gridCrosshairs.forEach(ch => {
-        const pulse = 0.5 + 0.5 * Math.sin(now * 0.002 * ch.pulseSpeed + ch.phase);
-        ctx.fillStyle = ch.color || '#00FF66';
-        ctx.globalAlpha = ch.alpha * pulse;
-        // Horizontal bar: 13px wide x 2px thick
-        ctx.fillRect(ch.x - 6, ch.y - 1, 13, 2);
-        // Vertical bar: 2px wide x 13px tall
-        ctx.fillRect(ch.x - 1, ch.y - 6, 2, 13);
-      });
-
-      // 3. Draw Large Sliding Pixels & Chunky Segmented Trails
-      this.pixels.forEach(p => {
-        p.x += p.vx * dt;
-
-        if (p.x > w + 120) {
-          p.x = -80;
-          p.y = Math.floor((Math.random() * h) / gridSize) * gridSize + 25 - (p.h / 2);
-        }
-
-        // Draw segmented trailing pixel dashes behind the lead head
-        const stepSpacing = p.w * 0.65 + 6;
-        for (let step = 1; step <= p.trailSteps; step++) {
-          const trailX = p.x - step * stepSpacing;
-          if (trailX > -50 && trailX < w + 50) {
-            const decay = 1 - (step / (p.trailSteps + 1));
-            const trailW = Math.max(5, Math.floor(p.w * decay));
-            const trailH = Math.max(4, Math.floor(p.h * (0.4 + 0.6 * decay)));
-            const trailY = p.y + (p.h - trailH) / 2;
-
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.alpha * decay * 0.6;
-            ctx.fillRect(trailX, trailY, trailW, trailH);
+        // 1. Grid Dots
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.055)';
+        for (let x = 25; x < w; x += gridSize) {
+          for (let y = 25; y < h; y += gridSize) {
+            ctx.fillRect(x - 1, y - 1, 2.5, 2.5);
           }
         }
 
-        // Main Pixel Head with Soft Luminescent Glow
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 10;
+        // 2. Coordinate Crosshairs
+        this.gridCrosshairs.forEach(ch => {
+          const pulse = 0.5 + 0.5 * Math.sin(now * 0.002 * ch.pulseSpeed + ch.phase);
+          ctx.fillStyle = ch.color || '#00FF66';
+          ctx.globalAlpha = ch.alpha * pulse;
+          ctx.fillRect(ch.x - 6, ch.y - 1, 13, 2);
+          ctx.fillRect(ch.x - 1, ch.y - 6, 2, 13);
+        });
 
-        // Draw solid main head block
-        ctx.fillRect(p.x, p.y, p.w, p.h);
+        // 3. Sliding Pixel Packets & Segmented Trails
+        this.pixels.forEach(p => {
+          p.x += p.vx * dt;
 
-        // Bright inner core highlight for substantial blocks
-        if (p.w >= 18) {
-          ctx.fillStyle = '#ffffff';
-          ctx.globalAlpha = Math.min(1, p.alpha * 0.75);
-          ctx.shadowBlur = 0;
-          ctx.fillRect(p.x + 3, p.y + 2, Math.max(4, p.w - 6), Math.max(2, p.h - 4));
-        }
+          if (p.x > w + 120) {
+            p.x = -80;
+            p.y = Math.floor((Math.random() * h) / gridSize) * gridSize + 25 - (p.h / 2);
+          }
 
-        ctx.restore();
-      });
+          const stepSpacing = p.w * 0.65 + 6;
+          for (let step = 1; step <= p.trailSteps; step++) {
+            const trailX = p.x - step * stepSpacing;
+            if (trailX > -50 && trailX < w + 50) {
+              const decay = 1 - (step / (p.trailSteps + 1));
+              const trailW = Math.max(5, Math.floor(p.w * decay));
+              const trailH = Math.max(4, Math.floor(p.h * (0.4 + 0.6 * decay)));
+              const trailY = p.y + (p.h - trailH) / 2;
+
+              ctx.fillStyle = p.color;
+              ctx.globalAlpha = p.alpha * decay * 0.6;
+              ctx.fillRect(trailX, trailY, trailW, trailH);
+            }
+          }
+
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 10;
+          ctx.fillRect(p.x, p.y, p.w, p.h);
+
+          if (p.w >= 18) {
+            ctx.fillStyle = '#ffffff';
+            ctx.globalAlpha = Math.min(1, p.alpha * 0.75);
+            ctx.shadowBlur = 0;
+            ctx.fillRect(p.x + 3, p.y + 2, Math.max(4, p.w - 6), Math.max(2, p.h - 4));
+          }
+
+          ctx.restore();
+        });
+      } else if (theme === 'sorbet') {
+        // Sorbet Theme: Strobing pixel hearts phasing in and out across the screen
+        this.strobingHearts.forEach(heart => {
+          const strobe = 0.5 + 0.5 * Math.sin(now * 0.0025 * heart.strobeSpeed + heart.phase);
+          const currentAlpha = heart.maxAlpha * (0.08 + 0.92 * strobe);
+          this.drawPixelHeart(ctx, heart.x, heart.y, heart.pixelSize, heart.color, currentAlpha);
+        });
+      } else if (theme === 'surf') {
+        // Surf Theme: Tiny pixel hearts strobing and shining, surfing smoothly from left to right
+        this.surfingHearts.forEach(heart => {
+          heart.x += heart.vx * dt;
+          heart.y = heart.baseY + Math.sin(heart.x * heart.waveFreq + heart.wavePhase) * heart.waveAmp + Math.cos(now * 0.0025 + heart.wavePhase) * 3;
+
+          if (heart.x > w + 40) {
+            heart.x = -30;
+            heart.baseY = Math.random() * h;
+          }
+
+          const shimmer = 0.45 + 0.55 * Math.sin(now * 0.006 * heart.shimmerSpeed + heart.x * 0.02);
+          const currentAlpha = heart.alpha * shimmer;
+
+          // Tiny sparkling wake droplets
+          ctx.fillStyle = heart.color;
+          ctx.globalAlpha = currentAlpha * 0.35;
+          ctx.fillRect(heart.x - 8, heart.y + 2, 4, 2);
+          ctx.fillRect(heart.x - 16, heart.y + 3, 3, 1.5);
+
+          this.drawPixelHeart(ctx, heart.x, heart.y, heart.pixelSize, heart.color, currentAlpha);
+        });
+      } else if (theme === 'beige') {
+        // Beige: No animated elements - keeping it clean and office appropriate
+        ctx.clearRect(0, 0, w, h);
+      }
 
       ctx.globalAlpha = 1;
     }
@@ -325,7 +560,9 @@
        ========================================================================== */
 
     applyContrastNormalization() {
-      // 1. Universal Form Controls & Inputs Guardian (Eliminates white-on-white login fields)
+      const theme = this.getActiveThemeConfig();
+
+      // 1. Universal Form Controls & Inputs Guardian (Eliminates white-on-white / unreadable login fields)
       const formControls = document.querySelectorAll(`
         input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([class^="zw-"]),
         textarea:not([class^="zw-"]),
@@ -338,12 +575,12 @@
         if (!el.hasAttribute('data-zw-orig-style')) {
           el.setAttribute('data-zw-orig-style', el.getAttribute('style') || '');
         }
-        el.style.setProperty('background-color', '#131420', 'important');
+        el.style.setProperty('background-color', theme.inputBg, 'important');
         el.style.setProperty('background-image', 'none', 'important');
-        el.style.setProperty('color', '#ffffff', 'important');
-        el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
-        el.style.setProperty('border', '1.5px solid #272a3d', 'important');
-        el.style.setProperty('caret-color', '#00FF66', 'important');
+        el.style.setProperty('color', theme.inputColor, 'important');
+        el.style.setProperty('-webkit-text-fill-color', theme.inputColor, 'important');
+        el.style.setProperty('border', `1.5px solid ${theme.inputBorder}`, 'important');
+        el.style.setProperty('caret-color', theme.caretColor, 'important');
         this.normalizedStyleElements.add(el);
       });
 
@@ -358,14 +595,14 @@
       buttons.forEach(el => {
         if (el.closest('#zenweb-root, [id^="zenweb-"], [class^="zw-"]')) return;
         const comp = window.getComputedStyle(el);
-        if (this.isBrightBackground(comp.backgroundColor)) {
+        if (theme.mode === 'dark' ? this.isBrightBackground(comp.backgroundColor) : this.isDarkBackground(comp.backgroundColor)) {
           if (!el.hasAttribute('data-zw-orig-style')) {
             el.setAttribute('data-zw-orig-style', el.getAttribute('style') || '');
           }
-          el.style.setProperty('background-color', '#161826', 'important');
-          el.style.setProperty('color', '#00FF66', 'important');
-          el.style.setProperty('-webkit-text-fill-color', '#00FF66', 'important');
-          el.style.setProperty('border', '1.5px solid #00FF66', 'important');
+          el.style.setProperty('background-color', theme.buttonBg, 'important');
+          el.style.setProperty('color', theme.buttonColor, 'important');
+          el.style.setProperty('-webkit-text-fill-color', theme.buttonColor, 'important');
+          el.style.setProperty('border', `1.5px solid ${theme.buttonBorder}`, 'important');
           this.normalizedStyleElements.add(el);
         }
       });
@@ -392,8 +629,8 @@
 
         const comp = window.getComputedStyle(el);
 
-        // Check if background is bright white or light grey (e.g. Times of India white box, ad boxes)
-        if (comp.backgroundColor && this.isBrightBackground(comp.backgroundColor)) {
+        // Check if background needs neutralizing
+        if (comp.backgroundColor && (theme.mode === 'dark' ? this.isBrightBackground(comp.backgroundColor) : this.isDarkBackground(comp.backgroundColor))) {
           el.style.setProperty('background-color', 'transparent', 'important');
           el.style.setProperty('background-image', 'none', 'important');
           this.normalizedStyleElements.add(el);
@@ -404,31 +641,46 @@
         const isDarkBg = this.isDarkBackground(effectiveBg);
         const isBrightBg = this.isBrightBackground(effectiveBg);
 
-        // Collision Check A: White-on-White text
-        if (isBrightBg && this.isBrightText(comp.color)) {
-          el.style.setProperty('background-color', '#12131c', 'important');
-          el.style.setProperty('color', '#ffffff', 'important');
-          el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
-          this.normalizedStyleElements.add(el);
-        }
-
-        // Collision Check B: Dark-on-Dark text (e.g. Times of India headline)
-        else if (isDarkBg && this.isLowContrastTextOnDark(comp.color)) {
-          if (el.tagName === 'A' || el.closest('a')) {
-            el.style.setProperty('color', '#00FF66', 'important');
-            el.style.setProperty('-webkit-text-fill-color', '#00FF66', 'important');
-          } else if (/^H[1-6]$/.test(el.tagName) || el.className?.toString().match(/title|heading|headline/i)) {
+        if (theme.mode === 'dark') {
+          // Dark Mode Collisions
+          if (isBrightBg && this.isBrightText(comp.color)) {
+            el.style.setProperty('background-color', '#12131c', 'important');
             el.style.setProperty('color', '#ffffff', 'important');
             el.style.setProperty('-webkit-text-fill-color', '#ffffff', 'important');
-          } else {
-            el.style.setProperty('color', '#f4f6fb', 'important');
-            el.style.setProperty('-webkit-text-fill-color', '#f4f6fb', 'important');
+            this.normalizedStyleElements.add(el);
+          } else if (isDarkBg && this.isLowContrastTextOnDark(comp.color)) {
+            if (el.tagName === 'A' || el.closest('a')) {
+              el.style.setProperty('color', theme.linkColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.linkColor, 'important');
+            } else if (/^H[1-6]$/.test(el.tagName) || el.className?.toString().match(/title|heading|headline/i)) {
+              el.style.setProperty('color', theme.titleColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.titleColor, 'important');
+            } else {
+              el.style.setProperty('color', theme.textColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.textColor, 'important');
+            }
+            this.normalizedStyleElements.add(el);
           }
-          this.normalizedStyleElements.add(el);
+        } else {
+          // Light Mode Collisions (Sorbet, Surf, Beige)
+          if (isBrightBg && this.isBrightText(comp.color)) {
+            // Text is too bright on light canvas (e.g. pale white text on pink/blue/beige canvas)
+            if (el.tagName === 'A' || el.closest('a')) {
+              el.style.setProperty('color', theme.linkColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.linkColor, 'important');
+            } else if (/^H[1-6]$/.test(el.tagName) || el.className?.toString().match(/title|heading|headline/i)) {
+              el.style.setProperty('color', theme.titleColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.titleColor, 'important');
+            } else {
+              el.style.setProperty('color', theme.textColor, 'important');
+              el.style.setProperty('-webkit-text-fill-color', theme.textColor, 'important');
+            }
+            this.normalizedStyleElements.add(el);
+          }
         }
       });
 
-      // Style GitHub Contribution Calendar in rich hues of pink
+      // Style GitHub Contribution Calendar in active theme palette
       this.styleGitHubContributionGrid();
 
       // Setup MutationObserver for dynamic SPA content loading (e.g. Times of India, Reddit, Twitter)
@@ -463,17 +715,43 @@
 
       if (days.length === 0) return;
 
-      const pinkShades = {
-        '0': { bg: '#171827', border: '#272a3e' },
-        '1': { bg: '#5c183d', border: 'rgba(255, 0, 122, 0.45)' },
-        '2': { bg: '#9e145e', border: 'rgba(255, 0, 122, 0.7)' },
-        '3': { bg: '#d8006b', border: '#FF007A' },
-        '4': { bg: '#FF007A', border: '#ff70b3' }
+      const themeKey = this.getActiveThemeKey();
+      const themePalettes = {
+        cyberpunk: {
+          '0': { bg: '#171827', border: '#272a3e' },
+          '1': { bg: '#5c183d', border: 'rgba(255, 0, 122, 0.45)' },
+          '2': { bg: '#9e145e', border: 'rgba(255, 0, 122, 0.7)' },
+          '3': { bg: '#d8006b', border: '#FF007A' },
+          '4': { bg: '#FF007A', border: '#ff70b3' }
+        },
+        sorbet: {
+          '0': { bg: '#FFF0F5', border: '#FBCFE8' },
+          '1': { bg: '#FCE7F3', border: '#F9A8D4' },
+          '2': { bg: '#F472B6', border: '#EC4899' },
+          '3': { bg: '#DB2777', border: '#BE185D' },
+          '4': { bg: '#9D174D', border: '#831843' }
+        },
+        surf: {
+          '0': { bg: '#E0F2FE', border: '#BAE6FD' },
+          '1': { bg: '#BAE6FD', border: '#7DD3FC' },
+          '2': { bg: '#38BDF8', border: '#0EA5E9' },
+          '3': { bg: '#0284C7', border: '#0369A1' },
+          '4': { bg: '#0369A1', border: '#075985' }
+        },
+        beige: {
+          '0': { bg: '#F7F4EE', border: '#E5E0D5' },
+          '1': { bg: '#EFECE4', border: '#D6CEBF' },
+          '2': { bg: '#D6CEBF', border: '#A27B5C' },
+          '3': { bg: '#8C6D53', border: '#6F4E37' },
+          '4': { bg: '#2C221E', border: '#1C1512' }
+        }
       };
+
+      const currentPalette = themePalettes[themeKey] || themePalettes.cyberpunk;
 
       days.forEach(el => {
         const level = el.getAttribute('data-level') || '0';
-        const shade = pinkShades[level] || pinkShades['0'];
+        const shade = currentPalette[level] || currentPalette['0'];
 
         if (!el.hasAttribute('data-zw-orig-style') && el.getAttribute('style')) {
           el.setAttribute('data-zw-orig-style', el.getAttribute('style'));
@@ -490,7 +768,7 @@
       const legendItems = document.querySelectorAll('.ContributionCalendar-legend [data-level], ul.legend [data-level]');
       legendItems.forEach(item => {
         const level = item.getAttribute('data-level') || '0';
-        const shade = pinkShades[level] || pinkShades['0'];
+        const shade = currentPalette[level] || currentPalette['0'];
         if (!item.hasAttribute('data-zw-orig-style') && item.getAttribute('style')) {
           item.setAttribute('data-zw-orig-style', item.getAttribute('style'));
         }
@@ -941,8 +1219,9 @@
       this.isRestructured = true;
 
       const root = document.documentElement;
-      root.setAttribute('data-zenweb-theme', 'pixel-dark');
-      root.setAttribute('data-zenweb-font', 'circular-digital');
+      const themeKey = this.getActiveThemeKey();
+      root.setAttribute('data-zenweb-theme', themeKey);
+      root.setAttribute('data-zenweb-font', themeKey === 'beige' ? 'office-editorial' : 'circular-digital');
       root.setAttribute('data-zenweb-restructured', 'true');
 
       const archetype = this.detectPageArchetype();
@@ -1662,7 +1941,19 @@
           <span class="zw-dock-label" id="zw-dock-agent-label">VISION</span>
         </button>
 
-        <!-- 5. Minimize / Expand Toggle -->
+        <!-- 5. Theme Switcher (Cycles: Cyberpunk / Sorbet / Surf / Beige) -->
+        <button class="zw-dock-btn" id="zw-dock-theme" title="Cycle Themes (Cyberpunk / Sorbet / Surf / Beige)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <rect x="5" y="4" width="14" height="16" fill="#181a26" stroke="#2e3247" stroke-width="1"/>
+            <rect x="7" y="6" width="4" height="4" fill="#00FF66"/>
+            <rect x="13" y="6" width="4" height="4" fill="#FF007A"/>
+            <rect x="7" y="12" width="4" height="4" fill="#38BDF8"/>
+            <rect x="13" y="12" width="4" height="4" fill="#F5E6CA"/>
+          </svg>
+          <span class="zw-dock-label" id="zw-dock-theme-label">CYBER</span>
+        </button>
+
+        <!-- 6. Minimize / Expand Toggle -->
         <button class="zw-dock-btn-min" id="zw-dock-minimize" title="Minimize Dock">
           <svg viewBox="0 0 24 24" width="12" height="12" fill="none">
             <path d="M5 12h14" stroke="#9499aa" stroke-width="2.5" stroke-linecap="round"/>
@@ -1725,6 +2016,16 @@
         }
       });
 
+      dock.querySelector('#zw-dock-theme')?.addEventListener('click', () => {
+        const themeOrder = ['cyberpunk', 'sorbet', 'surf', 'beige'];
+        const current = this.getActiveThemeKey();
+        const nextIdx = (themeOrder.indexOf(current) + 1) % themeOrder.length;
+        const nextTheme = themeOrder[nextIdx];
+        this.setTheme(nextTheme);
+        this.updateDockState();
+        this.showToast(`✓ Theme: ${nextTheme.toUpperCase()}`);
+      });
+
       this.updateDockState();
     }
 
@@ -1739,6 +2040,9 @@
       const agentBtn = dock.querySelector('#zw-dock-agent');
       const agentLabel = dock.querySelector('#zw-dock-agent-label');
       const visionIconWrap = dock.querySelector('#zw-dock-vision-icon-wrap');
+
+      const themeLabel = dock.querySelector('#zw-dock-theme-label');
+      const themeBtn = dock.querySelector('#zw-dock-theme');
 
       // 3. Update Pixel On/Off Toggle (Title: ON or OFF)
       const isRestructureOn = this.settings?.dataRestructuring !== false;
@@ -1771,6 +2075,15 @@
         agentBtn?.classList.remove('zw-dock-active');
         agentBtn?.setAttribute('title', 'AI Vision Monitor: OFF (Click to Enable)');
       }
+
+      // 5. Update Theme Switcher Label
+      const currentTheme = this.getActiveThemeKey();
+      if (themeLabel) {
+        themeLabel.textContent = currentTheme.slice(0, 6).toUpperCase();
+      }
+      if (themeBtn) {
+        themeBtn.setAttribute('title', `Active Theme: ${currentTheme.toUpperCase()} (Click to Cycle)`);
+      }
     }
 
     /* ==========================================================================
@@ -1779,13 +2092,14 @@
 
     applyActiveState() {
       const root = document.documentElement;
-      root.setAttribute('data-zenweb-theme', 'pixel-dark');
-      root.setAttribute('data-zenweb-font', 'circular-digital');
+      const themeKey = this.getActiveThemeKey();
+      root.setAttribute('data-zenweb-theme', themeKey);
+      root.setAttribute('data-zenweb-font', themeKey === 'beige' ? 'office-editorial' : 'circular-digital');
 
       // 1. Mount Sliding Pixel Canvas
       this.mountSlidingPixelCanvas();
       if (this.slidingPixelCanvas) {
-        this.slidingPixelCanvas.style.display = 'block';
+        this.slidingPixelCanvas.style.display = themeKey === 'beige' ? 'none' : 'block';
       }
 
       // 2. Mount Hardware Remote Dock
@@ -1897,6 +2211,9 @@
         switch (msg.type) {
           case 'UPDATE_SETTINGS':
             this.settings = { ...this.settings, ...msg.settings };
+            if (msg.settings && msg.settings.theme) {
+              this.setTheme(msg.settings.theme);
+            }
             if (this.settings.enabled === false) {
               this.applyDisabledState();
             } else {
@@ -1904,6 +2221,14 @@
             }
             this.updateDockState();
             sendResponse({ success: true });
+            break;
+
+          case 'SET_THEME':
+            if (msg.theme) {
+              this.setTheme(msg.theme);
+            }
+            this.updateDockState();
+            sendResponse({ success: true, theme: this.getActiveThemeKey() });
             break;
 
           case 'TRIGGER_MINIGAME_BREAK':

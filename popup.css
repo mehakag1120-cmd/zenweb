@@ -444,3 +444,68 @@ body {
   color: var(--text-muted);
   letter-spacing: 0.05em;
 }
+
+/* Theme Palette Grid */
+.zw-theme-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.zw-theme-card {
+  all: initial;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.zw-theme-card:hover {
+  border-color: var(--neon-green);
+  transform: translate(-1px, -1px);
+}
+
+.zw-theme-card.active {
+  border-color: var(--neon-green);
+  background: rgba(0, 255, 102, 0.08);
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.3), 2px 2px 0px #000;
+}
+
+.zw-theme-swatches {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.zw-theme-swatches span {
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-block;
+}
+
+.zw-theme-card strong {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+}
+
+.zw-theme-card small {
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-top: 2px;
+  display: block;
+}

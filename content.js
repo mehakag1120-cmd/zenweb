@@ -1206,6 +1206,97 @@
        7. BESPOKE HARDWARE REMOTE PANEL (BOTTOM-LEFT CYBER DECK - NO EMOJIS)
        ========================================================================== */
 
+    /* ==========================================================================
+       7. BESPOKE HARDWARE REMOTE PANEL (8-BIT PIXEL ICONS - RETRO CYBER DECK)
+       ========================================================================== */
+
+    getTogglePixelSVG(isOn) {
+      if (isOn) {
+        return `
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Outer Pixel Track Frame (Electric Green Glow) -->
+            <rect x="3" y="6" width="18" height="12" fill="#0c2417" stroke="#00FF66" stroke-width="1.5"/>
+            <!-- Left Active Fill -->
+            <rect x="5" y="8" width="7" height="8" fill="#00FF66" fill-opacity="0.28"/>
+            <!-- ON Bar '|' -->
+            <rect x="7" y="10" width="2" height="4" fill="#00FF66"/>
+            <!-- Pixel Slider Knob (Right) -->
+            <rect x="12" y="5" width="8" height="14" fill="#00FF66"/>
+            <rect x="14" y="7" width="4" height="10" fill="#FFFFFF"/>
+            <rect x="15" y="9" width="2" height="6" fill="#00FF66"/>
+          </svg>
+        `;
+      } else {
+        return `
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Outer Pixel Track Frame (Muted Dark) -->
+            <rect x="3" y="6" width="18" height="12" fill="#12131c" stroke="#3d4157" stroke-width="1.5"/>
+            <!-- Right Dark Cavity -->
+            <rect x="11" y="8" width="8" height="8" fill="#090a10"/>
+            <!-- OFF Circle 'O' in right track -->
+            <rect x="14" y="9" width="4" height="6" fill="#50546d"/>
+            <rect x="15" y="10" width="2" height="4" fill="#090a10"/>
+            <!-- Pixel Slider Knob (Left) -->
+            <rect x="4" y="5" width="8" height="14" fill="#4a4d62"/>
+            <rect x="5" y="7" width="4" height="10" fill="#6f748f"/>
+            <rect x="6" y="9" width="2" height="6" fill="#2e3247"/>
+          </svg>
+        `;
+      }
+    }
+
+    getVisionPixelSVG(isOn) {
+      if (isOn) {
+        return `
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Stepped Pixel Upper Eyelid Arc (Green) -->
+            <rect x="8" y="5" width="8" height="2" fill="#00FF66"/>
+            <rect x="5" y="7" width="3" height="2" fill="#00FF66"/>
+            <rect x="16" y="7" width="3" height="2" fill="#00FF66"/>
+            <rect x="2" y="9" width="3" height="2" fill="#00FF66"/>
+            <rect x="19" y="9" width="3" height="2" fill="#00FF66"/>
+            <!-- Stepped Pixel Lower Eyelid Arc -->
+            <rect x="2" y="13" width="3" height="2" fill="#00FF66"/>
+            <rect x="19" y="13" width="3" height="2" fill="#00FF66"/>
+            <rect x="5" y="15" width="3" height="2" fill="#00FF66"/>
+            <rect x="16" y="15" width="3" height="2" fill="#00FF66"/>
+            <rect x="8" y="17" width="8" height="2" fill="#00FF66"/>
+            <!-- Sclera Fill -->
+            <rect x="5" y="9" width="14" height="6" fill="#00FF66" fill-opacity="0.14"/>
+            <!-- Glowing Pixel Reticle / Iris (Center) -->
+            <rect x="9" y="9" width="6" height="6" fill="#00FF66"/>
+            <rect x="10" y="10" width="4" height="4" fill="#090a10"/>
+            <rect x="11" y="11" width="2" height="2" fill="#FFFFFF"/>
+            <!-- Active Cyber Radar Beams -->
+            <rect x="11" y="2" width="2" height="2" fill="#00FF66"/>
+            <rect x="11" y="20" width="2" height="2" fill="#00FF66"/>
+            <rect x="6" y="3" width="2" height="1" fill="#FF007A"/>
+            <rect x="16" y="3" width="2" height="1" fill="#FF007A"/>
+          </svg>
+        `;
+      } else {
+        return `
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Closed Eyelid Center Line -->
+            <rect x="3" y="11" width="18" height="2" fill="#4a4d62"/>
+            <!-- Stepped Curved Brow (dim) -->
+            <rect x="6" y="9" width="12" height="1" fill="#2e3247"/>
+            <!-- Downward Eyelashes -->
+            <rect x="6" y="13" width="2" height="3" fill="#3d4157"/>
+            <rect x="11" y="13" width="2" height="4" fill="#3d4157"/>
+            <rect x="16" y="13" width="2" height="3" fill="#3d4157"/>
+            <!-- Diagonal Pink Inactive Slash / Off Indicator -->
+            <rect x="5" y="5" width="2" height="2" fill="#FF007A"/>
+            <rect x="7" y="7" width="2" height="2" fill="#FF007A"/>
+            <rect x="9" y="9" width="2" height="2" fill="#FF007A"/>
+            <rect x="13" y="13" width="2" height="2" fill="#FF007A"/>
+            <rect x="15" y="15" width="2" height="2" fill="#FF007A"/>
+            <rect x="17" y="17" width="2" height="2" fill="#FF007A"/>
+          </svg>
+        `;
+      }
+    }
+
     mountFloatingDock() {
       if (document.getElementById('zenweb-dock')) return;
 
@@ -1218,47 +1309,64 @@
           <span class="zw-dock-brand-text">ZEN</span>
         </div>
 
-        <!-- 1. Reset / Gamepad Icon -->
-        <button class="zw-dock-btn" id="zw-dock-game" title="Launch 90s Focus Reset Game">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-            <rect x="2" y="6" width="20" height="12" rx="3" stroke="#00FF66" stroke-width="1.8" fill="rgba(0, 255, 102, 0.08)"/>
-            <path d="M6 12h4M8 10v4" stroke="#00FF66" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="15" cy="11" r="1.3" fill="#FF007A"/>
-            <circle cx="18" cy="13" r="1.3" fill="#00FF66"/>
+        <!-- 1. Pixel Game Console Icon (Title: GAMES) -->
+        <button class="zw-dock-btn" id="zw-dock-game" title="Launch 90s Focus Reset Games">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Outer Console Body -->
+            <rect x="4" y="3" width="16" height="18" fill="#181a26" stroke="#2e3247" stroke-width="1"/>
+            <rect x="5" y="2" width="14" height="1" fill="#3d425d"/>
+            <!-- Screen Display with Pixel Sprite -->
+            <rect x="6" y="5" width="12" height="7" fill="#090a10"/>
+            <rect x="7" y="6" width="10" height="5" fill="#00FF66" fill-opacity="0.25"/>
+            <rect x="7" y="6" width="2" height="1" fill="#FF007A"/>
+            <rect x="11" y="7" width="2" height="2" fill="#00FF66"/>
+            <rect x="13" y="8" width="2" height="2" fill="#00FF66"/>
+            <!-- Pixel D-Pad on Left -->
+            <rect x="7" y="14" width="2" height="5" fill="#00FF66"/>
+            <rect x="5.5" y="15.5" width="5" height="2" fill="#00FF66"/>
+            <rect x="7" y="15.5" width="2" height="2" fill="#00cc52"/>
+            <!-- Pixel Action Buttons on Right -->
+            <rect x="14" y="16.5" width="2.5" height="2.5" fill="#FF007A"/>
+            <rect x="16.5" y="14" width="2.5" height="2.5" fill="#00FF66"/>
+            <rect x="14" y="19" width="4" height="1" fill="#2e3247"/>
           </svg>
-          <span class="zw-dock-label">RESET</span>
+          <span class="zw-dock-label" id="zw-dock-game-label">GAMES</span>
         </button>
 
-        <!-- 2. Water / Hydration Droplet Icon -->
+        <!-- 2. Pixel Waterdrop Icon (Title: WATER) -->
         <button class="zw-dock-btn" id="zw-dock-water" title="Log Hydration Break">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-            <path d="M12 3L6 11a7 7 0 1012 0L12 3z" stroke="#38BDF8" stroke-width="1.8" fill="rgba(56, 189, 248, 0.1)"/>
-            <path d="M8 13h8M9 16h6" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round"/>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" style="shape-rendering: crispEdges;">
+            <!-- Stepped Pixel Droplet Outer -->
+            <rect x="11" y="2" width="2" height="2" fill="#38BDF8"/>
+            <rect x="10" y="4" width="4" height="2" fill="#38BDF8"/>
+            <rect x="9" y="6" width="6" height="2" fill="#38BDF8"/>
+            <rect x="8" y="8" width="8" height="2" fill="#38BDF8"/>
+            <rect x="7" y="10" width="10" height="2" fill="#38BDF8"/>
+            <rect x="6" y="12" width="12" height="4" fill="#38BDF8"/>
+            <rect x="7" y="16" width="10" height="3" fill="#38BDF8"/>
+            <rect x="8" y="19" width="8" height="2" fill="#38BDF8"/>
+            <rect x="10" y="21" width="4" height="1" fill="#38BDF8"/>
+            <!-- Inner Deep Cyan Shadow -->
+            <rect x="10" y="13" width="6" height="5" fill="#0284C7"/>
+            <rect x="9" y="15" width="8" height="2" fill="#0284C7"/>
+            <!-- Pixel White Glint -->
+            <rect x="8" y="10" width="2" height="3" fill="#FFFFFF"/>
+            <rect x="7" y="12" width="2" height="4" fill="#FFFFFF"/>
+            <rect x="9" y="8" width="2" height="2" fill="#FFFFFF"/>
           </svg>
-          <span class="zw-dock-label">WATER</span>
+          <span class="zw-dock-label" id="zw-dock-water-label">WATER</span>
         </button>
 
-        <!-- 3. Cards / Bullet Deck Icon -->
-        <button class="zw-dock-btn" id="zw-dock-restructure" title="Toggle Scannable Bullet Cards">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-            <rect x="3" y="4" width="18" height="6.5" rx="1.5" stroke="#FF007A" stroke-width="1.6" fill="rgba(255, 0, 122, 0.1)"/>
-            <rect x="3" y="13.5" width="18" height="6.5" rx="1.5" stroke="#00FF66" stroke-width="1.6" fill="rgba(0, 255, 102, 0.1)"/>
-            <circle cx="6" cy="7.2" r="1" fill="#FF007A"/>
-            <circle cx="6" cy="16.7" r="1" fill="#00FF66"/>
-            <path d="M9.5 7.2h8.5M9.5 16.7h8.5" stroke="#f4f6fb" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          <span class="zw-dock-label">CARDS</span>
+        <!-- 3. Pixel On/Off Toggle (Title: ON / OFF) -->
+        <button class="zw-dock-btn" id="zw-dock-restructure" title="Toggle Focus Restructuring">
+          <span id="zw-dock-toggle-icon-wrap"></span>
+          <span class="zw-dock-label" id="zw-dock-toggle-label">ON</span>
         </button>
 
-        <!-- 4. Agent / Neural Visor Icon -->
-        <button class="zw-dock-btn" id="zw-dock-agent" title="AI Screen Activity Monitor">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
-            <rect x="3" y="6" width="18" height="12" rx="3" stroke="#00FF66" stroke-width="1.8" fill="rgba(0, 255, 102, 0.08)"/>
-            <path d="M6 12h12" stroke="#00FF66" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="2.2" fill="#FF007A"/>
-            <path d="M12 2v4M12 18v4" stroke="#00FF66" stroke-width="1.8"/>
-          </svg>
-          <span class="zw-dock-label" id="zw-dock-agent-label">AGENT</span>
+        <!-- 4. Pixel Vision Icon (Indicates AI Monitoring ON / OFF) -->
+        <button class="zw-dock-btn" id="zw-dock-agent" title="AI Vision Activity Monitor">
+          <span id="zw-dock-vision-icon-wrap"></span>
+          <span class="zw-dock-label" id="zw-dock-agent-label">VISION</span>
         </button>
 
         <!-- 5. Minimize / Expand Toggle -->
@@ -1303,11 +1411,12 @@
         chrome.storage?.sync?.set({ dataRestructuring: this.settings.dataRestructuring });
         if (this.settings.dataRestructuring) {
           this.applyDataRestructuring();
-          this.showToast("✓ Webpage restructured into scannable bullet cards!");
+          this.showToast("✓ ZenWeb Mode: ON");
         } else {
           this.removeDataRestructuring();
-          this.showToast("Original webpage text restored.");
+          this.showToast("ZenWeb Mode: OFF (Native page restored)");
         }
+        this.updateDockState();
       });
 
       dock.querySelector('#zw-dock-agent').addEventListener('click', () => {
@@ -1318,8 +1427,8 @@
           chrome.storage?.sync?.set({ screenActivityMonitoring: this.settings.screenActivityMonitoring });
           this.updateDockState();
           this.showToast(this.settings.screenActivityMonitoring
-            ? "✓ AI Screen Activity Monitor: ACTIVE"
-            : "AI Screen Activity Monitor: PAUSED");
+            ? "✓ AI Vision Activity Monitor: ON"
+            : "AI Vision Activity Monitor: OFF");
         }
       });
 
@@ -1330,22 +1439,44 @@
       const dock = document.getElementById('zenweb-dock');
       if (!dock) return;
 
+      const toggleBtn = dock.querySelector('#zw-dock-restructure');
+      const toggleLabel = dock.querySelector('#zw-dock-toggle-label');
+      const toggleIconWrap = dock.querySelector('#zw-dock-toggle-icon-wrap');
+
       const agentBtn = dock.querySelector('#zw-dock-agent');
       const agentLabel = dock.querySelector('#zw-dock-agent-label');
-      const restructureBtn = dock.querySelector('#zw-dock-restructure');
+      const visionIconWrap = dock.querySelector('#zw-dock-vision-icon-wrap');
 
-      if (this.settings.screenMonitoringPermission && this.settings.screenActivityMonitoring !== false) {
-        agentBtn?.classList.add('zw-dock-active');
-        if (agentLabel) agentLabel.textContent = 'ACTIVE';
+      // 3. Update Pixel On/Off Toggle (Title: ON or OFF)
+      const isRestructureOn = this.settings?.dataRestructuring !== false;
+      if (toggleIconWrap) {
+        toggleIconWrap.innerHTML = this.getTogglePixelSVG(isRestructureOn);
+      }
+      if (toggleLabel) {
+        toggleLabel.textContent = isRestructureOn ? 'ON' : 'OFF';
+      }
+      if (isRestructureOn) {
+        toggleBtn?.classList.add('zw-dock-active');
+        toggleBtn?.setAttribute('title', 'Focus Restructuring: ON (Click to Turn OFF)');
       } else {
-        agentBtn?.classList.remove('zw-dock-active');
-        if (agentLabel) agentLabel.textContent = 'PAUSED';
+        toggleBtn?.classList.remove('zw-dock-active');
+        toggleBtn?.setAttribute('title', 'Focus Restructuring: OFF (Click to Turn ON)');
       }
 
-      if (this.settings.dataRestructuring !== false) {
-        restructureBtn?.classList.add('zw-dock-active');
+      // 4. Update Pixel Vision Icon (Indicates AI Monitoring ON or OFF)
+      const isVisionActive = this.settings?.screenMonitoringPermission && this.settings?.screenActivityMonitoring !== false;
+      if (visionIconWrap) {
+        visionIconWrap.innerHTML = this.getVisionPixelSVG(isVisionActive);
+      }
+      if (agentLabel) {
+        agentLabel.textContent = isVisionActive ? 'VISION' : 'OFF';
+      }
+      if (isVisionActive) {
+        agentBtn?.classList.add('zw-dock-active');
+        agentBtn?.setAttribute('title', 'AI Vision Monitor: ON (Click to Pause)');
       } else {
-        restructureBtn?.classList.remove('zw-dock-active');
+        agentBtn?.classList.remove('zw-dock-active');
+        agentBtn?.setAttribute('title', 'AI Vision Monitor: OFF (Click to Enable)');
       }
     }
 

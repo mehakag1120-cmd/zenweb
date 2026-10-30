@@ -231,12 +231,12 @@ html[data-zenweb-theme="pixel-dark"] iframe[src*="ad"] {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
+  width: 80vw !important;
+  height: 80vh !important;
   z-index: 1 !important;
   pointer-events: none !important;
   contain: strict !important;
-  opacity: 0.92 !important;
+  opacity: 0.70 !important;
   mix-blend-mode: screen !important;
 }
 
@@ -1046,7 +1046,16 @@ html[data-zenweb-theme="pixel-dark"] iframe[src*="ad"] {
 
 .zw-dock-btn svg {
   display: block !important;
+  shape-rendering: crispEdges !important;
+  image-rendering: pixelated !important;
   transition: transform 0.15s ease !important;
+}
+
+#zw-dock-toggle-icon-wrap,
+#zw-dock-vision-icon-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .zw-dock-btn:hover {

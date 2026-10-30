@@ -137,11 +137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Broadcast to all open tabs so every tab synchronizes immediately
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
-        if (tab.id) {
+        if (tab.id && tab.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
           chrome.tabs.sendMessage(tab.id, {
             type: 'UPDATE_SETTINGS',
             settings: currentSettings
-          }).catch(() => {});
+          }, () => {
+            void chrome.runtime.lastError;
+          });
         }
       });
     });
@@ -174,7 +176,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Trigger permission modal on active tab
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
-          chrome.tabs.sendMessage(tabs[0].id, { type: 'REQUEST_PERMISSION_DIALOG' }).catch(() => {});
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'REQUEST_PERMISSION_DIALOG' }, () => {
+            void chrome.runtime.lastError;
+          });
           window.close();
         }
       });
@@ -197,7 +201,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'TRIGGER_MINIGAME_BREAK',
           game: gameSelector.value,
           duration: 90
-        }).catch(() => {});
+        }, () => {
+          void chrome.runtime.lastError;
+        });
         window.close();
       }
     });

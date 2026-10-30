@@ -367,7 +367,7 @@
       this.pixels = [];
       this.gridCrosshairs = [];
       this.strobingHearts = [];
-      this.surfingHearts = [];
+      this.surfingSharks = [];
 
       const theme = this.getActiveThemeKey();
 
@@ -2234,12 +2234,14 @@
     extractCleanText(container = document.body) {
       const clone = container.cloneNode(true);
       clone.querySelectorAll(`
-        script, style, noscript, nav, footer, aside,
+        script, style, noscript, nav, footer, aside, header,
         button, input, textarea, select, form,
         [role="button"], [role="dialog"], [role="tooltip"], [role="navigation"],
         [aria-hidden="true"], .sr-only, .visually-hidden, svg,
         .avatar-upload, .js-user-profile-bio-form, [data-hotkey],
-        [id^="zenweb-"], [class^="zw-"]
+        [id^="zenweb-"], [class^="zw-"],
+        [class*="edition"], [class*="language"], [class*="lang-"], [class*="top-nav"],
+        [class*="header"], [class*="menu"], [class*="masthead"], [class*="branding"]
       `).forEach(el => el.remove());
       return clone.innerText.replace(/\s+/g, ' ').trim();
     }

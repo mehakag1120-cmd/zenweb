@@ -112,15 +112,18 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 function broadcastToActiveTab(message) {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]?.id) {
-      chrome.tabs.sendMessage(tabs[0].id, message).catch(() => {});
+    const tab = tabs[0];
+    if (tab?.id && tab?.url && !tab.url.startsWith('chrome://') && !tab.url.startsWith('chrome-extension://')) {
+      chrome.tabs.sendMessage(tab.id, message, () => {
+        void chrome.runtime.lastError;
+      });
     }
   });
 }
 
 // Context Menu Click Dispatcher
 chrome.contextMenus?.onClicked.addListener((info, tab) => {
-  if (!tab?.id) return;
+  if (!tab?.id || !tab?.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) return;
 
   switch (info.menuItemId) {
     case 'zw-trigger-minigame':
@@ -129,20 +132,20 @@ chrome.contextMenus?.onClicked.addListener((info, tab) => {
         game: 'random',
         duration: 90,
         reason: 'USER_MANUAL'
-      });
+      }, () => { void chrome.runtime.lastError; });
       break;
 
     case 'zw-trigger-water':
       chrome.tabs.sendMessage(tab.id, {
         type: 'TRIGGER_WATER_REMINDER',
         reason: 'USER_MANUAL'
-      });
+      }, () => { void chrome.runtime.lastError; });
       break;
 
     case 'zw-restructure-page':
       chrome.tabs.sendMessage(tab.id, {
         type: 'TOGGLE_RESTRUCTURE'
-      });
+      }, () => { void chrome.runtime.lastError; });
       break;
 
     case 'zw-open-sidepanel':

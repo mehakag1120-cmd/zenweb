@@ -425,17 +425,17 @@ html[data-zenweb-theme="pixel-dark"] th:not([class^="zw-"]):not(.ContributionCal
 }
 
 /* Universal Inline White Background Neutralizer */
-html[data-zenweb-theme="cyberpunk"] [style*="background-color: rgb(255,
+html[data-zenweb-theme="cyberpunk"] [style*="background-color: rgb(255, 255, 255)"],
 html[data-zenweb-theme="pixel-dark"] [style*="background-color: rgb(255, 255, 255)"],
 html[data-zenweb-theme="cyberpunk"] [style*="background-color: #fff"],
 html[data-zenweb-theme="pixel-dark"] [style*="background-color: #fff"],
 html[data-zenweb-theme="cyberpunk"] [style*="background-color: white"],
 html[data-zenweb-theme="pixel-dark"] [style*="background-color: white"],
-html[data-zenweb-theme="cyberpunk"] [style*="background: rgb(255,
+html[data-zenweb-theme="cyberpunk"] [style*="background: rgb(255, 255, 255)"],
 html[data-zenweb-theme="pixel-dark"] [style*="background: rgb(255, 255, 255)"],
 html[data-zenweb-theme="cyberpunk"] [style*="background: #fff"],
 html[data-zenweb-theme="pixel-dark"] [style*="background: #fff"],
-html[data-zenweb-theme="cyberpunk"] [style*="background: white"] ,
+html[data-zenweb-theme="cyberpunk"] [style*="background: white"],
 html[data-zenweb-theme="pixel-dark"] [style*="background: white"] {
   background-color: transparent !important;
   background-image: none !important;

@@ -1,13 +1,14 @@
 /**
- * ZenWeb Pixel-Digital Stylesheet (v2.2)
+ * ZenWeb Pixel-Digital Stylesheet (v2.3)
  * Inspired by books.baseten.com: Sliding pixel aesthetics, anti-aliased transitions,
  * cohesive white-grey-black palette with electric green (#00FF66) and cyber pink (#FF007A) accents.
+ * Complete Contrast Specificity Engine for universal dark mode readability.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 /* ==========================================================================
-   1. DIGITAL COLOR TOKENS & DESIGN SYSTEM
+   1. DESIGN TOKENS & COLOR PALETTE
    ========================================================================== */
 
 :root {
@@ -16,7 +17,7 @@
   --zw-gray-surface: #181926;
   --zw-gray-card: #141520;
   --zw-gray-border: #272a3d;
-  --zw-gray-light: #8f96a3;
+  --zw-gray-light: #9499aa;
   --zw-white: #f4f6fb;
   --zw-green: #00FF66;
   --zw-green-glow: rgba(0, 255, 102, 0.25);
@@ -32,52 +33,36 @@
 }
 
 /* ==========================================================================
-   2. RESTRUCTURED WEBPAGE THEME & TYPOGRAPHY ENHANCEMENT
+   2. UNIVERSAL CONTRAST & DARK THEME SPECIFICITY ENGINE
+   Ensures text POPs with high contrast against the dark background on ANY site
+   (Times of India, CNN, NYT, Reddit, Wikipedia, Medium, personal blogs).
    ========================================================================== */
 
-html[data-zenweb-theme="pixel-dark"] {
+html[data-zenweb-theme="pixel-dark"],
+html[data-zenweb-theme="pixel-dark"] body {
   background-color: var(--zw-black) !important;
   color: var(--zw-white) !important;
+  font-family: var(--zw-font-primary) !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
 
-html[data-zenweb-theme="pixel-dark"] body {
-  background-color: transparent !important;
-  color: var(--zw-white) !important;
-  font-family: var(--zw-font-primary) !important;
-}
-
-/* Transparent container normalization so sliding pixel canvas is visible */
-html[data-zenweb-theme="pixel-dark"] div:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-console):not(.demo-article),
-html[data-zenweb-theme="pixel-dark"] section:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-console),
-html[data-zenweb-theme="pixel-dark"] article:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-article),
-html[data-zenweb-theme="pixel-dark"] main:not([id^="zenweb-"]):not([class^="zw-"]) {
-  background-color: transparent !important;
-  color: var(--zw-white) !important;
-}
-
-/* Universal text size & line spacing boost for effortless reading */
-html[data-zenweb-theme="pixel-dark"] p:not([class^="zw-"]),
-html[data-zenweb-theme="pixel-dark"] li:not([class^="zw-"]),
-html[data-zenweb-theme="pixel-dark"] blockquote:not([class^="zw-"]),
-html[data-zenweb-theme="pixel-dark"] dd:not([class^="zw-"]) {
-  font-size: 18px !important;
-  line-height: 1.8 !important;
-  letter-spacing: 0.015em !important;
-  color: var(--zw-white) !important;
-  font-family: var(--zw-font-primary) !important;
-}
-
+/* Universal text contrast rules with ultra-high specificity */
 html[data-zenweb-theme="pixel-dark"] h1,
 html[data-zenweb-theme="pixel-dark"] h2,
 html[data-zenweb-theme="pixel-dark"] h3,
-html[data-zenweb-theme="pixel-dark"] h4 {
-  font-family: var(--zw-font-heading) !important;
+html[data-zenweb-theme="pixel-dark"] h4,
+html[data-zenweb-theme="pixel-dark"] h5,
+html[data-zenweb-theme="pixel-dark"] h6,
+html[data-zenweb-theme="pixel-dark"] [class*="title"],
+html[data-zenweb-theme="pixel-dark"] [class*="heading"],
+html[data-zenweb-theme="pixel-dark"] [class*="headline"],
+html[data-zenweb-theme="pixel-dark"] [class*="header"]:not([class^="zw-"]) {
   color: #ffffff !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.3 !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-family: var(--zw-font-heading) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9) !important;
 }
 
 html[data-zenweb-theme="pixel-dark"] h1 {
@@ -86,18 +71,123 @@ html[data-zenweb-theme="pixel-dark"] h1 {
   margin-bottom: 24px !important;
 }
 
-html[data-zenweb-theme="pixel-dark"] a {
+/* Hyperlinks and article titles that are links */
+html[data-zenweb-theme="pixel-dark"] a,
+html[data-zenweb-theme="pixel-dark"] a > *,
+html[data-zenweb-theme="pixel-dark"] [role="link"],
+html[data-zenweb-theme="pixel-dark"] [role="link"] > * {
   color: var(--zw-green) !important;
-  text-decoration-thickness: 1.5px !important;
-  text-underline-offset: 4px !important;
+  -webkit-text-fill-color: var(--zw-green) !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
 }
 
-html[data-zenweb-theme="pixel-dark"] a:hover {
+html[data-zenweb-theme="pixel-dark"] a:hover,
+html[data-zenweb-theme="pixel-dark"] a:hover > *,
+html[data-zenweb-theme="pixel-dark"] [role="link"]:hover,
+html[data-zenweb-theme="pixel-dark"] [role="link"]:hover > * {
   color: var(--zw-pink) !important;
+  -webkit-text-fill-color: var(--zw-pink) !important;
+}
+
+/* Headline links specifically must be ultra-bright white with green on hover */
+html[data-zenweb-theme="pixel-dark"] h1 a,
+html[data-zenweb-theme="pixel-dark"] h2 a,
+html[data-zenweb-theme="pixel-dark"] h3 a,
+html[data-zenweb-theme="pixel-dark"] h4 a,
+html[data-zenweb-theme="pixel-dark"] h5 a,
+html[data-zenweb-theme="pixel-dark"] h6 a,
+html[data-zenweb-theme="pixel-dark"] [class*="headline"] a,
+html[data-zenweb-theme="pixel-dark"] [class*="title"] a,
+html[data-zenweb-theme="pixel-dark"] a[class*="headline"],
+html[data-zenweb-theme="pixel-dark"] a[class*="title"] {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+html[data-zenweb-theme="pixel-dark"] h1 a:hover,
+html[data-zenweb-theme="pixel-dark"] h2 a:hover,
+html[data-zenweb-theme="pixel-dark"] h3 a:hover,
+html[data-zenweb-theme="pixel-dark"] h4 a:hover,
+html[data-zenweb-theme="pixel-dark"] [class*="headline"] a:hover,
+html[data-zenweb-theme="pixel-dark"] [class*="title"] a:hover,
+html[data-zenweb-theme="pixel-dark"] a[class*="headline"]:hover,
+html[data-zenweb-theme="pixel-dark"] a[class*="title"]:hover {
+  color: var(--zw-green) !important;
+  -webkit-text-fill-color: var(--zw-green) !important;
+}
+
+/* Body copy, paragraphs, list items */
+html[data-zenweb-theme="pixel-dark"] p:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] li:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] blockquote:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] dd:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] dt:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="desc"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="summary"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="text"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="body"]:not([class^="zw-"]) {
+  color: var(--zw-white) !important;
+  -webkit-text-fill-color: var(--zw-white) !important;
+  font-family: var(--zw-font-primary) !important;
+}
+
+/* Secondary meta text (dates, author bylines, categories, tags) */
+html[data-zenweb-theme="pixel-dark"] time,
+html[data-zenweb-theme="pixel-dark"] small,
+html[data-zenweb-theme="pixel-dark"] [class*="meta"],
+html[data-zenweb-theme="pixel-dark"] [class*="author"],
+html[data-zenweb-theme="pixel-dark"] [class*="byline"],
+html[data-zenweb-theme="pixel-dark"] [class*="date"],
+html[data-zenweb-theme="pixel-dark"] [class*="category"],
+html[data-zenweb-theme="pixel-dark"] [class*="tag"] {
+  color: var(--zw-gray-light) !important;
+  -webkit-text-fill-color: var(--zw-gray-light) !important;
+}
+
+/* Neutralize blinding white container backgrounds across all page elements */
+html[data-zenweb-theme="pixel-dark"] div:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-console):not(.demo-article),
+html[data-zenweb-theme="pixel-dark"] section:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-console),
+html[data-zenweb-theme="pixel-dark"] article:not([id^="zenweb-"]):not([class^="zw-"]):not(.demo-article),
+html[data-zenweb-theme="pixel-dark"] main:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] nav:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] header:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] aside:not([id^="zenweb-"]):not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] ul:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] ol:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] table:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] tbody:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] tr:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] td:not([class^="zw-"]) {
+  background-color: transparent !important;
+  border-color: var(--zw-gray-border) !important;
+  box-shadow: none !important;
+}
+
+/* Darken website card surfaces so they match the Baseten aesthetic */
+html[data-zenweb-theme="pixel-dark"] [class*="card"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="story"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="item"]:not([class^="zw-"]) {
+  background-color: rgba(18, 19, 28, 0.7) !important;
+  border-color: var(--zw-gray-border) !important;
+}
+
+/* Suppress jarring white ad boxes and intrusive promotional banners */
+html[data-zenweb-theme="pixel-dark"] [class*="ad-"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [class*="ads-"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [id*="ad-"]:not([class^="zw-"]),
+html[data-zenweb-theme="pixel-dark"] [id*="google_ads"],
+html[data-zenweb-theme="pixel-dark"] iframe[src*="doubleclick"],
+html[data-zenweb-theme="pixel-dark"] iframe[src*="ad"] {
+  background-color: var(--zw-gray-dark) !important;
+  border: 1px dashed var(--zw-gray-border) !important;
+  opacity: 0.18 !important;
+  filter: grayscale(1) !important;
 }
 
 /* ==========================================================================
-   3. SLIDING PIXEL BACKGROUND CANVAS
+   3. SLIDING PIXEL BACKGROUND CANVAS (BASETEN AESTHETIC)
    ========================================================================== */
 
 #zenweb-pixel-canvas {
@@ -106,9 +196,11 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  z-index: -1 !important;
+  z-index: 1 !important;
   pointer-events: none !important;
   contain: strict !important;
+  opacity: 0.85 !important;
+  mix-blend-mode: screen !important;
 }
 
 /* ==========================================================================
@@ -156,7 +248,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 .zw-card-meta {
   font-family: var(--zw-font-mono, monospace) !important;
   font-size: 10.5px !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   letter-spacing: 0.05em !important;
 }
 
@@ -256,7 +348,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 .zw-pixel-close {
   all: initial;
   cursor: pointer !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   font-size: 15px !important;
   font-family: sans-serif !important;
   padding: 2px 6px !important;
@@ -337,7 +429,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   width: 100vw !important;
   height: 100vh !important;
   z-index: 2147483646 !important;
-  background: rgba(9, 10, 15, 0.9) !important;
+  background: rgba(9, 10, 15, 0.92) !important;
   backdrop-filter: blur(10px) !important;
   display: flex !important;
   align-items: center !important;
@@ -357,7 +449,6 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   overflow: hidden !important;
 }
 
-/* Permission Request Card */
 .zw-permission-card {
   max-width: 520px !important;
   width: 100% !important;
@@ -370,7 +461,6 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 }
 
 .zw-agent-avatar {
-  font-size: 38px !important;
   width: 64px !important;
   height: 64px !important;
   background: #181926 !important;
@@ -393,7 +483,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 .zw-permission-content p {
   font-size: 14px !important;
   line-height: 1.5 !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   margin-bottom: 14px !important;
 }
 
@@ -430,6 +520,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  gap: 8px !important;
   padding: 11px 18px !important;
   background: var(--zw-green, #00FF66) !important;
   color: #090a0f !important;
@@ -457,6 +548,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  gap: 8px !important;
   padding: 11px 18px !important;
   background: #202234 !important;
   color: var(--zw-white, #f4f6fb) !important;
@@ -493,7 +585,6 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 }
 
 .zw-water-icon {
-  font-size: 40px !important;
   width: 64px !important;
   height: 64px !important;
   border-radius: 8px !important;
@@ -516,7 +607,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 .zw-water-text p {
   font-size: 13.5px !important;
   line-height: 1.5 !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   margin: 0 !important;
 }
 
@@ -553,8 +644,12 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 }
 
 .zw-idle-icon {
-  font-size: 28px !important;
+  width: 36px !important;
+  height: 36px !important;
   flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .zw-idle-text strong {
@@ -565,7 +660,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 
 .zw-idle-text p {
   font-size: 12.5px !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   margin: 4px 0 0 0 !important;
   line-height: 1.4 !important;
 }
@@ -583,7 +678,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   display: inline-flex !important;
   align-items: center !important;
   padding: 8px 12px !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   font-family: var(--zw-font-mono, monospace) !important;
   font-size: 11.5px !important;
   cursor: pointer !important;
@@ -756,7 +851,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   align-items: center !important;
   gap: 10px !important;
   font-size: 12px !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   font-family: var(--zw-font-mono, monospace) !important;
 }
 
@@ -830,7 +925,7 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
 }
 
 /* ==========================================================================
-   8. FLOATING DIGITAL DOCK WIDGET
+   8. BESPOKE HARDWARE REMOTE PANEL (BOTTOM-LEFT CYBER DECK - NO EMOJIS)
    ========================================================================== */
 
 .zw-floating-dock {
@@ -841,19 +936,49 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   z-index: 2147483640 !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  background: var(--zw-gray-dark, #12131c) !important;
+  gap: 6px !important;
+  background: #10121a !important;
   border: 2px solid var(--zw-gray-border, #272a3d) !important;
   border-radius: 8px !important;
   padding: 6px 8px !important;
   box-shadow: 4px 4px 0px #000000 !important;
   font-family: var(--zw-font-mono, monospace) !important;
-  transition: transform 0.2s ease !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  user-select: none !important;
 }
 
 .zw-floating-dock:hover {
   transform: translate(-1px, -1px) !important;
   box-shadow: 6px 6px 0px #000000 !important;
+  border-color: var(--zw-green, #00FF66) !important;
+}
+
+/* Remote Header Badge */
+.zw-dock-brand-badge {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 4px 8px !important;
+  background: #181926 !important;
+  border: 1px solid var(--zw-gray-border, #272a3d) !important;
+  border-radius: 4px !important;
+  margin-right: 4px !important;
+}
+
+.zw-dock-led {
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background: var(--zw-green, #00FF66) !important;
+  box-shadow: 0 0 6px var(--zw-green, #00FF66) !important;
+  animation: zw-blink 1.5s infinite !important;
+}
+
+.zw-dock-brand-text {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  color: var(--zw-green, #00FF66) !important;
+  letter-spacing: 0.1em !important;
 }
 
 .zw-dock-btn {
@@ -862,36 +987,51 @@ html[data-zenweb-theme="pixel-dark"] a:hover {
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 3px !important;
-  padding: 6px 10px !important;
+  gap: 4px !important;
+  min-width: 52px !important;
+  padding: 8px 10px !important;
   border-radius: 4px !important;
   background: #181926 !important;
   color: var(--zw-white, #f4f6fb) !important;
   cursor: pointer !important;
-  border: 1px solid transparent !important;
+  border: 1px solid var(--zw-gray-border, #272a3d) !important;
+  box-shadow: 2px 2px 0px #000000 !important;
   transition: all 0.15s ease !important;
+}
+
+.zw-dock-btn svg {
+  display: block !important;
+  transition: transform 0.15s ease !important;
 }
 
 .zw-dock-btn:hover {
   background: #252839 !important;
   border-color: var(--zw-green, #00FF66) !important;
-  transform: translateY(-1px) !important;
+  transform: translate(-1px, -1px) !important;
+  box-shadow: 3px 3px 0px #000000 !important;
 }
 
-.zw-dock-btn span:first-child {
-  font-size: 16px !important;
+.zw-dock-btn:hover svg {
+  transform: scale(1.1) !important;
+}
+
+.zw-dock-btn:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow: 1px 1px 0px #000000 !important;
 }
 
 .zw-dock-label {
   font-size: 9.5px !important;
   font-weight: 700 !important;
-  color: var(--zw-gray-light, #8f96a3) !important;
+  color: var(--zw-gray-light, #9499aa) !important;
   letter-spacing: 0.05em !important;
+  font-family: var(--zw-font-mono, monospace) !important;
 }
 
 .zw-dock-active {
   border-color: var(--zw-green, #00FF66) !important;
-  background: rgba(0, 255, 102, 0.1) !important;
+  background: rgba(0, 255, 102, 0.12) !important;
+  box-shadow: 0 0 8px rgba(0, 255, 102, 0.25) !important;
 }
 
 .zw-dock-active .zw-dock-label {

@@ -1,5 +1,5 @@
 /**
- * ZenWeb Popup Controller (v2.1)
+ * ZenWeb Popup Controller (v2.3)
  * Live synchronization for 15-min focus reset mini-games, 30-min water reminders,
  * AI Screen Activity Monitor permissions, and page data restructuring.
  */
@@ -111,13 +111,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentSettings = { ...currentSettings, ...updated };
     chrome.storage.sync.set(updated);
 
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          type: 'UPDATE_SETTINGS',
-          settings: currentSettings
-        }).catch(() => {});
-      }
+    // Broadcast to all open tabs so every tab synchronizes immediately
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        if (tab.id) {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'UPDATE_SETTINGS',
+            settings: currentSettings
+          }).catch(() => {});
+        }
+      });
     });
   }
 
@@ -140,7 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Trigger permission modal on active tab
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs[0]?.id) {
-          chrome.tabs.sendMessage(tabs[0].id, { type: 'REQUEST_PERMISSION_DIALOG' });
+          chrome.tabs.sendMessage(tabs[0].id, { type: 'REQUEST_PERMISSION_DIALOG' }).catch(() => {});
           window.close();
         }
       });
@@ -163,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'TRIGGER_MINIGAME_BREAK',
           game: gameSelector.value,
           duration: 90
-        });
+        }).catch(() => {});
         window.close();
       }
     });
